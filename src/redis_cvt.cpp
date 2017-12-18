@@ -49,6 +49,8 @@ int RedisJob::convert_req() {
     }
 
     this->req_desc = &(it->second);
+    cmd = this->req_desc->ssdb_cmd;
+
     return 0;
 }
 

@@ -49,21 +49,19 @@ int VcClientConn::DealMessage() {
     int64_t start_us = slash::NowMicros();
 
     RedisJob request(argv_);
+    request.convert_req();
 
     if(log_level() >= Logger::LEVEL_DEBUG) {
         log_debug("[receive] req: %s", serialize_req(request.req).c_str());
     }
 
-    std::string &cmdName = argv_[0];
-    slash::StringToLower(cmdName);
-
-    Command *cmd = server->proc_map.get_proc(Bytes(cmdName));
+    std::string &cmdName = request.cmd;
+    Command *cmd = server->proc_map.get_proc(Bytes(slash::StringToLower(cmdName)));
     if (!cmd) {
         ReplyError("command not found");
         return -2;
     }
 
-    request.convert_req();
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
     request.convert_resq();
 

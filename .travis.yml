@@ -1,0 +1,40 @@
+language: cpp
+sudo: enabled
+compiler: gcc
+
+before_install:
+  - sudo apt-get -qq update
+#  - sudo apt-get install -y libxml2-dev
+
+os:
+  - linux
+
+addons:
+  apt:
+    packages:
+    - cmake
+    - cmake-data
+    - make
+    - autoconf
+    - g++
+
+script:
+#prepare
+  - mkdir build
+  - export PATH=$PATH:$PWD/build
+
+  - sh build-deps.sh
+#build
+
+  - cd build
+  - cmake ..
+  - make -j8
+  - cd ../
+
+#test
+
+#done
+
+env:
+  global:
+    - MAKEFLAGS="-j 8"

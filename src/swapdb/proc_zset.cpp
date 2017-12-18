@@ -345,13 +345,13 @@ static int _zincr(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, 
     int flags = ZADD_NONE;
     flags |= ZADD_INCR;
 
-    double score = req[3].Double();
+    double score = req[2].Double();
     if (errno == EINVAL){
         reply_err_return(INVALID_DBL);
     }
 
     double new_val = 0;
-    int ret = ssdb->zincr(ctx, req[1], req[2], dir * score, flags, &new_val);
+    int ret = ssdb->zincr(ctx, req[1], req[3], dir * score, flags, &new_val);
     if (ret < 0){
         reply_err_return(ret);
     }
@@ -375,11 +375,6 @@ static int _zincr(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, 
 int proc_zincr(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
 	return _zincr(ctx, serv->ssdb, req, resp, 1);
-}
-
-int proc_zdecr(Context &ctx, const Request &req, Response *resp){
-	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	return _zincr(ctx, serv->ssdb, req, resp, -1);
 }
 
 int proc_zcount(Context &ctx, const Request &req, Response *resp){

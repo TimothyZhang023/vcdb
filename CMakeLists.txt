@@ -33,14 +33,15 @@ SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build")
 
 
 INCLUDE_DIRECTORIES(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/swapdb
+
         ${SLASH_PATH}/
         ${PINK_PATH}/
         ${JEMALLOC_PATH}/include
         ${ROCKSDB_PATH}/include
         ${ROCKSDB_PATH}
         ${ZLIB_PATH}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/swapdb
 )
 
 
@@ -65,7 +66,6 @@ set(PINK_SOURCE_FILES
         deps/pink/pink/src/pink_cli.cc
         deps/pink/pink/src/pink_conn.cc
         deps/pink/pink/src/pink_epoll.cc
-        deps/pink/pink/src/pink_item.cc
         deps/pink/pink/src/pink_thread.cc
         deps/pink/pink/src/pink_util.cc
         deps/pink/pink/src/redis_cli.cc
@@ -75,6 +75,8 @@ set(PINK_SOURCE_FILES
         deps/pink/pink/src/simple_http_conn.cc
         deps/pink/pink/src/worker_thread.cc
         )
+ADD_LIBRARY(libpink STATIC ${PINK_SOURCE_FILES})
+set_target_properties(libpink PROPERTIES LINKER_LANGUAGE CXX OUTPUT_NAME "pink")
 
 set(SLASH_SOURCE_FILES
         deps/slash/slash/src/base_conf.cc
@@ -93,6 +95,8 @@ set(SLASH_SOURCE_FILES
         deps/slash/slash/src/testutil.cc
         )
 
+ADD_LIBRARY(libslash STATIC ${SLASH_SOURCE_FILES})
+set_target_properties(libslash PROPERTIES LINKER_LANGUAGE CXX OUTPUT_NAME "slash")
 
 SET(RDB_OBJS
         src/swapdb/redis/crc/crc64speed.c

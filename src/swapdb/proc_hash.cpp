@@ -254,7 +254,7 @@ int proc_hscan(Context &ctx, const Request &req, Response *resp) {
 
 
 int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(5);
+    CHECK_NUM_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 //	uint64_t limit = recv_bytes[4].Uint64();
@@ -283,7 +283,7 @@ int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hvals(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(5);
+    CHECK_NUM_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 //	uint64_t limit = recv_bytes[4].Uint64();

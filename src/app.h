@@ -6,12 +6,14 @@
 #define VCDB_APP_H
 
 
-
 #include <atomic>
+#include <string>
 
 static std::atomic<bool> running(false);
 
 void IntSigHandle(int sig);
+
+class Config;
 
 class App {
 public:
@@ -22,9 +24,9 @@ public:
 
     int usage(int argc, char **argv);
     int parse(int argc, char **argv);
-    int entrance(int argc, char **argv);
 
     int run();
+    int init();
 
     void signalSetup();
 
@@ -44,7 +46,16 @@ private:
     };
 
     AppArgs app_args;
+    Config *conf;
 
+    int go();
+
+
+    int read_pid();
+    void write_pid();
+    void check_pidfile();
+    void remove_pidfile();
+    void kill_process();
 };
 
 

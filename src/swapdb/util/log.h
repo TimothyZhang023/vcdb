@@ -6,6 +6,10 @@ found in the LICENSE file.
 #ifndef UTIL_LOG_H
 #define UTIL_LOG_H
 
+/**disable slash log*/
+
+#define __XDEBUG_H_
+
 #include <inttypes.h>
 #include <unistd.h>
 #include <stdarg.h>
@@ -103,33 +107,24 @@ void set_log_level(const char *s);
 int log_write(int level, const char *fmt, ...);
 FILE * log_fd();
 
-#ifndef IOS
-	#ifdef NDEBUG
-		#define log_trace(fmt, args...) do{}while(0)
-	#else
-		#define log_trace(fmt, args...)	\
-			log_write(Logger::LEVEL_TRACE, "%s(%d): " fmt, __FILE__, __LINE__, ##args)
-	#endif
-
-	#define log_debug(fmt, args...)	\
-		log_write(Logger::LEVEL_DEBUG, "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
-	#define log_info(fmt, args...)	\
-		log_write(Logger::LEVEL_INFO,  "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
-	#define log_warn(fmt, args...)	\
-		log_write(Logger::LEVEL_WARN,  "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
-	#define log_error(fmt, args...)	\
-		log_write(Logger::LEVEL_ERROR, "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
-	#define log_fatal(fmt, args...)	\
-		log_write(Logger::LEVEL_FATAL, "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
-#else
+#ifdef NDEBUG
 	#define log_trace(fmt, args...) do{}while(0)
-	#define log_debug(fmt, args...) do{}while(0)
-	#define log_info(fmt, args...) do{}while(0)
-	#define log_warn(fmt, args...) do{}while(0)
-	#define log_error(fmt, args...) do{}while(0)
-	#define log_fatal(fmt, args...) do{}while(0)
+#else
+	#define log_trace(fmt, args...)	\
+		log_write(Logger::LEVEL_TRACE, "%s(%d): " fmt, __FILE__, __LINE__, ##args)
 #endif
 
+
+#define log_debug(fmt, args...)	\
+	log_write(Logger::LEVEL_DEBUG, "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
+#define log_info(fmt, args...)	\
+	log_write(Logger::LEVEL_INFO,  "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
+#define log_warn(fmt, args...)	\
+	log_write(Logger::LEVEL_WARN,  "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
+#define log_error(fmt, args...)	\
+	log_write(Logger::LEVEL_ERROR, "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
+#define log_fatal(fmt, args...)	\
+	log_write(Logger::LEVEL_FATAL, "%s:%d " fmt, __FILENAME__, __LINE__, ##args)
 
 //#define NET_DEBUG ON
 
