@@ -16,3 +16,6 @@
 [submodule "deps/snappy"]
 	path = deps/snappy
 	url = https://github.com/google/snappy.git
+[submodule "deps/bzip2"]
+	path = deps/bzip2
+	url = https://github.com/osrf/bzip2_cmake.git

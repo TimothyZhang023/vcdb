@@ -10,6 +10,7 @@ SET(JEMALLOC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/jemalloc)
 SET(ROCKSDB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/rocksdb)
 SET(SNAPPY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/snappy)
 SET(ZLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib)
+SET(BZIP2_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/bzip2)
 
 
 # Set a default build type if none was specified
@@ -42,6 +43,7 @@ INCLUDE_DIRECTORIES(
         ${ROCKSDB_PATH}/include
         ${ROCKSDB_PATH}
         ${ZLIB_PATH}
+        ${BZIP2_PATH}
 )
 
 
@@ -51,6 +53,7 @@ LINK_DIRECTORIES(
         ${JEMALLOC_PATH}/lib/
         ${ROCKSDB_PATH}/
         ${SNAPPY_PATH}/
+        ${BZIP2_PATH}/
 )
 
 
@@ -159,4 +162,4 @@ set(SOURCE_FILES ${SWAPDB_SOURCE_FILES} src/main.cpp src/redis_cvt.cpp src/app.c
 
 add_executable(vcdb ${SOURCE_FILES})
 
-TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb librdb snappy z)
+TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb librdb snappy z bz2)

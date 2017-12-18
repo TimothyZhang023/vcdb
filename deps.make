@@ -69,6 +69,10 @@ ifndef ROCKSDB_PATH
 ROCKSDB_PATH = $(THIRD_PATH)/rocksdb
 endif
 
+ifndef BZIP2_PATH
+BZIP2_PATH = $(THIRD_PATH)/bzip2
+endif
+
 
 #-----------------------------------------------
 
@@ -120,6 +124,10 @@ zlib:
 	cd $(ZLIB_PATH) && \
 	    sh configure && \
 	    make -j8
+bzip2:
+	cd $(BZIP2_PATH) && \
+	    cmake . && \
+	    make -j8
 
 rocksdb:
 	cd $(ROCKSDB_PATH) && \
@@ -136,3 +144,4 @@ distclean: clean
 	make -C $(ROCKSDB_PATH)/ clean
 	make -C $(ZLIB_PATH)/ clean
 	make -C $(SNAPPY_PATH)/ clean
+	make -C $(BZIP2_PATH)/ clean
