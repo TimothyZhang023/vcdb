@@ -203,22 +203,22 @@ static RedisCommand_raw cmds_raw[] = {
 
 };
 
-class RedisRequest {
-    std::string cmd;
+class RedisJob {
     RedisRequestDesc *req_desc;
 
     std::vector<std::string> recv_string;
 
 
 public:
-    RedisRequest(const std::vector<std::string> &recv_string);
+    RedisJob(const std::vector<std::string> &recv_string);
     Request req;
     Response response;
+    std::string cmd;
 
     int convert_req();
     int convert_resq();
 
-    virtual ~RedisRequest();
+    virtual ~RedisJob();
 
     Buffer *output;
 

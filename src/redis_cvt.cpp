@@ -9,7 +9,7 @@
 
 
 
-RedisRequest::RedisRequest(const std::vector<std::string> &recv_string) : recv_string(recv_string) {
+RedisJob::RedisJob(const std::vector<std::string> &recv_string) : recv_string(recv_string) {
     for (const auto &t : recv_string) {
         req.emplace_back(t);
     }
@@ -20,12 +20,12 @@ RedisRequest::RedisRequest(const std::vector<std::string> &recv_string) : recv_s
 
 }
 
-RedisRequest::~RedisRequest() {
+RedisJob::~RedisJob() {
 
     delete output;
 }
 
-int RedisRequest::convert_req() {
+int RedisJob::convert_req() {
     if(!inited){
         inited = true;
 
@@ -52,7 +52,7 @@ int RedisRequest::convert_req() {
     return 0;
 }
 
-int RedisRequest::convert_resq() {
+int RedisJob::convert_resq() {
     const std::vector<std::string> &resp = response.resp;
 
     if(resp.empty()){

@@ -25,11 +25,30 @@ VcClientConn::~VcClientConn() {
     delete ctx;
 }
 
+int VcClientConn::ReplyError(const std::string& msg) {
+    ExpandWbufTo(static_cast<uint32_t>(msg.size()) + 3);
+
+    memcpy(wbuf_ + wbuf_len_, "-", 1);
+    wbuf_len_ += 1;
+
+    memcpy(wbuf_ + wbuf_len_, msg.data(), static_cast<size_t>(msg.size()));
+    wbuf_len_ += msg.size();
+
+    memcpy(wbuf_ + wbuf_len_, "\r\n", 2);
+    wbuf_len_ += 2;
+
+    set_is_reply(true);
+}
+
 int VcClientConn::DealMessage() {
-    if (argv_.empty()) return -2;
+    if (argv_.empty()) {
+        ReplyError("empty request");
+        return -2;
+    }
+
     int64_t start_us = slash::NowMicros();
 
-    RedisRequest request(argv_);
+    RedisJob request(argv_);
 
     if(log_level() >= Logger::LEVEL_DEBUG) {
         log_debug("[receive] req: %s", serialize_req(request.req).c_str());
@@ -38,9 +57,9 @@ int VcClientConn::DealMessage() {
     std::string &cmdName = argv_[0];
     slash::StringToLower(cmdName);
 
-
     Command *cmd = server->proc_map.get_proc(Bytes(cmdName));
     if (!cmd) {
+        ReplyError("command not found");
         return -2;
     }
 
@@ -64,6 +83,7 @@ int VcClientConn::DealMessage() {
     set_is_reply(true);
     return 0;
 }
+
 
 
 

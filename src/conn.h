@@ -23,6 +23,7 @@ public:
 
 protected:
     int DealMessage() override;
+    int ReplyError(const std::string& msg);
 
 private:
 
