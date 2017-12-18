@@ -1,0 +1,9 @@
+[submodule "deps/pink"]
+	path = deps/pink
+	url = https://github.com/Qihoo360/pink.git
+[submodule "deps/slash"]
+	path = deps/slash
+	url = https://github.com/Qihoo360/slash.git
+[submodule "deps/jemalloc"]
+	path = deps/jemalloc
+	url = https://github.com/jemalloc/jemalloc.git
