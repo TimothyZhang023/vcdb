@@ -4,6 +4,8 @@ A redis compatible storage with  high capacity KV storage
 
 ## Compile
 
+[![Build Status](https://travis-ci.org/TimothyZhang023/vcdb.svg?branch=master)](https://travis-ci.org/TimothyZhang023/vcdb)
+
 ### requirements:  
 ```
 CMake >= 3.1
