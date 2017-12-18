@@ -29,323 +29,324 @@ found in the LICENSE file.
  * enough buffer room to store it. */
 static inline
 int ld2string(char *buf, size_t len, long double value, int humanfriendly) {
-	size_t l;
+    size_t l;
 
-	if (std::isinf(value)) {
-		/* Libc in odd systems (Hi Solaris!) will format infinite in a
+    if (std::isinf(value)) {
+        /* Libc in odd systems (Hi Solaris!) will format infinite in a
          * different way, so better to handle it in an explicit way. */
-		if (len < 5) return 0; /* No room. 5 is "-inf\0" */
-		if (value > 0) {
-			memcpy(buf,"inf",3);
-			l = 3;
-		} else {
-			memcpy(buf,"-inf",4);
-			l = 4;
-		}
-	} else if (humanfriendly) {
-		/* We use 17 digits precision since with 128 bit floats that precision
+        if (len < 5) return 0; /* No room. 5 is "-inf\0" */
+        if (value > 0) {
+            memcpy(buf, "inf", 3);
+            l = 3;
+        } else {
+            memcpy(buf, "-inf", 4);
+            l = 4;
+        }
+    } else if (humanfriendly) {
+        /* We use 17 digits precision since with 128 bit floats that precision
          * after rounding is able to represent most small decimal numbers in a
          * way that is "non surprising" for the user (that is, most small
          * decimal numbers will be represented in a way that when converted
          * back into a string are exactly the same as what the user typed.) */
-		l = snprintf(buf,len,"%.17Lf", value);
-		if (l+1 > len) return 0; /* No room. */
-		/* Now remove trailing zeroes after the '.' */
-		if (strchr(buf,'.') != NULL) {
-			char *p = buf+l-1;
-			while(*p == '0') {
-				p--;
-				l--;
-			}
-			if (*p == '.') l--;
-		}
-	} else {
-		l = snprintf(buf,len,"%.17Lg", value);
-		if (l+1 > len) return 0; /* No room. */
-	}
-	buf[l] = '\0';
-	return l;
+        l = snprintf(buf, len, "%.17Lf", value);
+        if (l + 1 > len) return 0; /* No room. */
+        /* Now remove trailing zeroes after the '.' */
+        if (strchr(buf, '.') != NULL) {
+            char *p = buf + l - 1;
+            while (*p == '0') {
+                p--;
+                l--;
+            }
+            if (*p == '.') l--;
+        }
+    } else {
+        l = snprintf(buf, len, "%.17Lg", value);
+        if (l + 1 > len) return 0; /* No room. */
+    }
+    buf[l] = '\0';
+    return l;
 }
 
 inline static
-int is_empty_str(const char *str){
-	const char *p = str;
-	while(*p && isspace(*p)){
-		p++;
-	}
-	return *p == '\0';
+int is_empty_str(const char *str) {
+    const char *p = str;
+    while (*p && isspace(*p)) {
+        p++;
+    }
+    return *p == '\0';
 }
 
 /* 返回左边不包含空白字符的字符串的指针 */
 inline static
-char *ltrim(const char *str){
-	const char *p = str;
-	while(*p && isspace(*p)){
-		p++;
-	}
-	return (char *)p;
+char *ltrim(const char *str) {
+    const char *p = str;
+    while (*p && isspace(*p)) {
+        p++;
+    }
+    return (char *) p;
 }
 
 /* 返回指向字符串结尾的指针, 会修改字符串内容 */
 inline static
-char *rtrim(char *str){
-	char *p;
-	p = str + strlen(str) - 1;
-	while(p >= str && isspace(*p)){
-		p--;
-	}
-	*(++p) = '\0';
-	return p;
+char *rtrim(char *str) {
+    char *p;
+    p = str + strlen(str) - 1;
+    while (p >= str && isspace(*p)) {
+        p--;
+    }
+    *(++p) = '\0';
+    return p;
 }
 
 /* 返回左边不包含空白字符的字符串的指针 */
 inline static
-char *trim(char *str){
-	char *p;
-	p = ltrim(str);
-	rtrim(p);
-	return p;
+char *trim(char *str) {
+    char *p;
+    p = ltrim(str);
+    rtrim(p);
+    return p;
 }
 
 inline static
-std::string strtrim(const std::string& str) {
-	std::string::size_type pos = str.find_first_not_of(' ');
-	if (pos == std::string::npos)
-	{
-		return str;
-	}
-	std::string::size_type pos2 = str.find_last_not_of(' ');
-	if (pos2 != std::string::npos)
-	{
-		return str.substr(pos, pos2 - pos + 1);
-	}
-	return str.substr(pos);
+std::string strtrim(const std::string &str) {
+    std::string::size_type pos = str.find_first_not_of(' ');
+    if (pos == std::string::npos) {
+        return str;
+    }
+    std::string::size_type pos2 = str.find_last_not_of(' ');
+    if (pos2 != std::string::npos) {
+        return str.substr(pos, pos2 - pos + 1);
+    }
+    return str.substr(pos);
 }
 
 inline static
-void strtolower(std::string *str){
-	std::transform(str->begin(), str->end(), str->begin(), ::tolower);
+void strtolower(std::string *str) {
+    std::transform(str->begin(), str->end(), str->begin(), ::tolower);
 }
 
 inline static
-void strtoupper(std::string *str){
-	std::transform(str->begin(), str->end(), str->begin(), ::toupper);
+void strtoupper(std::string *str) {
+    std::transform(str->begin(), str->end(), str->begin(), ::toupper);
 }
 
 inline static
-std::string real_dirname(const char *filepath){
-	std::string dir;
-	if(filepath[0] != '/'){
-		char buf[1024];
-		char *p = getcwd(buf, sizeof(buf));
-		if(p != NULL){
-			dir.append(p);
-		}
-		dir.append("/");
-	}
+std::string real_dirname(const char *filepath) {
+    std::string dir;
+    if (filepath[0] != '/') {
+        char buf[1024];
+        char *p = getcwd(buf, sizeof(buf));
+        if (p != NULL) {
+            dir.append(p);
+        }
+        dir.append("/");
+    }
 
-	const char *p = strrchr(filepath, '/');
-	if(p != NULL){
-		dir.append(filepath, p - filepath);
-	}
-	return dir;
-}
-
-inline static
-std::string str_escape(const char *s, size_t size){
-	static const char *hex = "0123456789abcdef";
-	std::string ret;
-	for(size_t i=0; i<size; i++){
-		char c = s[i];
-		switch(c){
-			case '\r':
-				ret.append("\\r");
-				break;
-			case '\n':
-				ret.append("\\n");
-				break;
-			case '\t':
-				ret.append("\\t");
-				break;
-			case '\\':
-				ret.append("\\\\");
-				break;
-			case ' ':
-				ret.push_back(c);
-				break;
-			default:
-				if(c >= '!' && c <= '~'){
-					ret.push_back(c);
-				}else{
-					ret.append("\\x");
-					unsigned char d = (unsigned char) c;
-					ret.push_back(hex[d >> 4]);
-					ret.push_back(hex[d & 0x0f]);
-				}
-				break;
-		}
-	}
-	return ret;
-}
-
-inline static
-std::string str_escape(const std::string &s){
-	return str_escape(s.data(), (int)s.size());
-}
-
-inline static
-int hex_int(char c){
-	if(c >= '0' && c <= '9'){
-		return c - '0';
-	}else{
-		return c - 'a' + 10;
-	}
-}
-
-inline static
-std::string str_unescape(const char *s, int size){
-	std::string ret;
-	for(int i=0; i<size; i++){
-		char c = s[i];
-		if(c != '\\'){
-			ret.push_back(c);
-		}else{
-			if(i >= size - 1){
-				continue;
-			}
-			char c2 = s[++i];
-			switch(c2){
-				case 'a':
-					ret.push_back('\a');
-					break;
-				case 'b':
-					ret.push_back('\b');
-					break;
-				case 'f':
-					ret.push_back('\f');
-					break;
-				case 'v':
-					ret.push_back('\v');
-					break;
-				case 'r':
-					ret.push_back('\r');
-					break;
-				case 'n':
-					ret.push_back('\n');
-					break;
-				case 't':
-					ret.push_back('\t');
-					break;
-				case '\\':
-					ret.push_back('\\');
-					break;
-				case 'x':
-					if(i < size - 2){
-						char c3 = s[++i];
-						char c4 = s[++i];
-						ret.push_back((char)((hex_int(c3) << 4) + hex_int(c4)));
-					}
-					break;
-				default:
-					ret.push_back(c2);
-					break;
-			}
-		}
-	}
-	return ret;
-}
-
-inline static
-std::string str_unescape(const std::string &s){
-	return str_unescape(s.data(), (int)s.size());
-}
-
-inline static
-std::string hexmem(const void *p, size_t size){
-	return str_escape((char *)p, size);
-	/*
-	std::string ret;
-	char buf[4];
-	for(int i=0; i<size; i++){
-		char c = ((char *)p)[i];
-		if(isalnum(c) || isprint(c)){
-			ret.append(1, c);
-		}else{
-			switch(c){
-				case '\r':
-					ret.append("\\r", 2);
-					break;
-				case '\n':
-					ret.append("\\n", 2);
-					break;
-				default:
-					sprintf(buf, "\\%02x", (unsigned char)c);
-					ret.append(buf, 3);
-			}
-		}
-	}
-	return ret;
-	*/
+    const char *p = strrchr(filepath, '/');
+    if (p != NULL) {
+        dir.append(filepath, p - filepath);
+    }
+    return dir;
 }
 
 
-template <typename T>
 inline static
-std::string hexstr(const T &t){
-	return hexmem(t.data(), t.size());
+int hex_int(char c) {
+    if (c >= '0' && c <= '9') {
+        return c - '0';
+    } else {
+        return c - 'a' + 10;
+    }
+}
+
+inline static
+std::string str_unescape(const char *s, int size) {
+    std::string ret;
+    for (int i = 0; i < size; i++) {
+        char c = s[i];
+        if (c != '\\') {
+            ret.push_back(c);
+        } else {
+            if (i >= size - 1) {
+                continue;
+            }
+            char c2 = s[++i];
+            switch (c2) {
+                case 'a':
+                    ret.push_back('\a');
+                    break;
+                case 'b':
+                    ret.push_back('\b');
+                    break;
+                case 'f':
+                    ret.push_back('\f');
+                    break;
+                case 'v':
+                    ret.push_back('\v');
+                    break;
+                case 'r':
+                    ret.push_back('\r');
+                    break;
+                case 'n':
+                    ret.push_back('\n');
+                    break;
+                case 't':
+                    ret.push_back('\t');
+                    break;
+                case '\\':
+                    ret.push_back('\\');
+                    break;
+                case 'x':
+                    if (i < size - 2) {
+                        char c3 = s[++i];
+                        char c4 = s[++i];
+                        ret.push_back((char) ((hex_int(c3) << 4) + hex_int(c4)));
+                    }
+                    break;
+                default:
+                    ret.push_back(c2);
+                    break;
+            }
+        }
+    }
+    return ret;
+}
+
+inline static
+std::string str_unescape(const std::string &s) {
+    return str_unescape(s.data(), (int) s.size());
+}
+
+
+inline static
+std::string str_escape(const char *s, size_t size) {
+    static const char *hex = "0123456789abcdef";
+    std::string ret;
+    for (size_t i = 0; i < size; i++) {
+        char c = s[i];
+        switch (c) {
+            case '\r':
+                ret.append("\\r");
+                break;
+            case '\n':
+                ret.append("\\n");
+                break;
+            case '\t':
+                ret.append("\\t");
+                break;
+            case '\\':
+                ret.append("\\\\");
+                break;
+            case ' ':
+                ret.push_back(c);
+                break;
+            default:
+                if (c >= '!' && c <= '~') {
+                    ret.push_back(c);
+                } else {
+                    ret.append("\\x");
+                    unsigned char d = (unsigned char) c;
+                    ret.push_back(hex[d >> 4]);
+                    ret.push_back(hex[d & 0x0f]);
+                }
+                break;
+        }
+    }
+    return ret;
+}
+
+
+inline static
+std::string str_escape(const std::string &s) {
+    return str_escape(s.data(), (int) s.size());
+}
+
+inline static
+std::string hexmem(const void *p, size_t size) {
+    return str_escape((char *) p, size);
+    /*
+    std::string ret;
+    char buf[4];
+    for(int i=0; i<size; i++){
+        char c = ((char *)p)[i];
+        if(isalnum(c) || isprint(c)){
+            ret.append(1, c);
+        }else{
+            switch(c){
+                case '\r':
+                    ret.append("\\r", 2);
+                    break;
+                case '\n':
+                    ret.append("\\n", 2);
+                    break;
+                default:
+                    sprintf(buf, "\\%02x", (unsigned char)c);
+                    ret.append(buf, 3);
+            }
+        }
+    }
+    return ret;
+    */
+}
+
+
+template<typename T>
+inline static
+std::string hexstr(const T &t) {
+    return hexmem(t.data(), t.size());
 }
 
 #define hexcstr(t) hexstr(t).c_str()
 
 // TODO: mem_printf("%5c%d%s", p, size);
 static inline
-void dump(const void *p, int size, const char *msg = NULL){
-	if(msg == NULL){
-		printf("dump <");
-	}else{
-		printf("%s <", msg);
-	}
-	std::string s = hexmem(p, size);
-	printf("%s>\n", s.c_str());
+void dump(const void *p, int size, const char *msg = NULL) {
+    if (msg == NULL) {
+        printf("dump <");
+    } else {
+        printf("%s <", msg);
+    }
+    std::string s = hexmem(p, size);
+    printf("%s>\n", s.c_str());
 }
 
 
 static inline
-std::string str(const char *s){
-	return std::string(s);
+std::string str(const char *s) {
+    return std::string(s);
 }
 
 static inline
-std::string str(int v){
-	char buf[21] = {0};
-	snprintf(buf, sizeof(buf), "%d", v);
-	return std::string(buf);
+std::string str(int v) {
+    char buf[21] = {0};
+    snprintf(buf, sizeof(buf), "%d", v);
+    return std::string(buf);
 }
 
 static inline
-std::string str(int64_t v){
-	char buf[21] = {0};
-	snprintf(buf, sizeof(buf), "%" PRId64 "", v);
-	return std::string(buf);
+std::string str(int64_t v) {
+    char buf[21] = {0};
+    snprintf(buf, sizeof(buf), "%" PRId64 "", v);
+    return std::string(buf);
 }
 
 static inline
-std::string str(uint64_t v){
-	char buf[21] = {0};
-	snprintf(buf, sizeof(buf), "%" PRIu64 "", v);
-	return std::string(buf);
+std::string str(uint64_t v) {
+    char buf[21] = {0};
+    snprintf(buf, sizeof(buf), "%" PRIu64 "", v);
+    return std::string(buf);
 }
 
 static inline
-std::string str(long double v){
-	char buf[256];
-	int len = ld2string(buf,sizeof(buf),v,1);
+std::string str(long double v) {
+    char buf[256];
+    int len = ld2string(buf, sizeof(buf), v, 1);
 
-	return std::string(buf, len);
+    return std::string(buf, len);
 }
 
 static inline
-std::string str(double d){
+std::string str(double d) {
 // 	char dbuf[128], sbuf[128];
 //	int dlen, slen;
 //	if (::isinf(d)) {
@@ -357,138 +358,138 @@ std::string str(double d){
 //		return std::string(dbuf, dlen);
 //	}
 
- 	char buf[128];
-	int len = ld2string(buf,sizeof(buf),d,0);
+    char buf[128];
+    int len = ld2string(buf, sizeof(buf), d, 0);
 
-	return std::string(buf, len);
+    return std::string(buf, len);
 }
 
 static inline
-std::string str(float v){
-	return str((double)v);
+std::string str(float v) {
+    return str((double) v);
 }
 
 
 // all str_to_xx methods set errno on error
 
 static inline
-int str_to_int(const std::string &str){
-	const char *start = str.c_str();
-	char *end;
+int str_to_int(const std::string &str) {
+    const char *start = str.c_str();
+    char *end;
 
-	errno = 0;
-	int ret = (int)strtol(start, &end, 10);
-	// the WHOLE string must be string represented integer
-	if(*end == '\0' && size_t(end - start) == str.size()){
-		errno = 0;
-	}else{
-		// strtoxx do not set errno all the time!
-		if(errno == 0){
-			errno = EINVAL;
-		}
-	}
-	return ret;
+    errno = 0;
+    int ret = (int) strtol(start, &end, 10);
+    // the WHOLE string must be string represented integer
+    if (*end == '\0' && size_t(end - start) == str.size()) {
+        errno = 0;
+    } else {
+        // strtoxx do not set errno all the time!
+        if (errno == 0) {
+            errno = EINVAL;
+        }
+    }
+    return ret;
 }
 
 static inline
-int str_to_int(const char *p, int size){
-	return str_to_int(std::string(p, size));
+int str_to_int(const char *p, int size) {
+    return str_to_int(std::string(p, size));
 }
 
 static inline
-int64_t str_to_int64(const std::string &str){
-	const char *start = str.c_str();
-	char *end;
+int64_t str_to_int64(const std::string &str) {
+    const char *start = str.c_str();
+    char *end;
 
-	errno = 0;
-	int64_t ret = (int64_t)strtoll(start, &end, 10);
-	// the WHOLE string must be string represented integer
-	if(*end == '\0' && size_t(end - start) == str.size()){
-		errno = 0;
-	}else{
-		// strtoxx do not set errno all the time!
-		if(errno == 0){
-			errno = EINVAL;
-		}
-	}
-	return ret;
+    errno = 0;
+    int64_t ret = (int64_t) strtoll(start, &end, 10);
+    // the WHOLE string must be string represented integer
+    if (*end == '\0' && size_t(end - start) == str.size()) {
+        errno = 0;
+    } else {
+        // strtoxx do not set errno all the time!
+        if (errno == 0) {
+            errno = EINVAL;
+        }
+    }
+    return ret;
 }
 
 static inline
-int64_t str_to_int64(const char *p, int size){
-	return str_to_int64(std::string(p, size));
+int64_t str_to_int64(const char *p, int size) {
+    return str_to_int64(std::string(p, size));
 }
 
 static inline
-uint64_t str_to_uint64(const std::string &str){
-	const char *start = str.c_str();
-	char *end;
+uint64_t str_to_uint64(const std::string &str) {
+    const char *start = str.c_str();
+    char *end;
 
-	errno = 0;
-	uint64_t ret = (uint64_t)strtoull(start, &end, 10);
-	// the WHOLE string must be string represented integer
-	if(*end == '\0' && size_t(end - start) == str.size()){
-		errno = 0;
-	}else{
-		// strtoxx do not set errno all the time!
-		if(errno == 0){
-			errno = EINVAL;
-		}
-	}
-	return ret;
+    errno = 0;
+    uint64_t ret = (uint64_t) strtoull(start, &end, 10);
+    // the WHOLE string must be string represented integer
+    if (*end == '\0' && size_t(end - start) == str.size()) {
+        errno = 0;
+    } else {
+        // strtoxx do not set errno all the time!
+        if (errno == 0) {
+            errno = EINVAL;
+        }
+    }
+    return ret;
 }
 
 static inline
-uint64_t str_to_uint64(const char *p, int size){
-	return str_to_uint64(std::string(p, size));
+uint64_t str_to_uint64(const char *p, int size) {
+    return str_to_uint64(std::string(p, size));
 }
 
 static inline
-long double str_to_long_double(const char *s, int slen){
-	char buf[256];
-	long double value;
-	char *eptr;
+long double str_to_long_double(const char *s, int slen) {
+    char buf[256];
+    long double value;
+    char *eptr;
 
-	if (slen >= sizeof(buf)) return 0;
-	memcpy(buf,s,slen);
-	buf[slen] = '\0';
+    if (slen >= sizeof(buf)) return 0;
+    memcpy(buf, s, slen);
+    buf[slen] = '\0';
 
-	errno = 0;
-	value = std::strtold(buf, &eptr);
-	if (isspace(buf[0]) || eptr[0] != '\0' ||
-		(errno == ERANGE &&
-		 (value == HUGE_VAL || value == -HUGE_VAL || value == 0)) ||
-		errno == EINVAL ||
-		std::isnan(value)) {
-		errno = EINVAL; //we set all err  EINVAL here
-		return 0L;
-	}
+    errno = 0;
+    value = std::strtold(buf, &eptr);
+    if (isspace(buf[0]) || eptr[0] != '\0' ||
+        (errno == ERANGE &&
+         (value == HUGE_VAL || value == -HUGE_VAL || value == 0)) ||
+        errno == EINVAL ||
+        std::isnan(value)) {
+        errno = EINVAL; //we set all err  EINVAL here
+        return 0L;
+    }
 
-	return value;
+    return value;
 }
 
 static inline
-double str_to_double(const char *s, int slen){
-	char buf[256];
-	double value;
-	char *eptr;
+double str_to_double(const char *s, int slen) {
+    char buf[256];
+    double value;
+    char *eptr;
 
-	if (slen >= sizeof(buf)) return 0;
-	memcpy(buf,s,slen);
-	buf[slen] = '\0';
+    if (slen >= sizeof(buf)) return 0;
+    memcpy(buf, s, slen);
+    buf[slen] = '\0';
 
-	errno = 0;
-	value = strtod(buf, &eptr);
-	if (isspace(buf[0]) || eptr[0] != '\0' ||
-		(errno == ERANGE &&
-		 (value == HUGE_VAL || value == -HUGE_VAL || value == 0)) ||
-		errno == EINVAL ||
-		std::isnan(value)) {
-		errno = EINVAL; //we set all err  EINVAL here
-		return 0;
-	}
+    errno = 0;
+    value = strtod(buf, &eptr);
+    if (isspace(buf[0]) || eptr[0] != '\0' ||
+        (errno == ERANGE &&
+         (value == HUGE_VAL || value == -HUGE_VAL || value == 0)) ||
+        errno == EINVAL ||
+        std::isnan(value)) {
+        errno = EINVAL; //we set all err  EINVAL here
+        return 0;
+    }
 
-	return value;
+    return value;
 
 //	std::string str(p, size);
 //	const char *start = str.c_str();
@@ -509,84 +510,84 @@ double str_to_double(const char *s, int slen){
 }
 
 static inline
-std::string substr(const std::string &str, int start, int size){
-	if(start < 0){
-		start = (int)str.size() + start;
-	}
-	if(size < 0){
-		// 忽略掉 abs(size) 个字节
-		size = ((int)str.size() + size) - start;
-	}
-	if(start < 0 || size_t(start) >= str.size() || size < 0){
-		return "";
-	}
-	return str.substr(start, size);
+std::string substr(const std::string &str, int start, int size) {
+    if (start < 0) {
+        start = (int) str.size() + start;
+    }
+    if (size < 0) {
+        // 忽略掉 abs(size) 个字节
+        size = ((int) str.size() + size) - start;
+    }
+    if (start < 0 || size_t(start) >= str.size() || size < 0) {
+        return "";
+    }
+    return str.substr(start, size);
 }
 
 static inline
-std::string str_slice(const std::string &str, int start, int end){
-	if(start < 0){
-		start = (int)str.size() + start;
-	}
-	int size;
-	if(end < 0){
-		size = ((int)str.size() + end + 1) - start;
-	}else{
-		size = end - start + 1;
-	}
-	if(start < 0 || size_t(start) >= str.size() || size < 0){
-		return "";
-	}
-	return str.substr(start, size);
+std::string str_slice(const std::string &str, int start, int end) {
+    if (start < 0) {
+        start = (int) str.size() + start;
+    }
+    int size;
+    if (end < 0) {
+        size = ((int) str.size() + end + 1) - start;
+    } else {
+        size = end - start + 1;
+    }
+    if (start < 0 || size_t(start) >= str.size() || size < 0) {
+        return "";
+    }
+    return str.substr(start, size);
 }
 
 static inline
-int bitcount(const char *p, int size){
-	int n = 0;
-	for(int i=0; i<size; i++){
-		unsigned char c = (unsigned char)p[i];
-		while(c){
-			n += c & 1;
-			c = c >> 1;
-		}
-	}
-	return n;
+int bitcount(const char *p, int size) {
+    int n = 0;
+    for (int i = 0; i < size; i++) {
+        unsigned char c = (unsigned char) p[i];
+        while (c) {
+            n += c & 1;
+            c = c >> 1;
+        }
+    }
+    return n;
 }
 
 /* Return the number of digits of 'v' when converted to string in radix 10.
  * See ll2string() for more information. */
 static inline
 uint32_t digits10(uint64_t v) {
-	if (v < 10) return 1;
-	if (v < 100) return 2;
-	if (v < 1000) return 3;
-	if (v < 1000000000000UL) {
-		if (v < 100000000UL) {
-			if (v < 1000000) {
-				if (v < 10000) return 4;
-				return 5 + (v >= 100000);
-			}
-			return 7 + (v >= 10000000UL);
-		}
-		if (v < 10000000000UL) {
-			return 9 + (v >= 1000000000UL);
-		}
-		return 11 + (v >= 100000000000UL);
-	}
-	return 12 + digits10(v / 1000000000000UL);
+    if (v < 10) return 1;
+    if (v < 100) return 2;
+    if (v < 1000) return 3;
+    if (v < 1000000000000UL) {
+        if (v < 100000000UL) {
+            if (v < 1000000) {
+                if (v < 10000) return 4;
+                return 5 + (v >= 100000);
+            }
+            return 7 + (v >= 10000000UL);
+        }
+        if (v < 10000000000UL) {
+            return 9 + (v >= 1000000000UL);
+        }
+        return 11 + (v >= 100000000000UL);
+    }
+    return 12 + digits10(v / 1000000000000UL);
 }
 
 /* Like digits10() but for signed values. */
 static inline
 uint32_t sdigits10(int64_t v) {
-	if (v < 0) {
-		/* Abs value of LLONG_MIN requires special handling. */
-		uint64_t uv = (v != LLONG_MIN) ?
-					  (uint64_t)-v : ((uint64_t) LLONG_MAX)+1;
-		return digits10(uv)+1; /* +1 for the minus. */
-	} else {
-		return digits10(v);
-	}
+    if (v < 0) {
+        /* Abs value of LLONG_MIN requires special handling. */
+        uint64_t uv = (v != LLONG_MIN) ?
+                      (uint64_t) -v : ((uint64_t) LLONG_MAX) + 1;
+        return digits10(uv) + 1; /* +1 for the minus. */
+    } else {
+        return digits10(v);
+    }
 }
 
 /* Convert a string into a double. Returns 1 if the string could be parsed
@@ -598,25 +599,25 @@ uint32_t sdigits10(int64_t v) {
  * representing the number are accepted. */
 static inline
 int string2ld(const char *s, size_t slen, long double *dp) {
-	char buf[256];
-	long double value;
-	char *eptr;
+    char buf[256];
+    long double value;
+    char *eptr;
 
-	if (slen >= sizeof(buf)) return 0;
-	memcpy(buf,s,slen);
-	buf[slen] = '\0';
+    if (slen >= sizeof(buf)) return 0;
+    memcpy(buf, s, slen);
+    buf[slen] = '\0';
 
-	errno = 0;
-	value = strtold(buf, &eptr);
-	if (isspace(buf[0]) || eptr[0] != '\0' ||
-		(errno == ERANGE &&
-		 (value == HUGE_VAL || value == -HUGE_VAL || value == 0)) ||
-		errno == EINVAL ||
-		std::isnan(value))
-		return 0;
+    errno = 0;
+    value = strtold(buf, &eptr);
+    if (isspace(buf[0]) || eptr[0] != '\0' ||
+        (errno == ERANGE &&
+         (value == HUGE_VAL || value == -HUGE_VAL || value == 0)) ||
+        errno == EINVAL ||
+        std::isnan(value))
+        return 0;
 
-	if (dp) *dp = value;
-	return 1;
+    if (dp) *dp = value;
+    return 1;
 }
 
 
@@ -633,356 +634,358 @@ int string2ld(const char *s, size_t slen, long double *dp) {
  * designed for unsigned integers. */
 static inline
 int ll2string(char *dst, size_t dstlen, long long svalue) {
-	static const char digits[201] =
-			"0001020304050607080910111213141516171819"
-					"2021222324252627282930313233343536373839"
-					"4041424344454647484950515253545556575859"
-					"6061626364656667686970717273747576777879"
-					"8081828384858687888990919293949596979899";
-	int negative;
-	unsigned long long value;
+    static const char digits[201] =
+            "0001020304050607080910111213141516171819"
+                    "2021222324252627282930313233343536373839"
+                    "4041424344454647484950515253545556575859"
+                    "6061626364656667686970717273747576777879"
+                    "8081828384858687888990919293949596979899";
+    int negative;
+    unsigned long long value;
 
-	/* The main loop works with 64bit unsigned integers for simplicity, so
+    /* The main loop works with 64bit unsigned integers for simplicity, so
      * we convert the number here and remember if it is negative. */
-	if (svalue < 0) {
-		if (svalue != LLONG_MIN) {
-			value = -svalue;
-		} else {
-			value = ((unsigned long long) LLONG_MAX)+1;
-		}
-		negative = 1;
-	} else {
-		value = svalue;
-		negative = 0;
-	}
+    if (svalue < 0) {
+        if (svalue != LLONG_MIN) {
+            value = -svalue;
+        } else {
+            value = ((unsigned long long) LLONG_MAX) + 1;
+        }
+        negative = 1;
+    } else {
+        value = svalue;
+        negative = 0;
+    }
 
-	/* Check length. */
-	uint32_t const length = digits10(value)+negative;
-	if (length >= dstlen) return 0;
+    /* Check length. */
+    uint32_t const length = digits10(value) + negative;
+    if (length >= dstlen) return 0;
 
-	/* Null term. */
-	uint32_t next = length;
-	dst[next] = '\0';
-	next--;
-	while (value >= 100) {
-		int const i = (value % 100) * 2;
-		value /= 100;
-		dst[next] = digits[i + 1];
-		dst[next - 1] = digits[i];
-		next -= 2;
-	}
+    /* Null term. */
+    uint32_t next = length;
+    dst[next] = '\0';
+    next--;
+    while (value >= 100) {
+        int const i = (value % 100) * 2;
+        value /= 100;
+        dst[next] = digits[i + 1];
+        dst[next - 1] = digits[i];
+        next -= 2;
+    }
 
-	/* Handle last 1-2 digits. */
-	if (value < 10) {
-		dst[next] = '0' + (uint32_t) value;
-	} else {
-		int i = (uint32_t) value * 2;
-		dst[next] = digits[i + 1];
-		dst[next - 1] = digits[i];
-	}
+    /* Handle last 1-2 digits. */
+    if (value < 10) {
+        dst[next] = '0' + (uint32_t) value;
+    } else {
+        int i = (uint32_t) value * 2;
+        dst[next] = digits[i + 1];
+        dst[next - 1] = digits[i];
+    }
 
-	/* Add sign. */
-	if (negative) dst[0] = '-';
-	return length;
+    /* Add sign. */
+    if (negative) dst[0] = '-';
+    return length;
 }
 
 static inline
 int string2ll(const char *s, size_t slen, long long *value) {
-	const char *p = s;
-	size_t plen = 0;
-	int negative = 0;
-	unsigned long long v;
+    const char *p = s;
+    size_t plen = 0;
+    int negative = 0;
+    unsigned long long v;
 
-	if (plen == slen)
-		return 0;
+    if (plen == slen)
+        return 0;
 
-	/* Special case: first and only digit is 0. */
-	if (slen == 1 && p[0] == '0') {
-		if (value != NULL) *value = 0;
-		return 1;
-	}
+    /* Special case: first and only digit is 0. */
+    if (slen == 1 && p[0] == '0') {
+        if (value != NULL) *value = 0;
+        return 1;
+    }
 
-	if (p[0] == '-') {
-		negative = 1;
-		p++; plen++;
+    if (p[0] == '-') {
+        negative = 1;
+        p++;
+        plen++;
 
-		/* Abort on only a negative sign. */
-		if (plen == slen)
-			return 0;
-	}
+        /* Abort on only a negative sign. */
+        if (plen == slen)
+            return 0;
+    }
 
-	/* First digit should be 1-9, otherwise the string should just be 0. */
-	if (p[0] >= '1' && p[0] <= '9') {
-		v = p[0]-'0';
-		p++; plen++;
-	} else if (p[0] == '0' && slen == 1) {
-		*value = 0;
-		return 1;
-	} else {
-		return 0;
-	}
+    /* First digit should be 1-9, otherwise the string should just be 0. */
+    if (p[0] >= '1' && p[0] <= '9') {
+        v = p[0] - '0';
+        p++;
+        plen++;
+    } else if (p[0] == '0' && slen == 1) {
+        *value = 0;
+        return 1;
+    } else {
+        return 0;
+    }
 
-	while (plen < slen && p[0] >= '0' && p[0] <= '9') {
-		if (v > (ULLONG_MAX / 10)) /* Overflow. */
-			return 0;
-		v *= 10;
+    while (plen < slen && p[0] >= '0' && p[0] <= '9') {
+        if (v > (ULLONG_MAX / 10)) /* Overflow. */
+            return 0;
+        v *= 10;
 
-		if (v > (ULLONG_MAX - (p[0]-'0'))) /* Overflow. */
-			return 0;
-		v += p[0]-'0';
+        if (v > (ULLONG_MAX - (p[0] - '0'))) /* Overflow. */
+            return 0;
+        v += p[0] - '0';
 
-		p++; plen++;
-	}
+        p++;
+        plen++;
+    }
 
-	/* Return if not all bytes were used. */
-	if (plen < slen)
-		return 0;
+    /* Return if not all bytes were used. */
+    if (plen < slen)
+        return 0;
 
-	if (negative) {
-		if (v > ((unsigned long long)(-(LLONG_MIN+1))+1)) /* Overflow. */
-			return 0;
-		if (value != NULL) *value = -v;
-	} else {
-		if (v > LLONG_MAX) /* Overflow. */
-			return 0;
-		if (value != NULL) *value = v;
-	}
-	return 1;
+    if (negative) {
+        if (v > ((unsigned long long) (-(LLONG_MIN + 1)) + 1)) /* Overflow. */
+            return 0;
+        if (value != NULL) *value = -v;
+    } else {
+        if (v > LLONG_MAX) /* Overflow. */
+            return 0;
+        if (value != NULL) *value = v;
+    }
+    return 1;
 }
 
 /* Glob-style pattern matching. */
 static inline
 int stringmatchlen(const char *pattern, int patternLen,
-				   const char *string, int stringLen, int nocase)
-{
-	while(patternLen) {
-		switch(pattern[0]) {
-			case '*':
-				while (pattern[1] == '*') {
-					pattern++;
-					patternLen--;
-				}
-				if (patternLen == 1)
-					return 1; /* match */
-				while(stringLen) {
-					if (stringmatchlen(pattern+1, patternLen-1,
-									   string, stringLen, nocase))
-						return 1; /* match */
-					string++;
-					stringLen--;
-				}
-				return 0; /* no match */
-				break;
-			case '?':
-				if (stringLen == 0)
-					return 0; /* no match */
-				string++;
-				stringLen--;
-				break;
-			case '[':
-			{
-				int no_t, match;
+                   const char *string, int stringLen, int nocase) {
+    while (patternLen) {
+        switch (pattern[0]) {
+            case '*':
+                while (pattern[1] == '*') {
+                    pattern++;
+                    patternLen--;
+                }
+                if (patternLen == 1)
+                    return 1; /* match */
+                while (stringLen) {
+                    if (stringmatchlen(pattern + 1, patternLen - 1,
+                                       string, stringLen, nocase))
+                        return 1; /* match */
+                    string++;
+                    stringLen--;
+                }
+                return 0; /* no match */
+                break;
+            case '?':
+                if (stringLen == 0)
+                    return 0; /* no match */
+                string++;
+                stringLen--;
+                break;
+            case '[': {
+                int no_t, match;
 
-				pattern++;
-				patternLen--;
-				no_t = pattern[0] == '^';
-				if (no_t) {
-					pattern++;
-					patternLen--;
-				}
-				match = 0;
-				while(1) {
-					if (pattern[0] == '\\') {
-						pattern++;
-						patternLen--;
-						if (pattern[0] == string[0])
-							match = 1;
-					} else if (pattern[0] == ']') {
-						break;
-					} else if (patternLen == 0) {
-						pattern--;
-						patternLen++;
-						break;
-					} else if (pattern[1] == '-' && patternLen >= 3) {
-						int start = pattern[0];
-						int end = pattern[2];
-						int c = string[0];
-						if (start > end) {
-							int t = start;
-							start = end;
-							end = t;
-						}
-						if (nocase) {
-							start = tolower(start);
-							end = tolower(end);
-							c = tolower(c);
-						}
-						pattern += 2;
-						patternLen -= 2;
-						if (c >= start && c <= end)
-							match = 1;
-					} else {
-						if (!nocase) {
-							if (pattern[0] == string[0])
-								match = 1;
-						} else {
-							if (tolower((int)pattern[0]) == tolower((int)string[0]))
-								match = 1;
-						}
-					}
-					pattern++;
-					patternLen--;
-				}
-				if (no_t)
-					match = !match;
-				if (!match)
-					return 0; /* no match */
-				string++;
-				stringLen--;
-				break;
-			}
-			case '\\':
-				if (patternLen >= 2) {
-					pattern++;
-					patternLen--;
-				}
-				/* fall through */
-			default:
-				if (!nocase) {
-					if (pattern[0] != string[0])
-						return 0; /* no match */
-				} else {
-					if (tolower((int)pattern[0]) != tolower((int)string[0]))
-						return 0; /* no match */
-				}
-				string++;
-				stringLen--;
-				break;
-		}
-		pattern++;
-		patternLen--;
-		if (stringLen == 0) {
-			while(*pattern == '*') {
-				pattern++;
-				patternLen--;
-			}
-			break;
-		}
-	}
-	if (patternLen == 0 && stringLen == 0)
-		return 1;
-	return 0;
+                pattern++;
+                patternLen--;
+                no_t = pattern[0] == '^';
+                if (no_t) {
+                    pattern++;
+                    patternLen--;
+                }
+                match = 0;
+                while (1) {
+                    if (pattern[0] == '\\') {
+                        pattern++;
+                        patternLen--;
+                        if (pattern[0] == string[0])
+                            match = 1;
+                    } else if (pattern[0] == ']') {
+                        break;
+                    } else if (patternLen == 0) {
+                        pattern--;
+                        patternLen++;
+                        break;
+                    } else if (pattern[1] == '-' && patternLen >= 3) {
+                        int start = pattern[0];
+                        int end = pattern[2];
+                        int c = string[0];
+                        if (start > end) {
+                            int t = start;
+                            start = end;
+                            end = t;
+                        }
+                        if (nocase) {
+                            start = tolower(start);
+                            end = tolower(end);
+                            c = tolower(c);
+                        }
+                        pattern += 2;
+                        patternLen -= 2;
+                        if (c >= start && c <= end)
+                            match = 1;
+                    } else {
+                        if (!nocase) {
+                            if (pattern[0] == string[0])
+                                match = 1;
+                        } else {
+                            if (tolower((int) pattern[0]) == tolower((int) string[0]))
+                                match = 1;
+                        }
+                    }
+                    pattern++;
+                    patternLen--;
+                }
+                if (no_t)
+                    match = !match;
+                if (!match)
+                    return 0; /* no match */
+                string++;
+                stringLen--;
+                break;
+            }
+            case '\\':
+                if (patternLen >= 2) {
+                    pattern++;
+                    patternLen--;
+                }
+                /* fall through */
+            default:
+                if (!nocase) {
+                    if (pattern[0] != string[0])
+                        return 0; /* no match */
+                } else {
+                    if (tolower((int) pattern[0]) != tolower((int) string[0]))
+                        return 0; /* no match */
+                }
+                string++;
+                stringLen--;
+                break;
+        }
+        pattern++;
+        patternLen--;
+        if (stringLen == 0) {
+            while (*pattern == '*') {
+                pattern++;
+                patternLen--;
+            }
+            break;
+        }
+    }
+    if (patternLen == 0 && stringLen == 0)
+        return 1;
+    return 0;
 }
 
 
 static inline
 void random_str(char *s, const int len) {
-	static const char alphanum[] =
-			"0123456789"
-					"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-					"abcdefghijklmnopqrstuvwxyz";
+    static const char alphanum[] =
+            "0123456789"
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    "abcdefghijklmnopqrstuvwxyz";
 
-	for (int i = 0; i < len; ++i) {
-		s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-	}
+    for (int i = 0; i < len; ++i) {
+        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
 
-	s[len] = 0;
+    s[len] = 0;
 }
 
 /* Convert number of bytes into a human readable string of the form:
  * 100B, 2G, 100M, 4K, and so forth. */
 inline std::string bytesToHuman(int64_t n) {
-	double d;
+    double d;
 
-	std::stringstream stream;
+    std::stringstream stream;
 
-	if (n < 0) {
-		stream << "-";
-		n = -n;
-	}
+    if (n < 0) {
+        stream << "-";
+        n = -n;
+    }
 
-	if (n < 1024) {
-		/* Bytes */
-		stream << n << "B";
-	} else if (n < (1024 * 1024)) {
-		d = (double) n / (1024.0);
-		stream << std::fixed << std::setprecision(2);
-		stream << d << "K";
-	} else if (n < (1024LL * 1024 * 1024)) {
-		d = (double) n / (1024.0 * 1024.0);
-		stream << std::fixed << std::setprecision(2);
-		stream << d << "M";
-	} else if (n < (1024LL * 1024 * 1024 * 1024)) {
-		d = (double) n / (1024.0 * 1024.0 * 1024.0);
-		stream << std::fixed << std::setprecision(2);
-		stream << d << "G";
-	}
+    if (n < 1024) {
+        /* Bytes */
+        stream << n << "B";
+    } else if (n < (1024 * 1024)) {
+        d = (double) n / (1024.0);
+        stream << std::fixed << std::setprecision(2);
+        stream << d << "K";
+    } else if (n < (1024LL * 1024 * 1024)) {
+        d = (double) n / (1024.0 * 1024.0);
+        stream << std::fixed << std::setprecision(2);
+        stream << d << "M";
+    } else if (n < (1024LL * 1024 * 1024 * 1024)) {
+        d = (double) n / (1024.0 * 1024.0 * 1024.0);
+        stream << std::fixed << std::setprecision(2);
+        stream << d << "G";
+    }
 
-	return stream.str();
+    return stream.str();
 }
 
 
-inline std::string timestampToHuman(int64_t ts)
-{
-	std::stringstream stream;
+inline std::string timestampToHuman(int64_t ts) {
+    std::stringstream stream;
 
-	if (ts < 0) {
-		stream << "-";
-		ts = -ts;
-	}
+    if (ts < 0) {
+        stream << "-";
+        ts = -ts;
+    }
 
-	if (ts > (1000 * 60 * 60 * 24)) {
-		int day = (int) (ts * 1.0 / (1000 * 60 * 60 * 24 * 1.0));
-		stream << day << "d";
-		ts = ts % (1000 * 60 * 60 * 24);
-	}
+    if (ts > (1000 * 60 * 60 * 24)) {
+        int day = (int) (ts * 1.0 / (1000 * 60 * 60 * 24 * 1.0));
+        stream << day << "d";
+        ts = ts % (1000 * 60 * 60 * 24);
+    }
 
-	if (ts > (1000 * 60 * 60)) {
-		int hour = (int) (ts * 1.0 / (1000 * 60 * 60 * 1.0));
-		stream << hour << "h";
-		ts = ts % (1000 * 60 * 60);
-	}
+    if (ts > (1000 * 60 * 60)) {
+        int hour = (int) (ts * 1.0 / (1000 * 60 * 60 * 1.0));
+        stream << hour << "h";
+        ts = ts % (1000 * 60 * 60);
+    }
 
-	if (ts > (1000 * 60)) {
-		int minute = (int) (ts * 1.0 / (1000 * 60 * 1.0));
-		stream << minute << "m";
-		ts = ts % (1000 * 60);
-	}
+    if (ts > (1000 * 60)) {
+        int minute = (int) (ts * 1.0 / (1000 * 60 * 1.0));
+        stream << minute << "m";
+        ts = ts % (1000 * 60);
+    }
 
 
-	if (ts > (1000)) {
-		int second = (int) (ts * 1.0 / (1000 * 1.0));
-		stream << second << "s";
-		ts = ts % (1000);
-	}
+    if (ts > (1000)) {
+        int second = (int) (ts * 1.0 / (1000 * 1.0));
+        stream << second << "s";
+        ts = ts % (1000);
+    }
 
-	if (ts > (0)) {
-		stream << ts << "ms";
-	}
+    if (ts > (0)) {
+        stream << ts << "ms";
+    }
 
-	return stream.str();
+    return stream.str();
 }
 
 // is big endia. TODO: auto detect
 #if 0
-	#define big_endian(v) (v)
+#define big_endian(v) (v)
 #else
-	static inline
-	uint16_t big_endian(uint16_t v){
-		return (v>>8) | (v<<8);
-	}
 
-	static inline
-	uint32_t big_endian(uint32_t v){
-		return (v >> 24) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | (v << 24);
-	}
+static inline
+uint16_t big_endian(uint16_t v) {
+    return (v >> 8) | (v << 8);
+}
 
-	static inline
-	uint64_t big_endian(uint64_t v){
-		uint32_t h = v >> 32;
-		uint32_t l = v & 0xffffffffull;
-		return big_endian(h) | ((uint64_t)big_endian(l) << 32);
-	}
+static inline
+uint32_t big_endian(uint32_t v) {
+    return (v >> 24) | ((v >> 8) & 0xff00) | ((v << 8) & 0xff0000) | (v << 24);
+}
+
+static inline
+uint64_t big_endian(uint64_t v) {
+    uint32_t h = v >> 32;
+    uint32_t l = v & 0xffffffffull;
+    return big_endian(h) | ((uint64_t) big_endian(l) << 32);
+}
+
 #endif
 
 

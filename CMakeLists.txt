@@ -114,6 +114,8 @@ set_target_properties(librdb PROPERTIES LINKER_LANGUAGE CXX OUTPUT_NAME "rdb")
 
 
 set(SWAPDB_SOURCE_FILES
+        src/swapdb/serv.cpp
+        src/swapdb/proc.cpp
         src/swapdb/proc_hash.cpp
         src/swapdb/proc_kv.cpp
         src/swapdb/proc_list.cpp
@@ -148,7 +150,7 @@ set(SWAPDB_SOURCE_FILES
         )
 
 
-set(SOURCE_FILES ${SWAPDB_SOURCE_FILES} src/main.cpp src/app.cpp src/conn.cpp src/conn.h)
+set(SOURCE_FILES ${SWAPDB_SOURCE_FILES} src/main.cpp src/redis_cvt.cpp src/app.cpp src/conn.cpp src/conn.h)
 
 
 add_executable(vcdb ${SOURCE_FILES})

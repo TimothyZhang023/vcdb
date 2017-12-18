@@ -16,6 +16,7 @@ found in the LICENSE file.
 class Bytes;
 class Config;
 class Iterator;
+class Context;
 
 
 #ifdef USE_LEVELDB

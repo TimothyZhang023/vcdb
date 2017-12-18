@@ -5,8 +5,9 @@
 #include "slash/include/env.h"
 
 #include "conn.h"
+#include "redis_cvt.h"
 
-#include <util/mem.h>
+#include <swapdb/serv.h>
 
 
 static std::map<std::string, std::string> db;
@@ -15,67 +16,55 @@ static std::map<std::string, std::string> db;
 VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread, void *worker_specific_data)
         : RedisConn(fd, ip_port, thread) {
     // Handle worker_specific_data ...
+    server = static_cast<SSDBServer *>(worker_specific_data);
+    ctx = new Context();
+    ctx->serv = server;
 }
 
 VcClientConn::~VcClientConn() {
+    delete ctx;
 }
 
 int VcClientConn::DealMessage() {
     if (argv_.empty()) return -2;
+    int64_t start_us = slash::NowMicros();
 
-    std::string opt = argv_[0];
-    slash::StringToLower(opt);
+    RedisRequest request(argv_);
 
-
-    printf("Get redis message %s ", hexcstr(opt));
-
-
-    for (int i = 0; i < argv_.size(); i++) {
-        printf("%s ", hexcstr(argv_[i]));
+    if(log_level() >= Logger::LEVEL_DEBUG) {
+        log_debug("[receive] req: %s", serialize_req(request.req).c_str());
     }
-    printf("\n");
 
-    uint64_t start_us = slash::NowMicros();
+    std::string &cmdName = argv_[0];
+    slash::StringToLower(cmdName);
 
 
-
-    std::string val = "result";
-    std::string res;
-    // set command
-    if (argv_.size() == 3) {
-        res = "+OK\r\n";
-        db[argv_[1]] = argv_[2];
-        memcpy(wbuf_ + wbuf_len_, res.data(), res.size());
-        wbuf_len_ += res.size();
-    } else {
-        std::map<std::string, std::string>::iterator iter = db.find(argv_[1]);
-        if (iter != db.end()) {
-            val = iter->second;
-            memcpy(wbuf_ + wbuf_len_, "*1\r\n$", 5);
-            wbuf_len_ += 5;
-            std::string len = std::to_string(val.length());
-            memcpy(wbuf_ + wbuf_len_, len.data(), len.size());
-            wbuf_len_ += len.size();
-            memcpy(wbuf_ + wbuf_len_, "\r\n", 2);
-            wbuf_len_ += 2;
-            memcpy(wbuf_ + wbuf_len_, val.data(), val.size());
-            wbuf_len_ += val.size();
-            memcpy(wbuf_ + wbuf_len_, "\r\n", 2);
-            wbuf_len_ += 2;
-        } else {
-            res = "$-1\r\n";
-            memcpy(wbuf_ + wbuf_len_, res.data(), res.size());
-            wbuf_len_ += res.size();
-        }
+    Command *cmd = server->proc_map.get_proc(Bytes(cmdName));
+    if (!cmd) {
+        return -2;
     }
+
+    request.convert_req();
+    int result = (*cmd->proc)(*ctx, request.req, &(request.response));
+    request.convert_resq();
+
+    ExpandWbufTo(static_cast<uint32_t>(request.output->size()));
+    memcpy(wbuf_ + wbuf_len_, request.output->data(), static_cast<size_t>(request.output->size()));
+    wbuf_len_ += request.output->size();
+
+
+
+    int64_t time_proc = slash::NowMicros() - start_us;
+    log_debug("[result]  p:%d, req: %s, resp: %s,",
+              time_proc,
+              serialize_req(request.req).c_str(),
+              serialize_req(request.response.resp).c_str());
+
 
     set_is_reply(true);
-
-
-    int64_t duration = slash::NowMicros() - start_us;
-
-
     return 0;
 }
+
+
 
 
