@@ -6,10 +6,6 @@ found in the LICENSE file.
 #ifndef UTIL_LOG_H
 #define UTIL_LOG_H
 
-/**disable slash log*/
-
-#define __XDEBUG_H_
-
 #include <inttypes.h>
 #include <unistd.h>
 #include <stdarg.h>
@@ -29,7 +25,6 @@ found in the LICENSE file.
 #include <sys/stat.h>
 #include <pthread.h>
 #include <string>
-
 #ifndef __FILENAME__
 #include <string.h>
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

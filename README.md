@@ -14,7 +14,7 @@ GCC >= 4.8
 
 ### Get the source code
 ```
-git clone https://github.com/JRHZRD/swapdb.git --recursive
+git clone https://github.com/TimothyZhang023/vcdb.git --recursive
 ```
 
 ## Build
@@ -22,8 +22,6 @@ git clone https://github.com/JRHZRD/swapdb.git --recursive
 (you can skip this step if you add '--recursive' option when 'git clone'.) for submodules update process.
 ```
 git submodule update --init --recursive
-```
 
-```
-sh build-deps.sh && mkdir build && cd build && cmake .. && make -j8
+make
 ```

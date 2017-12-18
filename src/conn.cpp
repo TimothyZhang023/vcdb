@@ -5,7 +5,7 @@
 #include "slash/include/env.h"
 
 #include "conn.h"
-#include "redis_cvt.h"
+#include "job.h"
 
 #include <swapdb/serv.h>
 
@@ -16,7 +16,7 @@ static std::map<std::string, std::string> db;
 VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread, void *worker_specific_data)
         : RedisConn(fd, ip_port, thread) {
     // Handle worker_specific_data ...
-    server = static_cast<SSDBServer *>(worker_specific_data);
+    server = static_cast<VcServer *>(worker_specific_data);
     ctx = new Context();
     ctx->serv = server;
 }
@@ -46,6 +46,11 @@ int VcClientConn::DealMessage() {
         return -2;
     }
 
+    if (!server->status) {
+        ReplyError("server not serving ~");
+        return -2;
+    }
+
     int64_t start_us = slash::NowMicros();
 
     RedisJob request(argv_);
@@ -55,8 +60,7 @@ int VcClientConn::DealMessage() {
         log_debug("[receive] req: %s", serialize_req(request.req).c_str());
     }
 
-    std::string &cmdName = request.cmd;
-    Command *cmd = server->proc_map.get_proc(Bytes(slash::StringToLower(cmdName)));
+    Command *cmd = server->proc_map.getProc(slash::StringToLower(request.cmd));
     if (!cmd) {
         ReplyError("command not found");
         return -2;
@@ -66,6 +70,8 @@ int VcClientConn::DealMessage() {
 
     if (request.response.redisResponse != nullptr) {
         request.output->append(request.response.redisResponse->toRedis());
+        delete request.response.redisResponse;
+        request.response.redisResponse = nullptr;
     } else {
         request.convert_resq();
     }
@@ -85,8 +91,3 @@ int VcClientConn::DealMessage() {
     set_is_reply(true);
     return 0;
 }
-
-
-
-
-

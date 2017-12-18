@@ -4,7 +4,6 @@ compiler: gcc
 
 before_install:
   - sudo apt-get -qq update
-#  - sudo apt-get install -y libxml2-dev
 
 os:
   - linux
@@ -19,22 +18,8 @@ addons:
     - g++
 
 script:
-#prepare
-  - mkdir build
-  - export PATH=$PATH:$PWD/build
-
-  - sh build-deps.sh
-#build
-
-  - cd build
-  - cmake ..
-  - make -j8
-  - cd ../
-
-#test
-  - sh runtest.sh
-
-#done
+  - make
+  - make test
 
 env:
   global:

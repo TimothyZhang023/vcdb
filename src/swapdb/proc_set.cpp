@@ -7,7 +7,7 @@ found in the LICENSE file.
 
 int proc_sadd(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(3);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     const Bytes &name = req[1];
     std::string val;
@@ -19,7 +19,7 @@ int proc_sadd(Context &ctx, const Request &req, Response *resp){
 
     int64_t num = 0;
 
-    int ret = serv->ssdb->sadd(ctx, name, mem_set, &num);
+    int ret = serv->db->sadd(ctx, name, mem_set, &num);
     if (ret < 0) {
         reply_err_return(ret);
     } else {
@@ -31,14 +31,14 @@ int proc_sadd(Context &ctx, const Request &req, Response *resp){
 
 int proc_srem(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(3);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     const Bytes &name = req[1];
 
 
     int64_t num = 0;
 
-    int ret = serv->ssdb->srem(ctx, name, req, &num);
+    int ret = serv->db->srem(ctx, name, req, &num);
 
     if (ret < 0) {
         reply_err_return(ret);
@@ -50,12 +50,12 @@ int proc_srem(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_scard(Context &ctx, const Request &req, Response *resp){
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
     uint64_t len = 0;
 
-    int ret = serv->ssdb->scard(ctx, req[1], &len);
+    int ret = serv->db->scard(ctx, req[1], &len);
 
     if (ret < 0) {
         reply_err_return(ret);
@@ -69,10 +69,10 @@ int proc_scard(Context &ctx, const Request &req, Response *resp){
 
 int proc_sismember(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(3);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     bool ismember = false;
-    int ret = serv->ssdb->sismember(ctx, req[1], req[2], &ismember);
+    int ret = serv->db->sismember(ctx, req[1], req[2], &ismember);
 
     if (ret < 0) {
         reply_err_return(ret);
@@ -87,11 +87,11 @@ int proc_sismember(Context &ctx, const Request &req, Response *resp){
 
 int proc_smembers(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(2);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     resp->reply_list_ready();
 
-    int ret = serv->ssdb->smembers(ctx, req[1],  resp->resp);
+    int ret = serv->db->smembers(ctx, req[1],  resp->resp);
 
     if (ret < 0){
         resp->resp.clear();
@@ -104,7 +104,7 @@ int proc_smembers(Context &ctx, const Request &req, Response *resp){
 
 int proc_spop(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(2);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     int64_t pop_count = 1;
     if (req.size() >2) {
@@ -116,7 +116,7 @@ int proc_spop(Context &ctx, const Request &req, Response *resp){
 
     resp->reply_list_ready();
 
-    int ret = serv->ssdb->spop(ctx, req[1], resp->resp, pop_count);
+    int ret = serv->db->spop(ctx, req[1], resp->resp, pop_count);
 
     if (ret < 0){
         resp->resp.clear();
@@ -130,7 +130,7 @@ int proc_spop(Context &ctx, const Request &req, Response *resp){
 
 int proc_srandmember(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(2);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     int64_t count = 1;
     if (req.size() >2) {
@@ -142,7 +142,7 @@ int proc_srandmember(Context &ctx, const Request &req, Response *resp){
 
     resp->reply_list_ready();
 
-    int ret = serv->ssdb->srandmember(ctx, req[1], resp->resp, count);
+    int ret = serv->db->srandmember(ctx, req[1], resp->resp, count);
 
     if (ret < 0){
         resp->resp.clear();
@@ -155,7 +155,7 @@ int proc_srandmember(Context &ctx, const Request &req, Response *resp){
 
 int proc_sscan(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(3);
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
 
     int cursorIndex = 2;
@@ -175,7 +175,7 @@ int proc_sscan(Context &ctx, const Request &req, Response *resp){
     }
 
     resp->reply_scan_ready();
-    ret =  serv->ssdb->sscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp);
+    ret =  serv->db->sscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp);
 
     if (ret < 0) {
         resp->resp.clear();

@@ -6,14 +6,12 @@
 #define VCDB_CONTEXT_H
 
 
-//class NetworkServer;
-class SSDBServer;
+class VcServer;
 
 
 class Context {
 public:
-//    NetworkServer *net = nullptr;
-    SSDBServer *serv = nullptr;
+    VcServer *serv = nullptr;
 };
 
 

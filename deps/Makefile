@@ -38,8 +38,7 @@ endif
 
 # ----------------------------------------------
 OUTPUT = $(CURDIR)/output
-THIRD_PATH = $(CURDIR)/deps
-SRC_PATH = $(CURDIR)/src
+THIRD_PATH = $(CURDIR)
 
 # ----------------Dependences-------------------
 
@@ -102,40 +101,54 @@ AM_LINK = $(AM_V_CCLD)$(CXX) $^ $(EXEC_LDFLAGS) -o $@ $(LDFLAGS)
 
 CXXFLAGS += -g
 
+default: all
+.PHONY: default
 
 slash:
 	$(AM_V_at)make -C $(SLASH_PATH)/slash/ DEBUG_LEVEL=$(DEBUG_LEVEL)
+.PHONY: slash
 
 pink:
 	$(AM_V_at)make -C $(PINK_PATH)/pink/ DEBUG_LEVEL=$(DEBUG_LEVEL) NO_PB=1 SLASH_PATH=$(SLASH_PATH)
+.PHONY: pink
 
 jemalloc:
 	cd $(JEMALLOC_PATH) && \
 	    sh autogen.sh && \
 	    sh configure && \
 	    make -j8
+.PHONY: jemalloc
 
 snappy:
 	cd $(SNAPPY_PATH) && \
 	cmake . &&\
 	make -j8 snappy
+.PHONY: snappy
 
 zlib:
 	cd $(ZLIB_PATH) && \
 	    sh configure && \
 	    make -j8
+.PHONY: zlib
+
+
 bzip2:
 	cd $(BZIP2_PATH) && \
 	    cmake . && \
 	    make -j8
+.PHONY: bzip2
 
 rocksdb:
 	cd $(ROCKSDB_PATH) && \
 	make -j10 OPT="-DSNAPPY -I$(SNAPPY_PATH) -L$(SNAPPY_PATH) -DJEMALLOC -I$(JEMALLOC_PATH)/include -L$(JEMALLOC_PATH)/lib -L$(ZLIB_PATH) --rtti" static_lib
+.PHONY: rocksdb
 
+all: jemalloc slash pink snappy zlib bzip2 rocksdb
+.PHONY: all
 
 clean:
 	rm -rf $(OUTPUT)
+.PHONY: clean
 
 distclean: clean
 	make -C $(PINK_PATH)/pink/ SLASH_PATH=$(SLASH_PATH) clean
@@ -145,3 +158,4 @@ distclean: clean
 	make -C $(ZLIB_PATH)/ clean
 	make -C $(SNAPPY_PATH)/ clean
 	make -C $(BZIP2_PATH)/ clean
+.PHONY: distclean

@@ -2,7 +2,7 @@
 // Created by zts on 12/18/17.
 //
 
-#include "redis_cvt.h"
+#include "job.h"
 
 #define INIT_BUFFER_SIZE  1024
 #define BEST_BUFFER_SIZE  (8 * 1024)
@@ -84,7 +84,7 @@ int RedisJob::convert_resq() {
     }
 
     // not supported command
-    if(req_desc == NULL){
+    if(req_desc == nullptr){
         {
             char buf[32];
             snprintf(buf, sizeof(buf), "*%d\r\n", (int)resp.size() - 1);

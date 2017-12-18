@@ -212,8 +212,8 @@ int App::go() {
     }
 
 
-    SSDBServer *server;
-    server = new SSDBServer(data_db);
+    VcServer *server;
+    server = new VcServer(data_db);
 
     int port = conf->get_num("server.port");
 

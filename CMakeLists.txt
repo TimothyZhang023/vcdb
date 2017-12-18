@@ -3,7 +3,6 @@ project(vcdb)
 
 set(CMAKE_CXX_STANDARD 11)
 
-
 SET(SLASH_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/slash)
 SET(PINK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/pink)
 SET(JEMALLOC_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/jemalloc)
@@ -11,6 +10,9 @@ SET(ROCKSDB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/rocksdb)
 SET(SNAPPY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/snappy)
 SET(ZLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib)
 SET(BZIP2_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/bzip2)
+
+
+ADD_DEFINITIONS(-D__XDEBUG_H_)
 
 
 # Set a default build type if none was specified
@@ -57,50 +59,6 @@ LINK_DIRECTORIES(
 )
 
 
-set(PINK_SOURCE_FILES
-        deps/pink/pink/src/bg_thread.cc
-        deps/pink/pink/src/build_version.cc.in
-        deps/pink/pink/src/dispatch_thread.cc
-        deps/pink/pink/src/holy_thread.cc
-        deps/pink/pink/src/http_conn.cc
-        #deps/pink/pink/src/pb_cli.cc
-        #deps/pink/pink/src/pb_conn.cc
-        deps/pink/pink/src/period_thread.cc
-        deps/pink/pink/src/pink_cli.cc
-        deps/pink/pink/src/pink_conn.cc
-        deps/pink/pink/src/pink_epoll.cc
-        deps/pink/pink/src/pink_thread.cc
-        deps/pink/pink/src/pink_util.cc
-        deps/pink/pink/src/redis_cli.cc
-        deps/pink/pink/src/redis_conn.cc
-        deps/pink/pink/src/server_socket.cc
-        deps/pink/pink/src/server_thread.cc
-        deps/pink/pink/src/simple_http_conn.cc
-        deps/pink/pink/src/worker_thread.cc
-        )
-ADD_LIBRARY(libpink STATIC ${PINK_SOURCE_FILES})
-set_target_properties(libpink PROPERTIES LINKER_LANGUAGE CXX OUTPUT_NAME "pink")
-
-set(SLASH_SOURCE_FILES
-        deps/slash/slash/src/base_conf.cc
-        deps/slash/slash/src/build_version.cc.in
-        deps/slash/slash/src/cond_lock.cc
-        deps/slash/slash/src/env.cc
-        deps/slash/slash/src/posix.cc
-        deps/slash/slash/src/rsync.cc
-        deps/slash/slash/src/slash_binlog_impl.cc
-        deps/slash/slash/src/slash_coding.cc
-        deps/slash/slash/src/slash_hash.cc
-        deps/slash/slash/src/slash_mutex.cc
-        deps/slash/slash/src/slash_status.cc
-        deps/slash/slash/src/slash_string.cc
-        deps/slash/slash/src/slash_testharness.cc
-        deps/slash/slash/src/testutil.cc
-        )
-
-ADD_LIBRARY(libslash STATIC ${SLASH_SOURCE_FILES})
-set_target_properties(libslash PROPERTIES LINKER_LANGUAGE CXX OUTPUT_NAME "slash")
-
 SET(RDB_OBJS
         src/swapdb/redis/crc/crc64speed.c
         src/swapdb/redis/crc/crcspeed.c
@@ -118,7 +76,6 @@ SET(RDB_OBJS
 
 ADD_LIBRARY(librdb STATIC ${RDB_OBJS})
 set_target_properties(librdb PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 OUTPUT_NAME "rdb")
-
 
 set(SWAPDB_SOURCE_FILES
         src/swapdb/serv.cpp
@@ -157,7 +114,7 @@ set(SWAPDB_SOURCE_FILES
         )
 
 
-set(SOURCE_FILES ${SWAPDB_SOURCE_FILES} src/main.cpp src/redis_cvt.cpp src/app.cpp src/conn.cpp src/conn.h)
+set(SOURCE_FILES ${SWAPDB_SOURCE_FILES} src/main.cpp src/job.cpp src/app.cpp src/conn.cpp src/conn.h)
 
 
 add_executable(vcdb ${SOURCE_FILES})

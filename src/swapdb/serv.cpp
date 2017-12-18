@@ -14,249 +14,113 @@ extern "C" {
 }
 
 DEF_PROC(type);
-
 DEF_PROC(get);
-
 DEF_PROC(set);
-
 DEF_PROC(append);
-
 DEF_PROC(setx);
-
 DEF_PROC(psetx);
-
 DEF_PROC(setnx);
-
 DEF_PROC(getset);
-
 DEF_PROC(getbit);
-
 DEF_PROC(setbit);
-
 DEF_PROC(countbit);
-
 DEF_PROC(substr);
-
 DEF_PROC(getrange);
-
 DEF_PROC(setrange);
-
 DEF_PROC(strlen);
-
 DEF_PROC(bitcount);
-
 DEF_PROC(del);
-
 DEF_PROC(incr);
-
 DEF_PROC(incrbyfloat);
-
 DEF_PROC(decr);
-
 DEF_PROC(scan);
-
 DEF_PROC(keys);
-
 DEF_PROC(exists);
-
 DEF_PROC(multi_get);
-
 DEF_PROC(multi_set);
-
 DEF_PROC(multi_del);
-
 DEF_PROC(ttl);
-
 DEF_PROC(pttl);
-
 DEF_PROC(expire);
-
 DEF_PROC(pexpire);
-
 DEF_PROC(expireat);
-
 DEF_PROC(pexpireat);
-
 DEF_PROC(persist);
-
 DEF_PROC(hsize);
-
 DEF_PROC(hget);
-
 DEF_PROC(hset);
-
 DEF_PROC(hsetnx);
-
 DEF_PROC(hdel);
-
 DEF_PROC(hincr);
-
 DEF_PROC(hincrbyfloat);
-
 DEF_PROC(hgetall);
-
 DEF_PROC(hscan);
-
 DEF_PROC(hkeys);
-
 DEF_PROC(hvals);
-
 DEF_PROC(hexists);
-
 DEF_PROC(hmget);
-
 DEF_PROC(hmset);
-
 DEF_PROC(sadd);
-
 DEF_PROC(srem);
-
 DEF_PROC(scard);
-//DEF_PROC(sdiff);
-//DEF_PROC(sdiffstore);
-//DEF_PROC(sinter);
-//DEF_PROC(sinterstore);
 DEF_PROC(sismember);
-
 DEF_PROC(smembers);
-//DEF_PROC(smove);
 DEF_PROC(spop);
-
 DEF_PROC(srandmember);
-//DEF_PROC(sunion);
-//DEF_PROC(sunionstore);
 DEF_PROC(sscan);
-
 DEF_PROC(zrank);
-
 DEF_PROC(zrrank);
-
 DEF_PROC(zrange);
-
 DEF_PROC(zrrange);
-
 DEF_PROC(zrangebyscore);
-
 DEF_PROC(zrevrangebyscore);
-
 DEF_PROC(zsize);
-
 DEF_PROC(zget);
-
 DEF_PROC(zincr);
-
 DEF_PROC(zscan);
-
 DEF_PROC(zcount);
-
 DEF_PROC(zremrangebyrank);
-
 DEF_PROC(zremrangebyscore);
-
 DEF_PROC(multi_zset);
-
 DEF_PROC(multi_zdel);
-
 DEF_PROC(zlexcount);
-
 DEF_PROC(zrangebylex);
-
 DEF_PROC(zremrangebylex);
-
 DEF_PROC(zrevrangebylex);
-
 DEF_PROC(qsize);
-
 DEF_PROC(qpush_front);
-
 DEF_PROC(qpush_frontx);
-
 DEF_PROC(qpush_back);
-
 DEF_PROC(qpush_backx);
-
 DEF_PROC(qpop_front);
-
 DEF_PROC(qpop_back);
-
 DEF_PROC(qslice);
-
 DEF_PROC(qtrim);
-
 DEF_PROC(qget);
-
 DEF_PROC(qset);
-
 DEF_PROC(info);
-
 DEF_PROC(save);
-
 DEF_PROC(version);
-
 DEF_PROC(dbsize);
-
 DEF_PROC(filesize);
-
 DEF_PROC(compact);
-
 DEF_PROC(flush);
-
 DEF_PROC(flushdb);
-
 DEF_PROC(dreply);
-
 DEF_PROC(cursor_cleanup);
-
 DEF_PROC(debug);
-
 DEF_PROC(dump);
-
 DEF_PROC(restore);
-
 DEF_PROC(select);
-
 DEF_PROC(client);
-
 DEF_PROC(quit);
 
-DEF_PROC(replic);
-
-DEF_PROC(replic_info);
-
-DEF_PROC(slowlog);
-
-DEF_PROC(migrate);
-
 DEF_PROC(ssdb_scan);
-
 DEF_PROC(ssdb_dbsize);
 
 
-DEF_PROC(ssdb_sync2);
 
-DEF_PROC(redis_req_dump);
-
-DEF_PROC(redis_req_restore);
-
-DEF_PROC(rr_do_flushall);
-
-DEF_PROC(rr_flushall_check);
-
-DEF_PROC(rr_check_write);
-
-DEF_PROC(rr_make_snapshot);
-
-DEF_PROC(rr_transfer_snapshot);
-
-DEF_PROC(rr_del_snapshot);
-
-DEF_PROC(repopid);
-
-
-#define REG_PROC(c, f)  proc_map.set_proc(#c, f, proc_##c)
-
-
-void SSDBServer::reg_procs() {
+void VcServer::regProcs() {
     REG_PROC(type, "rt");
     REG_PROC(get, "rt");
     REG_PROC(set, "wt");
@@ -309,20 +173,12 @@ void SSDBServer::reg_procs() {
     REG_PROC(sadd, "wt");
     REG_PROC(srem, "wt");
     REG_PROC(scard, "rt");
-//    REG_PROC(sdiff, "rt");
-//    REG_PROC(sdiffstore, "wt");
-//    REG_PROC(sinter, "rt");
-//    REG_PROC(sinterstore, "wt");
     REG_PROC(sismember, "rt");
     REG_PROC(smembers, "rt");
-//    REG_PROC(smove, "wt");
     REG_PROC(spop, "wt");
     REG_PROC(srandmember, "rt");
-//    REG_PROC(sunion, "rt");
-//    REG_PROC(sunionstore, "wt");
     REG_PROC(sscan, "rt");
 
-    // because zrank may be extremly slow, execute in a seperate thread
     REG_PROC(zrank, "rt");
     REG_PROC(zrrank, "rt");
     REG_PROC(zrange, "rt");
@@ -356,7 +212,7 @@ void SSDBServer::reg_procs() {
     REG_PROC(qtrim, "wt");
 
     REG_PROC(cursor_cleanup, "rt");
-    REG_PROC(dump, "wt"); //auctual read but ...
+    REG_PROC(dump, "wt");
     REG_PROC(restore, "wt");
 
     REG_PROC(select, "rt");
@@ -369,35 +225,28 @@ void SSDBServer::reg_procs() {
     REG_PROC(info, "r");
     REG_PROC(dbsize, "rt");
     REG_PROC(save, "rt");
-    // doing compaction in a reader thread, because we have only one
-    // writer thread(for performance reason); we don't want to block writes
+
     REG_PROC(compact, "rt");
     REG_PROC(debug, "wt");
 
 }
 
-SSDBServer::~SSDBServer() {
-
-
-    log_info("SSDBServer finalized");
-}
-
 /*********************/
 
 int proc_flushdb(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
     log_warn("[!!!] do flushdb");
-    serv->ssdb->flushdb(ctx);
+    serv->db->flushdb(ctx);
     resp->reply_ok();
 
     return 0;
 }
 
 int proc_flush(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
-    serv->ssdb->flush(ctx);
+    serv->db->flush(ctx);
     resp->reply_ok();
 
     return 0;
@@ -417,7 +266,7 @@ int proc_client(Context &ctx, const Request &req, Response *resp) {
 
 
 int proc_debug(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
     std::string action = req[1].String();
@@ -439,7 +288,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
     } else if (action == "digest") {
 
         std::string res;
-        int ret = serv->ssdb->digest(&res);
+        int ret = serv->db->digest(&res);
         if (ret < 0) {
             reply_err_return(ret);
         }
@@ -469,7 +318,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
             batch.Put(encode_meta_key(Bytes(kbuf)), encode_kv_val(Bytes(vbuf), 0));
 
             if ((count % 10000) == 0) {
-                leveldb::Status s = serv->ssdb->CommitBatch(ctx, writeOptions, &(batch));
+                leveldb::Status s = serv->db->CommitBatch(ctx, writeOptions, &(batch));
                 if (!s.ok()) {
                     log_error("error: %s", s.ToString().c_str());
                     return STORAGE_ERR;
@@ -480,7 +329,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
 
         }
 
-        leveldb::Status s = serv->ssdb->CommitBatch(ctx, writeOptions, &(batch));
+        leveldb::Status s = serv->db->CommitBatch(ctx, writeOptions, &(batch));
         if (!s.ok()) {
             log_error("error: %s", s.ToString().c_str());
             return STORAGE_ERR;
@@ -501,7 +350,7 @@ int proc_quit(Context &ctx, const Request &req, Response *resp) {
 
 
 int proc_restore(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 
     int64_t ttl = req[2].Int64();
@@ -523,7 +372,7 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
     std::string val;
 
     PTST(restore, 0.01)
-    int ret = serv->ssdb->restore(ctx, req[1], ttl, req[3], replace, &val);
+    int ret = serv->db->restore(ctx, req[1], ttl, req[3], replace, &val);
     PTE(restore, hexstr(req[1]))
 
     if (ret < 0) {
@@ -538,13 +387,13 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_dump(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
     std::string val;
 
     PTST(dump, 0.01)
-    int ret = serv->ssdb->dump(ctx, req[1], &val, nullptr, true);
+    int ret = serv->db->dump(ctx, req[1], &val, nullptr, true);
     PTE(dump, hexstr(req[1]))
 
     resp->reply_get(ret, &val);
@@ -553,33 +402,33 @@ int proc_dump(Context &ctx, const Request &req, Response *resp) {
 
 
 int proc_cursor_cleanup(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
-    serv->ssdb->redisCursorCleanup();
+    serv->db->redisCursorCleanup();
 
     return 0;
 }
 
 int proc_compact(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
-    serv->ssdb->compact();
+    VcServer *serv = ctx.serv;
+    serv->db->compact();
     resp->reply_ok();
     return 0;
 }
 
 int proc_dbsize(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
-    uint64_t size = serv->ssdb->size();
+    VcServer *serv = ctx.serv;
+    uint64_t size = serv->db->size();
     resp->reply_int(1, size);
 
     return 0;
 }
 
 int proc_save(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
-    int ret = serv->ssdb->save(ctx);
+    int ret = serv->db->save(ctx);
     if (ret < 0) {
         resp->push_back("error");
     } else {
@@ -599,20 +448,20 @@ int proc_save(Context &ctx, const Request &req, Response *resp) {
 
 
 #define FastGetProperty(key, name) \
-    if (serv->ssdb->getLdb()->GetProperty((key), &val)) {\
+    if (serv->db->getLdb()->GetProperty((key), &val)) {\
     uint64_t temp_size = Bytes(val).Uint64();\
     resp->emplace_back(name":" + str(temp_size));\
 }
 
 #define FastGetPropertyHuman(key, name) \
-    if (serv->ssdb->getLdb()->GetProperty(key, &val)) {\
+    if (serv->db->getLdb()->GetProperty(key, &val)) {\
     uint64_t temp_size = Bytes(val).Uint64();\
     resp->emplace_back(name":" + str(temp_size));\
     resp->emplace_back(name"_human:" + bytesToHuman((int64_t) temp_size));\
 }
 
 int proc_info(Context &ctx, const Request &req, Response *resp) {
-    SSDBServer *serv = (SSDBServer *) ctx.serv;
+    VcServer *serv = ctx.serv;
 
 
     static struct utsname name;
@@ -671,7 +520,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
         ReplyWtihHuman(total_system_mem);
 
 
-        auto options = serv->ssdb->getLdb()->GetOptions().table_factory->GetOptions();
+        auto options = serv->db->getLdb()->GetOptions().table_factory->GetOptions();
         if (options != nullptr) {
             {
                 uint64_t block_cache_size = ((leveldb::BlockBasedTableOptions *) options)->block_cache->GetCapacity();
@@ -690,10 +539,10 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
         FastGetPropertyHuman(leveldb::DB::Properties::kSizeAllMemTables, "all_memtables_size");
         FastGetPropertyHuman(leveldb::DB::Properties::kEstimateTableReadersMem, "indexes_filter_blocks");
 
-        if (serv->ssdb->simCache != nullptr) {
+        if (serv->db->simCache != nullptr) {
 
-            uint64_t block_cache_miss = serv->ssdb->simCache->get_miss_counter();
-            uint64_t block_cache_hit = serv->ssdb->simCache->get_hit_counter();
+            uint64_t block_cache_miss = serv->db->simCache->get_miss_counter();
+            uint64_t block_cache_hit = serv->db->simCache->get_hit_counter();
             uint64_t total = block_cache_miss + block_cache_hit;
             ReplyWtihSize(block_cache_miss);
             ReplyWtihSize(block_cache_hit);
@@ -764,7 +613,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
     if (all || selected == "keyspace") {//Keyspace
         resp->push_back("# Keyspace");
 
-        uint64_t size = serv->ssdb->size();
+        uint64_t size = serv->db->size();
         resp->emplace_back("db0:keys=" + str(size) + ",expires=0,avg_ttl=0");
 
         resp->emplace_back("");
@@ -772,7 +621,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
 
 
     if (selected == "leveldb" || selected == "rocksdb") {
-        for (auto const &block : serv->ssdb->info()) {
+        for (auto const &block : serv->db->info()) {
             resp->push_back(block);
         }
 

@@ -6,12 +6,11 @@
 #define VCDB_CONN_H
 
 
-
 #include <pink/include/pink_conn.h>
 #include <pink/include/redis_conn.h>
 #include <swapdb/common/context.hpp>
 
-class SSDBServer;
+class VcServer;
 class Buffer;
 
 class VcClientConn : public pink::RedisConn {
@@ -27,7 +26,7 @@ protected:
 
 private:
 
-    SSDBServer *server = nullptr;
+    VcServer *server = nullptr;
     Context *ctx = nullptr;
 };
 
@@ -40,9 +39,9 @@ private:
 public:
     explicit VcServerConnFactory(void *data) : data(data) {}
 
-    virtual pink::PinkConn *NewPinkConn(int connfd, const std::string &ip_port,
+    pink::PinkConn *NewPinkConn(int connfd, const std::string &ip_port,
                                         pink::ServerThread *thread,
-                                        void *worker_specific_data) const {
+                                        void *worker_specific_data) const override {
         return new VcClientConn(connfd, ip_port, thread, data);
     }
 };
