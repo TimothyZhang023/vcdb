@@ -418,7 +418,7 @@ int proc_client(Context &ctx, const Request &req, Response *resp) {
 
 int proc_debug(Context &ctx, const Request &req, Response *resp) {
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     std::string action = req[1].String();
     strtolower(&action);
@@ -426,7 +426,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
     if (action == "segfault") {
         *((char *) -1) = 'x';
     } else if (action == "sleep") {
-        CHECK_NUM_PARAMS(3);
+        CHECK_MIN_PARAMS(3);
         double dtime = req[2].Double();
 
         long long utime = dtime * 1000000;
@@ -449,7 +449,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
 
         return 0;
     } else if (action == "populate") {
-        CHECK_NUM_PARAMS(3);
+        CHECK_MIN_PARAMS(3);
 
         uint64_t count = req[2].Uint64();
 
@@ -502,7 +502,7 @@ int proc_quit(Context &ctx, const Request &req, Response *resp) {
 
 int proc_restore(Context &ctx, const Request &req, Response *resp) {
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t ttl = req[2].Int64();
     if (errno == EINVAL || ttl < 0) {
@@ -539,7 +539,7 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
 
 int proc_dump(Context &ctx, const Request &req, Response *resp) {
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     std::string val;
 
@@ -554,7 +554,7 @@ int proc_dump(Context &ctx, const Request &req, Response *resp) {
 
 int proc_cursor_cleanup(Context &ctx, const Request &req, Response *resp) {
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     serv->ssdb->redisCursorCleanup();
 

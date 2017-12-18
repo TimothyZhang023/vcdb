@@ -9,7 +9,7 @@ found in the LICENSE file.
 
 int proc_type(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	std::string val;
 	int ret = serv->ssdb->type(ctx, req[1], &val);
@@ -25,7 +25,7 @@ int proc_type(Context &ctx, const Request &req, Response *resp){
 
 int proc_get(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	std::string val;
 	int ret = serv->ssdb->get(ctx, req[1], &val);
@@ -41,7 +41,7 @@ int proc_get(Context &ctx, const Request &req, Response *resp){
 
 int proc_getset(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	std::pair<std::string, bool> val;
 	int ret = serv->ssdb->getset(ctx, req[1], val, req[2]);
@@ -61,7 +61,7 @@ int proc_getset(Context &ctx, const Request &req, Response *resp){
 
 int proc_append(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	uint64_t newlen = 0;
 	int ret = serv->ssdb->append(ctx, req[1], req[2], &newlen);
@@ -75,7 +75,7 @@ int proc_append(Context &ctx, const Request &req, Response *resp){
 
 int proc_set(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	int64_t ttl = 0;
 
@@ -146,7 +146,7 @@ int proc_set(Context &ctx, const Request &req, Response *resp){
 
 int proc_setnx(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	int added = 0;
 	int ret = serv->ssdb->set(ctx, req[1], req[2], OBJ_SET_NX, 0, &added);
@@ -162,10 +162,10 @@ int proc_setnx(Context &ctx, const Request &req, Response *resp){
 
 int proc_setx(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
 
-	int64_t ttl = req[3].Int64();
+	int64_t ttl = req[2].Int64();
 	if (errno == EINVAL){
 		reply_err_return(INVALID_INT);
 	}
@@ -180,7 +180,7 @@ int proc_setx(Context &ctx, const Request &req, Response *resp){
 	}
 
 	int added = 0;
-	int ret = serv->ssdb->set(ctx, req[1], req[2], OBJ_SET_EX, ttl, &added);
+	int ret = serv->ssdb->set(ctx, req[1], req[3], OBJ_SET_EX, ttl, &added);
 
 	if(ret < 0){
 		reply_err_return(ret);
@@ -193,9 +193,9 @@ int proc_setx(Context &ctx, const Request &req, Response *resp){
 
 int proc_psetx(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
-    int64_t ttl = req[3].Int64();
+    int64_t ttl = req[2].Int64();
     if (errno == EINVAL){
         reply_err_return(INVALID_INT);
     }
@@ -211,7 +211,7 @@ int proc_psetx(Context &ctx, const Request &req, Response *resp){
 
 
 	int added = 0;
-	int ret = serv->ssdb->set(ctx, req[1], req[2], OBJ_SET_PX, ttl, &added);
+	int ret = serv->ssdb->set(ctx, req[1], req[3], OBJ_SET_PX, ttl, &added);
 
 	if(ret < 0){
 		reply_err_return(ret);
@@ -224,7 +224,7 @@ int proc_psetx(Context &ctx, const Request &req, Response *resp){
 
 int proc_pttl(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	int64_t ttl = serv->ssdb->expiration->pttl(ctx, req[1], TimeUnit::Millisecond);
 	if (ttl == -2) {
@@ -237,7 +237,7 @@ int proc_pttl(Context &ctx, const Request &req, Response *resp){
 
 int proc_ttl(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	int64_t ttl = serv->ssdb->expiration->pttl(ctx, req[1], TimeUnit::Second);
 	if (ttl == -2) {
@@ -250,7 +250,7 @@ int proc_ttl(Context &ctx, const Request &req, Response *resp){
 
 int proc_pexpire(Context &ctx, const Request &req, Response *resp){
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     long long when;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &when) == 0) {
@@ -271,7 +271,7 @@ int proc_pexpire(Context &ctx, const Request &req, Response *resp){
 
 int proc_expire(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
     long long when;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &when) == 0) {
@@ -293,7 +293,7 @@ int proc_expire(Context &ctx, const Request &req, Response *resp){
 
 int proc_expireat(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
     long long ts_ms;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &ts_ms) == 0) {
@@ -315,7 +315,7 @@ int proc_expireat(Context &ctx, const Request &req, Response *resp){
 
 int proc_persist(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	std::string val;
 	int ret = serv->ssdb->expiration->persist(ctx, req[1]);
@@ -330,7 +330,7 @@ int proc_persist(Context &ctx, const Request &req, Response *resp){
 
 int proc_pexpireat(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
     long long ts_ms;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &ts_ms) == 0) {
@@ -352,7 +352,7 @@ int proc_pexpireat(Context &ctx, const Request &req, Response *resp){
 
 int proc_exists(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
     uint64_t count = 0;
 	for_each(req.begin()+1 , req.end(), [&](Bytes key) {
@@ -388,7 +388,7 @@ int proc_multi_set(Context &ctx, const Request &req, Response *resp){
 
 int proc_multi_del(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	std::set<std::string> distinct_keys;
 
@@ -410,7 +410,7 @@ int proc_multi_del(Context &ctx, const Request &req, Response *resp){
 
 int proc_multi_get(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	resp->reply_list_ready();
 	for(int i=1; i<req.size(); i++){
@@ -430,7 +430,7 @@ int proc_multi_get(Context &ctx, const Request &req, Response *resp){
 
 int proc_del(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	int ret = serv->ssdb->del(ctx, req[1]);
 
@@ -447,7 +447,7 @@ int proc_del(Context &ctx, const Request &req, Response *resp){
 
 int proc_scan(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
     int cursorIndex = 1;
 
@@ -496,7 +496,7 @@ int proc_ssdb_dbsize(Context &ctx, const Request &req, Response *resp){
 
 int proc_ssdb_scan(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	uint64_t limit = 1000;
 
@@ -579,7 +579,7 @@ int proc_keys(Context &ctx, const Request &req, Response *resp){
 
 // dir := +1|-1
 static int _incr(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, int dir){
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 	int64_t by = 1;
 	if(req.size() > 2){
 		by = req[2].Int64();
@@ -600,7 +600,7 @@ static int _incr(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, i
 int proc_incrbyfloat(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
 
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
     long double by = req[2].LDouble();
 	if (errno == EINVAL){
 		reply_err_return(INVALID_INT);
@@ -630,7 +630,7 @@ int proc_decr(Context &ctx, const Request &req, Response *resp){
 
 int proc_getbit(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 	long long offset = 0;
 	string2ll(req[2].data(), (size_t)req[2].size(), &offset);
     if(offset < 0 || ((uint64_t)offset >> 3) >= MAX_PACKET_SIZE * 4){
@@ -652,7 +652,7 @@ int proc_getbit(Context &ctx, const Request &req, Response *resp){
 
 int proc_setbit(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
 	const Bytes &name = req[1];
 	long long offset = 0;
@@ -680,7 +680,7 @@ int proc_setbit(Context &ctx, const Request &req, Response *resp){
 
 int proc_countbit(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	const Bytes &key = req[1];
 	int start = 0;
@@ -713,7 +713,7 @@ int proc_countbit(Context &ctx, const Request &req, Response *resp){
 
 int proc_bitcount(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	const Bytes &name = req[1];
 	int start = 0;
@@ -746,7 +746,7 @@ int proc_bitcount(Context &ctx, const Request &req, Response *resp){
 
 int proc_getrange(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
 	const Bytes &name = req[1];
 	int64_t start = req[2].Int64();
@@ -779,7 +779,7 @@ int proc_substr(Context &ctx, const Request &req, Response *resp){
 
 int proc_setrange(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
  	int64_t start = req[2].Int64();
 	if (errno == EINVAL){
@@ -803,7 +803,7 @@ int proc_setrange(Context &ctx, const Request &req, Response *resp){
 
 int proc_strlen(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	const Bytes &name = req[1];
 	std::string val;

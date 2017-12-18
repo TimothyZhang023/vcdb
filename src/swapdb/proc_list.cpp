@@ -8,7 +8,7 @@ found in the LICENSE file.
 
 int proc_qsize(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
 	uint64_t len = 0;
 	int ret = serv->ssdb->LLen(ctx, req[1], &len);
@@ -24,7 +24,7 @@ int proc_qsize(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_qpush_frontx(Context &ctx, const Request &req, Response *resp){
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 	const Bytes &name = req[1];
@@ -42,7 +42,7 @@ int proc_qpush_frontx(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_qpush_front(Context &ctx, const Request &req, Response *resp){
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 	const Bytes &name = req[1];
@@ -58,7 +58,7 @@ int proc_qpush_front(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_qpush_backx(Context &ctx, const Request &req, Response *resp){
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 	uint64_t len = 0;
@@ -75,7 +75,7 @@ int proc_qpush_backx(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_qpush_back(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     uint64_t len = 0;
@@ -91,7 +91,7 @@ int proc_qpush_back(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_qpop_front(Context &ctx, const Request &req, Response *resp){
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 	const Bytes &name = req[1];
@@ -114,7 +114,7 @@ int proc_qpop_front(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_qpop_back(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 	std::pair<std::string, bool> val;
@@ -137,7 +137,7 @@ int proc_qpop_back(Context &ctx, const Request &req, Response *resp){
 
 int proc_qtrim(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
 	int64_t begin = req[2].Int64();
 	if (errno == EINVAL){
@@ -166,7 +166,7 @@ int proc_qtrim(Context &ctx, const Request &req, Response *resp){
 
 int proc_qslice(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
 	int64_t begin = req[2].Int64();
 	if (errno == EINVAL){
@@ -191,7 +191,7 @@ int proc_qslice(Context &ctx, const Request &req, Response *resp){
 
 int proc_qget(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	int64_t index = req[2].Int64();
 	if (errno == EINVAL){
@@ -216,7 +216,7 @@ int proc_qget(Context &ctx, const Request &req, Response *resp){
 
 int proc_qset(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
 	const Bytes &name = req[1];
 	int64_t index = req[2].Int64();

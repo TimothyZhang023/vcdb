@@ -7,7 +7,7 @@ found in the LICENSE file.
 #include "serv.h"
 
 int proc_hexists(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     const Bytes &name = req[1];
@@ -54,7 +54,7 @@ int proc_hmset(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hdel(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     const Bytes &name = req[1];
@@ -76,7 +76,7 @@ int proc_hdel(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hmget(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     const Bytes &name = req[1];
@@ -119,7 +119,7 @@ int proc_hmget(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hsize(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     uint64_t size = 0;
@@ -135,7 +135,7 @@ int proc_hsize(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hset(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     int added = 0;
@@ -153,7 +153,7 @@ int proc_hset(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     int added = 0;
@@ -171,7 +171,7 @@ int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hget(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 
@@ -193,7 +193,7 @@ int proc_hget(Context &ctx, const Request &req, Response *resp) {
 
 
 int proc_hgetall(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 
@@ -220,7 +220,7 @@ int proc_hgetall(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hscan(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 
@@ -254,7 +254,7 @@ int proc_hscan(Context &ctx, const Request &req, Response *resp) {
 
 
 int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 //	uint64_t limit = recv_bytes[4].Uint64();
@@ -283,7 +283,7 @@ int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hvals(Context &ctx, const Request &req, Response *resp) {
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 //	uint64_t limit = recv_bytes[4].Uint64();
@@ -312,7 +312,7 @@ int proc_hvals(Context &ctx, const Request &req, Response *resp) {
 
 int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     long double by = req[3].LDouble();
     if (errno == EINVAL) {
@@ -332,7 +332,7 @@ int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
 
 int proc_hincr(Context &ctx, const Request &req, Response *resp) {
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t by = req[3].Int64();
 

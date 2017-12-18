@@ -6,7 +6,7 @@ found in the LICENSE file.
 #include "serv.h"
 
 int proc_sadd(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     const Bytes &name = req[1];
@@ -30,7 +30,7 @@ int proc_sadd(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_srem(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     const Bytes &name = req[1];
@@ -51,7 +51,7 @@ int proc_srem(Context &ctx, const Request &req, Response *resp){
 
 int proc_scard(Context &ctx, const Request &req, Response *resp){
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     uint64_t len = 0;
 
@@ -68,7 +68,7 @@ int proc_scard(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_sismember(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     bool ismember = false;
@@ -86,7 +86,7 @@ int proc_sismember(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_smembers(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     resp->reply_list_ready();
@@ -103,7 +103,7 @@ int proc_smembers(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_spop(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     int64_t pop_count = 1;
@@ -129,7 +129,7 @@ int proc_spop(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_srandmember(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     int64_t count = 1;
@@ -154,7 +154,7 @@ int proc_srandmember(Context &ctx, const Request &req, Response *resp){
 
 
 int proc_sscan(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 

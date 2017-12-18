@@ -8,7 +8,7 @@ found in the LICENSE file.
 
 
 int proc_multi_zset(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 	int flags = ZADD_NONE;
@@ -124,7 +124,7 @@ int proc_multi_zset(Context &ctx, const Request &req, Response *resp){
 
 int proc_multi_zdel(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	const Bytes &name = req[1];
     std::set<Bytes> keys;
@@ -147,7 +147,7 @@ int proc_multi_zdel(Context &ctx, const Request &req, Response *resp){
 
 int proc_zsize(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(2);
+	CHECK_MIN_PARAMS(2);
 
     uint64_t size = 0;
 	int ret = serv->ssdb->zsize(ctx, req[1], &size);
@@ -161,7 +161,7 @@ int proc_zsize(Context &ctx, const Request &req, Response *resp){
 
 int proc_zget(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
 	double score = 0;
 	int ret = serv->ssdb->zget(ctx, req[1], req[2], &score);
@@ -179,7 +179,7 @@ int proc_zget(Context &ctx, const Request &req, Response *resp){
 
 int proc_zrank(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
     int64_t rank = 0;
 	int ret = serv->ssdb->zrank(ctx, req[1], req[2], &rank);
@@ -196,7 +196,7 @@ int proc_zrank(Context &ctx, const Request &req, Response *resp){
 
 int proc_zrrank(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(3);
+	CHECK_MIN_PARAMS(3);
 
     int64_t rank = 0;
 	int ret = serv->ssdb->zrrank(ctx, req[1], req[2], &rank);
@@ -213,7 +213,7 @@ int proc_zrrank(Context &ctx, const Request &req, Response *resp){
 
 int proc_zrange(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
     resp->reply_list_ready();
     int ret = serv->ssdb->zrange(ctx, req[1], req[2], req[3], resp->resp);
@@ -228,7 +228,7 @@ int proc_zrange(Context &ctx, const Request &req, Response *resp){
 
 int proc_zrrange(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
     resp->reply_list_ready();
     int ret = serv->ssdb->zrrange(ctx, req[1], req[2], req[3], resp->resp);
@@ -254,7 +254,7 @@ int string2ld(const char *s, size_t slen, long *value) {
 }
 
 static int _zrangebyscore(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, int reverse){
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
     long offset = 0, limit = -1;
     int withscores = 0;
     int ret = 0;
@@ -305,7 +305,7 @@ int proc_zrevrangebyscore(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_zscan(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
 
@@ -341,7 +341,8 @@ int proc_zscan(Context &ctx, const Request &req, Response *resp){
 
 // dir := +1|-1
 static int _zincr(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, int dir){
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
+    CHECK_MAX_PARAMS(4);
     int flags = ZADD_NONE;
     flags |= ZADD_INCR;
 
@@ -379,7 +380,7 @@ int proc_zincr(Context &ctx, const Request &req, Response *resp){
 
 int proc_zcount(Context &ctx, const Request &req, Response *resp){
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t count = 0;
     int ret = serv->ssdb->zremrangebyscore(ctx, req[1], req[2], req[3], false, &count);
@@ -394,7 +395,7 @@ int proc_zcount(Context &ctx, const Request &req, Response *resp){
 
 int proc_zremrangebyscore(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
  	int64_t count = 0;
     int ret = serv->ssdb->zremrangebyscore(ctx, req[1], req[2], req[3], true, &count);
@@ -409,7 +410,7 @@ int proc_zremrangebyscore(Context &ctx, const Request &req, Response *resp){
 
 int proc_zremrangebyrank(Context &ctx, const Request &req, Response *resp){
 	SSDBServer *serv = (SSDBServer *) ctx.serv;
-	CHECK_NUM_PARAMS(4);
+	CHECK_MIN_PARAMS(4);
 
     std::vector<std::string> key_score;
     int ret = serv->ssdb->zrange(ctx, req[1], req[2], req[3], key_score);
@@ -440,7 +441,7 @@ int proc_zremrangebyrank(Context &ctx, const Request &req, Response *resp){
 
 
 static int _zrangebylex(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, enum DIRECTION direction){
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
     long offset = 0, limit = -1;
     int ret = 0;
 
@@ -483,7 +484,7 @@ int proc_zrangebylex(Context &ctx, const Request &req, Response *resp){
 
 int proc_zremrangebylex(Context &ctx, const Request &req, Response *resp){
     SSDBServer *serv = (SSDBServer *) ctx.serv;
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t count = 0;
 
@@ -504,7 +505,7 @@ int proc_zrevrangebylex(Context &ctx, const Request &req, Response *resp){
 }
 
 int proc_zlexcount(Context &ctx, const Request &req, Response *resp){
-    CHECK_NUM_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
     SSDBServer *serv = (SSDBServer *) ctx.serv;
 
     int64_t count = 0;

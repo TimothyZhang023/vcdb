@@ -63,12 +63,16 @@ int VcClientConn::DealMessage() {
     }
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
-    request.convert_resq();
+
+    if (request.response.redisResponse != nullptr) {
+        request.output->append(request.response.redisResponse->toRedis());
+    } else {
+        request.convert_resq();
+    }
 
     ExpandWbufTo(static_cast<uint32_t>(request.output->size()));
     memcpy(wbuf_ + wbuf_len_, request.output->data(), static_cast<size_t>(request.output->size()));
     wbuf_len_ += request.output->size();
-
 
 
     int64_t time_proc = slash::NowMicros() - start_us;

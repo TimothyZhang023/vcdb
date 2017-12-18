@@ -20,8 +20,16 @@
 
 #define DEF_PROC(f) int proc_##f(Context &ctx, const Request &req, Response *resp)
 
-#define CHECK_NUM_PARAMS(n) do{ \
+#define CHECK_MIN_PARAMS(n) do{ \
 		if(req.size() < n){ \
+			resp->push_back("client_error"); \
+			resp->push_back("ERR wrong number of arguments"); \
+			return 0; \
+		} \
+	}while(0)
+
+#define CHECK_MAX_PARAMS(n) do{ \
+		if(req.size() > n){ \
 			resp->push_back("client_error"); \
 			resp->push_back("ERR wrong number of arguments"); \
 			return 0; \
