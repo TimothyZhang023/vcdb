@@ -87,7 +87,7 @@ set(SLASH_SOURCE_FILES
         )
 
 
-set(SOURCE_FILES src/main.cpp )
+set(SOURCE_FILES src/main.cpp src/app.cpp src/conn.cpp src/conn.h)
 
 
 add_executable(vcdb ${SOURCE_FILES})

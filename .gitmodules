@@ -7,3 +7,12 @@
 [submodule "deps/jemalloc"]
 	path = deps/jemalloc
 	url = https://github.com/jemalloc/jemalloc.git
+[submodule "deps/rocksdb"]
+	path = deps/rocksdb
+	url = https://github.com/facebook/rocksdb.git
+[submodule "deps/zlib"]
+	path = deps/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "deps/snappy"]
+	path = deps/snappy
+	url = https://github.com/google/snappy.git

@@ -53,7 +53,21 @@ PINK_PATH = $(THIRD_PATH)/pink
 endif
 PINK = $(PINK_PATH)/pink/lib/libpink$(DEBUG_SUFFIX).a
 
+ifndef JEMALLOC_PATH
+JEMALLOC_PATH = $(THIRD_PATH)/jemalloc
+endif
 
+ifndef ZLIB_PATH
+ZLIB_PATH = $(THIRD_PATH)/zlib
+endif
+
+ifndef SNAPPY_PATH
+SNAPPY_PATH = $(THIRD_PATH)/snappy
+endif
+
+ifndef ROCKSDB_PATH
+ROCKSDB_PATH = $(THIRD_PATH)/rocksdb
+endif
 
 
 #-----------------------------------------------
@@ -91,6 +105,26 @@ slash:
 pink:
 	$(AM_V_at)make -C $(PINK_PATH)/pink/ DEBUG_LEVEL=$(DEBUG_LEVEL) NO_PB=1 SLASH_PATH=$(SLASH_PATH)
 
+jemalloc:
+	cd $(JEMALLOC_PATH) && \
+	    sh autogen.sh && \
+	    sh configure && \
+	    make -j8
+
+snappy:
+	cd $(SNAPPY_PATH) && \
+	cmake . &&\
+	make -j8 snappy
+
+zlib:
+	cd $(ZLIB_PATH) && \
+	    sh configure && \
+	    make -j8
+
+rocksdb:
+	cd $(ROCKSDB_PATH) && \
+	make -j10 OPT="-DSNAPPY -I$(SNAPPY_PATH) -L$(SNAPPY_PATH) -DJEMALLOC -I$(JEMALLOC_PATH)/include -L$(JEMALLOC_PATH)/lib -L$(ZLIB_PATH) --rtti" static_lib
+
 
 clean:
 	rm -rf $(OUTPUT)
@@ -98,3 +132,7 @@ clean:
 distclean: clean
 	make -C $(PINK_PATH)/pink/ SLASH_PATH=$(SLASH_PATH) clean
 	make -C $(SLASH_PATH)/slash/ clean
+	make -C $(JEMALLOC_PATH)/ clean
+	make -C $(ROCKSDB_PATH)/ clean
+	make -C $(ZLIB_PATH)/ clean
+	make -C $(SNAPPY_PATH)/ clean
