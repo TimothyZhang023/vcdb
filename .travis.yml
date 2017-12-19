@@ -18,8 +18,7 @@ addons:
     - g++
 
 script:
-  - make
-  - make test
+  - make && make test
 
 env:
   global:
