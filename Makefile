@@ -87,11 +87,11 @@ vcdb:
 .PHONY: vcdb
 
 clean:
-	make -C $(OUTPUT) clean
+	make -C $(THIRD_PATH) clean
 .PHONY: clean
 
 distclean:
-	make -C $(THIRD_PATH) clean
+	make -C $(THIRD_PATH) distclean
 	rm -rf $(OUTPUT)
 .PHONY: distclean
 
