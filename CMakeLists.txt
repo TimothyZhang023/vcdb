@@ -56,6 +56,7 @@ LINK_DIRECTORIES(
         ${ROCKSDB_PATH}/
         ${SNAPPY_PATH}/
         ${BZIP2_PATH}/
+        ${ZLIB_PATH}/
 )
 
 
