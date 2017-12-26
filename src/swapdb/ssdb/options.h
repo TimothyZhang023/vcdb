@@ -73,8 +73,6 @@ struct Options {
     int level0_slowdown_writes_trigger = 20; //slow write
     int level0_stop_writes_trigger = 36;  //block write
 
-    std::string upstream_ip;
-    int upstream_port = 0;
 
     void load(Config *conf);
 

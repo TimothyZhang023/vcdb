@@ -73,8 +73,6 @@ SET(RDB_OBJS
         src/swapdb/redis/rdb_decoder.cpp
         src/swapdb/redis/sha1.c
         )
-
-
 ADD_LIBRARY(librdb STATIC ${RDB_OBJS})
 set_target_properties(librdb PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 OUTPUT_NAME "rdb")
 
@@ -111,11 +109,16 @@ set(SWAPDB_SOURCE_FILES
         src/swapdb/codec/internal_error.cpp
         src/swapdb/codec/util.cpp
 
-
         )
 
 
-set(SOURCE_FILES ${SWAPDB_SOURCE_FILES} src/main.cpp src/job.cpp src/app.cpp src/conn.cpp src/conn.h)
+set(SOURCE_FILES ${SWAPDB_SOURCE_FILES}
+        src/main.cpp
+        src/RedisJob.cpp
+        src/Application.cpp
+        src/ClientConn.cpp
+        src/AppArgs.cpp
+)
 
 
 add_executable(vcdb ${SOURCE_FILES})

@@ -147,10 +147,6 @@ all: jemalloc slash pink snappy zlib bzip2 rocksdb
 .PHONY: all
 
 clean:
-	rm -rf $(OUTPUT)
-.PHONY: clean
-
-distclean: clean
 	make -C $(PINK_PATH)/pink/ SLASH_PATH=$(SLASH_PATH) clean
 	make -C $(SLASH_PATH)/slash/ clean
 	make -C $(JEMALLOC_PATH)/ clean
@@ -158,4 +154,14 @@ distclean: clean
 	make -C $(ZLIB_PATH)/ clean
 	make -C $(SNAPPY_PATH)/ clean
 	make -C $(BZIP2_PATH)/ clean
+.PHONY: clean
+
+distclean: clean
+	make -C $(PINK_PATH)/pink/ SLASH_PATH=$(SLASH_PATH) distclean
+	make -C $(SLASH_PATH)/slash/ distclean
+	make -C $(JEMALLOC_PATH)/ distclean
+	make -C $(ROCKSDB_PATH)/ distclean
+	make -C $(ZLIB_PATH)/ distclean
+	make -C $(SNAPPY_PATH)/ distclean
+	make -C $(BZIP2_PATH)/ distclean
 .PHONY: distclean

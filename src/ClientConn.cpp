@@ -4,8 +4,8 @@
 #include "slash/include/slash_string.h"
 #include "slash/include/env.h"
 
-#include "conn.h"
-#include "job.h"
+#include "ClientConn.h"
+#include "RedisJob.h"
 
 #include <swapdb/serv.h>
 

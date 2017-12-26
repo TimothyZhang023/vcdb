@@ -14,8 +14,6 @@ void Options::load(Config *conf) {
     c = conf;
 
 
-    expire_enable = conf->get_bool("server.expire_enable", false);
-
     cache_size = (size_t) conf->get_num("rocksdb.cache_size", 16);
     sim_cache = (size_t) conf->get_num("rocksdb.sim_cache", 0);
     block_size = (size_t) conf->get_num("rocksdb.block_size", 16);
@@ -26,7 +24,7 @@ void Options::load(Config *conf) {
     compression = conf->get_bool("rocksdb.compression");
     rdb_compression = conf->get_bool("rocksdb.rdb_compression", false);
     transfer_compression = conf->get_bool("rocksdb.transfer_compression");
-    level_compaction_dynamic_level_bytes = conf->get_bool("rocksdb.level_compaction_dynamic_level_bytes");
+    level_compaction_dynamic_level_bytes = conf->get_bool("rocksdb.level_compaction_dynamic_level_bytes", false);
     use_direct_reads = conf->get_bool("rocksdb.use_direct_reads", false);
     optimize_filters_for_hits = conf->get_bool("rocksdb.optimize_filters_for_hits", false);
     cache_index_and_filter_blocks = conf->get_bool("rocksdb.cache_index_and_filter_blocks", false);
@@ -47,11 +45,6 @@ void Options::load(Config *conf) {
     level0_stop_writes_trigger = conf->get_num("rocksdb.level0_stop_writes_trigger", 36);
 
 
-    upstream_ip = conf->get_str("upstream.ip");
-    upstream_port = conf->get_num("upstream.port", 0);
-
-
-
 }
 
 std::ostream &operator<<(std::ostream &os, const Options &options) {
@@ -70,7 +63,6 @@ std::ostream &operator<<(std::ostream &os, const Options &options) {
 
             << "\n use_direct_reads: " << options.use_direct_reads
             << "\n optimize_filters_for_hits: " << options.optimize_filters_for_hits
-            << "\n expire_enable: " << options.expire_enable
 
             << "\n max_write_buffer_number: " << options.max_write_buffer_number
             << "\n max_background_flushes: " << options.max_background_flushes
@@ -90,8 +82,7 @@ std::ostream &operator<<(std::ostream &os, const Options &options) {
             << "\n level0_slowdown_writes_trigger: " << options.level0_slowdown_writes_trigger
 
             << "\n level0_stop_writes_trigger: " << options.level0_stop_writes_trigger
-            << "\n upstream_ip: " << options.upstream_ip
-            << "\n upstream_port: " << options.upstream_port
+
             << "\n c: " << options.c;
     return os;
 }

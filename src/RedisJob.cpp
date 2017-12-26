@@ -2,7 +2,7 @@
 // Created by zts on 12/18/17.
 //
 
-#include "job.h"
+#include "RedisJob.h"
 
 #define INIT_BUFFER_SIZE  1024
 #define BEST_BUFFER_SIZE  (8 * 1024)

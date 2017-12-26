@@ -1,8 +1,8 @@
-#include "app.h"
+#include "Application.h"
 
 int main(int argc, char **argv) {
 
-    App applicationServer;
+    Application applicationServer;
     applicationServer.parse(argc, argv);
 
     applicationServer.init();
