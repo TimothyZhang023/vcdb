@@ -7,7 +7,7 @@ found in the LICENSE file.
 #define SSDB_OPTION_H_
 
 #include <ostream>
-#include "../util/config.h"
+#include "util/config.h"
 
 #ifdef USE_LEVELDB
 class Options

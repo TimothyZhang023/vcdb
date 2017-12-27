@@ -7,8 +7,8 @@ found in the LICENSE file.
 #define SSDB_TTL_H_
 
 #include "ssdb_impl.h"
-#include "../util/thread.h"
-#include "../util/sorted_set.h"
+#include "util/thread.h"
+#include "util/sorted_set.h"
 #include <string>
 
 class SSDBImpl;

@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include "ttl.h"
 #include "t_cursor.h"
 #include "t_scan.h"
-#include "../serv.h"
+#include "serv.h"
 
 
 inline

@@ -4,7 +4,7 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 #include "options.h"
-#include "../util/strings.h"
+#include "util/strings.h"
 
 
 void Options::load(Config *conf) {
