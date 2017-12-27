@@ -68,17 +68,13 @@ public:
     }
 
     SSDBImpl *db = nullptr;
-    ProcMap proc_map;
+    ProcMap procMap;
 
     atomic<bool> status;
 
     void regProcs();
 
 };
-
-
-#define reply_err_return(n) resp->reply_errror(GetErrorInfo(n)); return 0
-#define reply_errinfo_return(c) resp->reply_errror((c)); return 0
 
 const double ZSET_SCORE_MAX = std::numeric_limits<double>::max();
 const double ZSET_SCORE_MIN = std::numeric_limits<double>::min();

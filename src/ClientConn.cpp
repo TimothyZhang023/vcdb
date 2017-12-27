@@ -20,13 +20,13 @@ VcClientConn::~VcClientConn() {
     delete ctx;
 }
 
-int VcClientConn::ReplyError(const std::string& msg, std::string* response) {
+int VcClientConn::ReplyError(const std::string &msg, std::string *response) {
     response->append("-");
     response->append(msg);
     response->append("\r\n");
 }
 
-int VcClientConn::DealMessage(pink::RedisCmdArgsType& argv, std::string* response) {
+int VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *response) {
     if (argv.empty()) {
         ReplyError("empty request", response);
         return -2;
@@ -39,14 +39,14 @@ int VcClientConn::DealMessage(pink::RedisCmdArgsType& argv, std::string* respons
 
     int64_t start_us = slash::NowMicros();
 
-    RedisJob request(argv);
+    RedisJob request(argv, response);
     request.convert_req();
 
-    if(log_level() >= Logger::LEVEL_DEBUG) {
+    if (log_level() >= Logger::LEVEL_DEBUG) {
         log_debug("[receive] req: %s", serialize_req(request.req).c_str());
     }
 
-    Command *cmd = server->proc_map.getProc(slash::StringToLower(request.cmd));
+    Command *cmd = server->procMap.getProc(slash::StringToLower(request.cmd));
     if (!cmd) {
         ReplyError("command not found", response);
         return -2;
@@ -54,21 +54,15 @@ int VcClientConn::DealMessage(pink::RedisCmdArgsType& argv, std::string* respons
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
 
-    if (request.response.redisResponse != nullptr) {
-        response->append(request.response.redisResponse->toRedis());
-        delete request.response.redisResponse;
-        request.response.redisResponse = nullptr;
-    } else {
+    if (response->empty()) {
         request.convert_resq();
-        response->append(request.output->data(), request.output->size());
     }
 
-
     int64_t time_proc = slash::NowMicros() - start_us;
-    log_debug("[result]  p:%d, req: %s, resp: %s,",
-              time_proc,
-              serialize_req(request.req).c_str(),
-              serialize_req(request.response.resp).c_str());
+
+    if (log_level() >= Logger::LEVEL_DEBUG) {
+        log_debug("[result] p:%d, req: %s, resp: %s,", time_proc, serialize_req(request.req).c_str(), hexcstr(*response));
+    }
 
     return 0;
 }

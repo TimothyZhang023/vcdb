@@ -16,7 +16,7 @@ int proc_hexists(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hget(ctx, name, key, val);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
         resp->reply_bool(0);
     } else {
@@ -30,7 +30,7 @@ int proc_hexists(Context &ctx, const Request &req, Response *resp) {
 int proc_hmset(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     if (req.size() < 4 || req.size() % 2 != 0) {
-        reply_errinfo_return("ERR wrong number of arguments for 'hmset' command");
+        addReplyErrorInfoReturn("ERR wrong number of arguments for 'hmset' command");
     }
 
     std::map<Bytes, Bytes> kvs;
@@ -45,7 +45,7 @@ int proc_hmset(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hmset(ctx, name, kvs);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     }
 
     resp->reply_int(0, 1);
@@ -68,7 +68,7 @@ int proc_hdel(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hdel(ctx, name, fields, &deleted);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     }
 
     resp->reply_int(0, deleted);
@@ -112,7 +112,7 @@ int proc_hmget(Context &ctx, const Request &req, Response *resp) {
 
         //nothing
     } else {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     }
 
     return 0;
@@ -126,7 +126,7 @@ int proc_hsize(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hsize(ctx, req[1], &size);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else {
         resp->reply_int(ret, size);
     }
@@ -142,7 +142,7 @@ int proc_hset(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hset(ctx, req[1], req[2], req[3], &added);
 //
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
         resp->reply_bool(ret);
     } else {
@@ -160,7 +160,7 @@ int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hsetnx(ctx, req[1], req[2], req[3], &added);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
         resp->reply_bool(ret);
     } else {
@@ -179,7 +179,7 @@ int proc_hget(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hget(ctx, req[1], req[2], val);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else {
         if (val.second) {
             resp->reply_get(1, &val.first);
@@ -201,7 +201,7 @@ int proc_hgetall(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hgetall(ctx, req[1], resMap);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
         resp->reply_list_ready();
 
@@ -230,22 +230,22 @@ int proc_hscan(Context &ctx, const Request &req, Response *resp) {
 
     cursor.Uint64();
     if (errno == EINVAL) {
-        reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
     }
 
     ScanParams scanParams;
 
     int ret = prepareForScanParams(req, cursorIndex + 1, scanParams);
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     }
     resp->reply_scan_ready();
 
-    ret = serv->db->hscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp);
+    ret = serv->db->hscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
     if (ret < 0) {
-        resp->resp.clear();
-        reply_err_return(ret);
+        resp->resp_arr.clear();
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
     }
 
@@ -263,7 +263,7 @@ int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hgetall(ctx, req[1], resMap);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
         resp->reply_list_ready();
 
@@ -292,7 +292,7 @@ int proc_hvals(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->hgetall(ctx, req[1], resMap);
 
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
         resp->reply_list_ready();
 
@@ -316,15 +316,15 @@ int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
 
     long double by = req[3].LDouble();
     if (errno == EINVAL) {
-        reply_err_return(INVALID_DBL);
+        addReplyErrorCodeReturn(INVALID_DBL);
     }
 
     long double new_val;
     int ret = serv->db->hincrbyfloat(ctx, req[1], req[2], by, &new_val);
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_long_double(ret, new_val);
+        resp->addReplyHumanLongDouble(new_val);
     }
     return 0;
 
@@ -337,13 +337,13 @@ int proc_hincr(Context &ctx, const Request &req, Response *resp) {
     int64_t by = req[3].Int64();
 
     if (errno == EINVAL) {
-        reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
     }
 
     int64_t new_val = 0;
     int ret = serv->db->hincr(ctx, req[1], req[2], by, &new_val);
     if (ret < 0) {
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else {
         resp->reply_int(ret, new_val);
     }

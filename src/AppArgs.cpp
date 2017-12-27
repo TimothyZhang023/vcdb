@@ -8,68 +8,68 @@
 #include <swapdb/util/log.h>
 
 
-int AppArgs::readPid() {
-    if (pidFile.empty()) {
+int AppArgs::ReadPid() {
+    if (pid_file.empty()) {
         return -1;
     }
     std::string s;
-    file_get_contents(pidFile, &s);
+    file_get_contents(pid_file, &s);
     if (s.empty()) {
         return -1;
     }
     return str_to_int(s);
 }
 
-void AppArgs::writePid() {
-    if (!isDaemon) {
+void AppArgs::WritePid() {
+    if (!is_daemon) {
         return;
     }
-    if (pidFile.empty()) {
+    if (pid_file.empty()) {
         return;
     }
     int pid = (int) getpid();
     std::string s = str(pid);
-    int ret = file_put_contents(pidFile, s);
+    int ret = file_put_contents(pid_file, s);
     if (ret == -1) {
-        log_error("Failed to write pidfile '%s'(%s)", pidFile.c_str(), strerror(errno));
+        log_error("Failed to write pidfile '%s'(%s)", pid_file.c_str(), strerror(errno));
         exit(1);
     }
 }
 
 
-void AppArgs::checkPidFile() {
-    if (!isDaemon) {
+void AppArgs::CheckPidFile() {
+    if (!is_daemon) {
         return;
     }
-    if (pidFile.size()) {
-        if (access(pidFile.c_str(), F_OK) == 0) {
+    if (pid_file.size()) {
+        if (access(pid_file.c_str(), F_OK) == 0) {
             fprintf(stderr, "Fatal error!\nPidfile %s already exists!\n"
                             "Kill the running process before you run this command,\n"
                             "or use '-s restart' option to restart the server.\n",
-                    pidFile.c_str());
+                    pid_file.c_str());
             exit(1);
         }
     }
 }
 
-void AppArgs::removePidFile() {
-    if (!isDaemon) {
+void AppArgs::RemovePidFile() {
+    if (!is_daemon) {
         return;
     }
-    if (pidFile.size()) {
-        remove(pidFile.c_str());
+    if (pid_file.size()) {
+        remove(pid_file.c_str());
     }
 }
 
-void AppArgs::killByPidFile() {
-    int pid = readPid();
+void AppArgs::KillByPidFile() {
+    int pid = ReadPid();
     if (pid == -1) {
-        fprintf(stderr, "could not read pidfile: %s(%s)\n", pidFile.c_str(), strerror(errno));
+        fprintf(stderr, "could not read pidfile: %s(%s)\n", pid_file.c_str(), strerror(errno));
         exit(1);
     }
     if (kill(pid, 0) == -1 && errno == ESRCH) {
         fprintf(stderr, "process: %d not running\n", pid);
-        removePidFile();
+        RemovePidFile();
         return;
     }
     int ret = kill(pid, SIGTERM);
@@ -78,7 +78,7 @@ void AppArgs::killByPidFile() {
         exit(1);
     }
 
-    while (file_exists(pidFile)) {
+    while (file_exists(pid_file)) {
         usleep(100 * 1000);
     }
 }

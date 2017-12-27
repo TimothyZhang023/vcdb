@@ -10,26 +10,24 @@
 class AppArgs {
 public:
     AppArgs() {
-        isDaemon = false;
+        is_daemon = false;
         action = "start";
     }
 
-    int readPid();
+    int ReadPid();
+    void WritePid();
 
-    void writePid();
-
-    void checkPidFile();
-    void removePidFile();
-    void killByPidFile();
-
+    void CheckPidFile();
+    void RemovePidFile();
+    void KillByPidFile();
 
 public:
-    bool isDaemon;
+    bool is_daemon;
     int port = 6379;
     std::string ip = "0.0.0.0";
-    std::string pidFile;
-    std::string confFile;
-    std::string workDir;
+    std::string pid_file;
+    std::string conf_file;
+    std::string work_dir;
     std::string action;
 
 };

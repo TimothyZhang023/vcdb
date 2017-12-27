@@ -15,7 +15,7 @@ int proc_type(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->type(ctx, req[1], &val);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
 	resp->reply_get(1, &val);
@@ -31,7 +31,7 @@ int proc_get(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->get(ctx, req[1], &val);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_get(ret, &val);
 	}
@@ -47,7 +47,7 @@ int proc_getset(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->getset(ctx, req[1], val, req[2]);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second){
 			resp->reply_get(1, &val.first);
@@ -66,7 +66,7 @@ int proc_append(Context &ctx, const Request &req, Response *resp){
 	uint64_t newlen = 0;
 	int ret = serv->db->append(ctx, req[1], req[2], &newlen);
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}else{
 		resp->reply_int(1, newlen);
 	}
@@ -97,7 +97,7 @@ int proc_set(Context &ctx, const Request &req, Response *resp){
 				flags |= OBJ_SET_PX;
 				tu = TimeUnit::Millisecond;
 			} else {
-				reply_err_return(SYNTAX_ERR);
+				addReplyErrorCodeReturn(SYNTAX_ERR);
 			}
 
 			if (key == "nx" || key == "xx") {
@@ -105,21 +105,21 @@ int proc_set(Context &ctx, const Request &req, Response *resp){
 			} else if (key=="ex" || key=="px") {
 				i++;
 				if (i >= req.size()) {
-					reply_err_return(SYNTAX_ERR);
+					addReplyErrorCodeReturn(SYNTAX_ERR);
 
 				} else {
 					ttl = Bytes(req[i]).Int64();
 					if (errno == EINVAL){
-						reply_err_return(INVALID_INT);
+						addReplyErrorCodeReturn(INVALID_INT);
 					}
 
 					if (ttl <= 0) {
-						reply_err_return(INVALID_EX_TIME);
+						addReplyErrorCodeReturn(INVALID_EX_TIME);
 					}
 
 				}
 			} else {
-				reply_err_return(SYNTAX_ERR);
+				addReplyErrorCodeReturn(SYNTAX_ERR);
 
 			}
 		}
@@ -127,7 +127,7 @@ int proc_set(Context &ctx, const Request &req, Response *resp){
 
 	int t_ret = serv->db->expiration->convert2ms(&ttl, tu);
 	if (t_ret < 0) {
-		reply_err_return(t_ret);
+		addReplyErrorCodeReturn(t_ret);
 	}
 
 
@@ -135,7 +135,7 @@ int proc_set(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->set(ctx, req[1], req[2], flags, ttl, &added);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
 	resp->reply_bool(added);
@@ -152,7 +152,7 @@ int proc_setnx(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->set(ctx, req[1], req[2], OBJ_SET_NX, 0, &added);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_bool(added);
 	}
@@ -167,23 +167,23 @@ int proc_setx(Context &ctx, const Request &req, Response *resp){
 
 	int64_t ttl = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	if (ttl <= 0) {
-		reply_err_return(INVALID_EX_TIME);
+		addReplyErrorCodeReturn(INVALID_EX_TIME);
 	}
 
 	int t_ret = serv->db->expiration->convert2ms(&ttl, TimeUnit::Second);
 	if (t_ret < 0) {
-		reply_err_return(t_ret);
+		addReplyErrorCodeReturn(t_ret);
 	}
 
 	int added = 0;
 	int ret = serv->db->set(ctx, req[1], req[3], OBJ_SET_EX, ttl, &added);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
 	resp->reply_bool(1);
@@ -197,16 +197,16 @@ int proc_psetx(Context &ctx, const Request &req, Response *resp){
 
     int64_t ttl = req[2].Int64();
     if (errno == EINVAL){
-        reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
     }
 
     if (ttl <= 0) {
-        reply_err_return(INVALID_EX_TIME);
+		addReplyErrorCodeReturn(INVALID_EX_TIME);
     }
 
     int t_ret = serv->db->expiration->convert2ms(&ttl, TimeUnit::Millisecond);
     if (t_ret < 0) {
-		reply_err_return(t_ret);
+		addReplyErrorCodeReturn(t_ret);
     }
 
 
@@ -214,7 +214,7 @@ int proc_psetx(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->set(ctx, req[1], req[3], OBJ_SET_PX, ttl, &added);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
     resp->reply_bool(1);
@@ -254,13 +254,13 @@ int proc_pexpire(Context &ctx, const Request &req, Response *resp){
 
     long long when;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &when) == 0) {
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
     }
 
     std::string val;
     int ret = serv->db->expiration->expire(ctx, req[1], (int64_t)when, TimeUnit::Millisecond);
     if (ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else if (ret < 2) {
 
 	}
@@ -275,13 +275,13 @@ int proc_expire(Context &ctx, const Request &req, Response *resp){
 
     long long when;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &when) == 0) {
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
     }
 
 	std::string val;
 	int ret = serv->db->expiration->expire(ctx, req[1], (int64_t)when, TimeUnit::Second);
     if (ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else if (ret < 2) {
 
 	}
@@ -297,13 +297,13 @@ int proc_expireat(Context &ctx, const Request &req, Response *resp){
 
     long long ts_ms;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &ts_ms) == 0) {
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
     }
 
 	std::string val;
 	int ret = serv->db->expiration->expireAt(ctx, req[1], (int64_t)ts_ms * 1000);
     if (ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else if (ret < 2) {
 
 	}
@@ -321,7 +321,7 @@ int proc_persist(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->expiration->persist(ctx, req[1]);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
 	resp->reply_bool(ret);
@@ -334,13 +334,13 @@ int proc_pexpireat(Context &ctx, const Request &req, Response *resp){
 
     long long ts_ms;
     if (string2ll(req[2].data(), (size_t)req[2].size(), &ts_ms) == 0) {
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
     }
 
 	std::string val;
 	int ret = serv->db->expiration->expireAt(ctx, req[1], (int64_t)ts_ms);
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else if (ret < 2) {
 
 	}
@@ -374,11 +374,11 @@ int proc_exists(Context &ctx, const Request &req, Response *resp){
 int proc_multi_set(Context &ctx, const Request &req, Response *resp){
 	VcServer *serv = ctx.serv;
 	if(req.size() < 3 || req.size() % 2 != 1){
-		reply_errinfo_return("ERR wrong number of arguments for MSET");
+		addReplyErrorInfoReturn("ERR wrong number of arguments for MSET");
 	}else{
 		int ret = serv->db->multi_set(ctx, req, 1);
 		if(ret < 0){
-			reply_err_return(ret);
+			addReplyErrorCodeReturn(ret);
 		} else {
 			resp->reply_int(ret, (uint64_t)ret);
 		}
@@ -399,7 +399,7 @@ int proc_multi_del(Context &ctx, const Request &req, Response *resp){
 	int64_t num = 0;
 	int ret = serv->db->multi_del(ctx, distinct_keys, &num);
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else{
 
 		resp->reply_int(0, num);
@@ -418,7 +418,7 @@ int proc_multi_get(Context &ctx, const Request &req, Response *resp){
 		int ret = serv->db->get(ctx, req[i], &val);
 //		if(ret < 0){
 //			resp->resp.clear();
-//			reply_err_return(ret);
+//			addReplyErrorCodeReturn(ret);
 //		}
 		if(ret == 1){
 			resp->push_back(req[i].String());
@@ -435,7 +435,7 @@ int proc_del(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->del(ctx, req[1]);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
 	std::string res = str(ret);
@@ -455,19 +455,19 @@ int proc_scan(Context &ctx, const Request &req, Response *resp){
 
     cursor.Uint64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	ScanParams scanParams;
 
 	int ret = prepareForScanParams(req, cursorIndex + 1, scanParams);
 	if (ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}
 
     resp->reply_scan_ready();
 
-    serv->db->scan(cursor, scanParams.pattern, scanParams.limit, resp->resp);
+    serv->db->scan(cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
 	return 0;
 }
@@ -512,7 +512,7 @@ int proc_ssdb_scan(Context &ctx, const Request &req, Response *resp){
 		} else if (key=="count") {
 			limit =  (*(it+1)).Uint64();
 			if (errno == EINVAL){
-				reply_err_return(INVALID_INT);
+				addReplyErrorCodeReturn(INVALID_INT);
 			}
 		} else if (key=="value") {
 			std::string has_value_s = (*(it+1)).String();
@@ -520,7 +520,7 @@ int proc_ssdb_scan(Context &ctx, const Request &req, Response *resp){
 
 			need_value = (has_value_s=="on");
 		} else {
-			reply_err_return(SYNTAX_ERR);
+			addReplyErrorCodeReturn(SYNTAX_ERR);
 		}
 	}
 	bool fulliter = (pattern == "*");
@@ -584,13 +584,13 @@ static int _incr(Context &ctx, SSDB *ssdb, const Request &req, Response *resp, i
 	if(req.size() > 2){
 		by = req[2].Int64();
 		if (errno == EINVAL){
-			reply_err_return(INVALID_INT);
+			addReplyErrorCodeReturn(INVALID_INT);
 		}
 	}
 	int64_t new_val;
 	int ret = ssdb->incr(ctx, req[1], dir * by, &new_val);
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}else{
 		resp->reply_int(ret, new_val);
 	}
@@ -603,16 +603,16 @@ int proc_incrbyfloat(Context &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
     long double by = req[2].LDouble();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	long double new_val = 0.0L;
 
 	int ret = serv->db->incrbyfloat(ctx, req[1], by, &new_val);
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	}else{
-		resp->reply_long_double(ret, new_val);
+		resp->addReplyHumanLongDouble(new_val);
 	}
 
 	return 0;
@@ -635,14 +635,14 @@ int proc_getbit(Context &ctx, const Request &req, Response *resp){
 	string2ll(req[2].data(), (size_t)req[2].size(), &offset);
     if(offset < 0 || ((uint64_t)offset >> 3) >= MAX_PACKET_SIZE * 4){
         std::string msg = "ERR offset is is not an integer or out of range";
-		reply_errinfo_return(msg);
+		addReplyErrorInfoReturn(msg);
     }
 
 	int res = 0;
 	int ret = serv->db->getbit(ctx, req[1], (int64_t)offset, &res);
 
 	if(ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_bool(res);
 	}
@@ -660,17 +660,17 @@ int proc_setbit(Context &ctx, const Request &req, Response *resp){
 
 	int on = req[3].Int();
 	if(on & ~1){
-		reply_errinfo_return("ERR bit is not an integer or out of range");
+		addReplyErrorInfoReturn("ERR bit is not an integer or out of range");
 	}
 	if(offset < 0 || ((uint64_t)offset >> 3) >= MAX_PACKET_SIZE * 4){
-		reply_errinfo_return("ERR offset is out of range [0, 4294967296)");
+		addReplyErrorInfoReturn("ERR offset is out of range [0, 4294967296)");
 	}
 
 	int res = 0;
 	int ret = serv->db->setbit(ctx, name, (int64_t)offset, on, &res);
 
 	if(ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_bool(res);
 	}
@@ -691,14 +691,14 @@ int proc_countbit(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->get(ctx, key, &val);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else{
 		std::string str;
 		int size = -1;
 		if(req.size() > 3){
 			size = req[3].Int();
 			if (errno == EINVAL){
-				reply_err_return(INVALID_INT);
+				addReplyErrorCodeReturn(INVALID_INT);
 			}
 
 			str = substr(val, start, size);
@@ -720,21 +720,21 @@ int proc_bitcount(Context &ctx, const Request &req, Response *resp){
 	if(req.size() > 2){
 		start = req[2].Int();
 		if (errno == EINVAL){
-			reply_err_return(INVALID_INT);
+			addReplyErrorCodeReturn(INVALID_INT);
 		}
 	}
 	int end = -1;
 	if(req.size() > 3){
 		end = req[3].Int();
 		if (errno == EINVAL){
-			reply_err_return(INVALID_INT);
+			addReplyErrorCodeReturn(INVALID_INT);
 		}
 	}
 	std::string val;
 	int ret = serv->db->get(ctx, name, &val);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else{
 		std::string str = str_slice(val, start, end);
 		int count = bitcount(str.data(), str.size());
@@ -751,20 +751,20 @@ int proc_getrange(Context &ctx, const Request &req, Response *resp){
 	const Bytes &name = req[1];
 	int64_t start = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 
 	int64_t end = req[3].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	std::pair<std::string, bool> val;
 	int ret = serv->db->getrange(ctx, name, start, end, val);
 
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else{
 		resp->reply_get(1, &val.first);
 	}
@@ -783,18 +783,18 @@ int proc_setrange(Context &ctx, const Request &req, Response *resp){
 
  	int64_t start = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+		addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	if (start < 0) {
-		reply_err_return(INDEX_OUT_OF_RANGE);
+		addReplyErrorCodeReturn(INDEX_OUT_OF_RANGE);
 	}
 
 	uint64_t new_len = 0;
 
 	int ret = serv->db->setrange(ctx, req[1], start, req[3], &new_len);
 	if(ret < 0){
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else{
 		resp->reply_int(1, new_len);
 	}
@@ -810,7 +810,7 @@ int proc_strlen(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->get(ctx, name, &val);
 
 	if(ret < 0) {
-		reply_err_return(ret);
+		addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_int(ret, (int64_t)val.size());
 	}

@@ -20,7 +20,7 @@ typedef std::unordered_map<std::string, Command *> proc_map_t;
 typedef int (*proc_t)(Context &ctx, const Request &req, Response *resp);
 
 
-#define REG_PROC(c, f)  proc_map.regProc(#c, f, proc_##c)
+#define REG_PROC(c, f)  procMap.regProc(#c, f, proc_##c)
 
 
 class ProcMap {

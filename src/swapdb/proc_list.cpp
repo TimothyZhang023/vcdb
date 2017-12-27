@@ -14,7 +14,7 @@ int proc_qsize(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->LLen(ctx, req[1], &len);
 
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_int(ret, len);
 	}
@@ -32,7 +32,7 @@ int proc_qpush_frontx(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->LPushX(ctx, name, req, 2, &len);
 
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_int(ret, len);
 	}
@@ -49,7 +49,7 @@ int proc_qpush_front(Context &ctx, const Request &req, Response *resp){
  	uint64_t len = 0;
 	int ret = serv->db->LPush(ctx, name, req, 2, &len);
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_int(ret, len);
 	}
@@ -65,7 +65,7 @@ int proc_qpush_backx(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->RPushX(ctx, req[1], req, 2, &len);
 
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_int(ret, len);
 	}
@@ -81,7 +81,7 @@ int proc_qpush_back(Context &ctx, const Request &req, Response *resp){
     uint64_t len = 0;
     int ret = serv->db->RPush(ctx, req[1], req, 2, &len);
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_int(ret, len);
 	}
@@ -100,7 +100,7 @@ int proc_qpop_front(Context &ctx, const Request &req, Response *resp){
 	int ret = serv->db->LPop(ctx, name, val);
 
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second) {
 			resp->reply_get(1, &val.first);
@@ -121,7 +121,7 @@ int proc_qpop_back(Context &ctx, const Request &req, Response *resp){
     int ret = serv->db->RPop(ctx, req[1], val);
 
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second) {
 			resp->reply_get(1, &val.first);
@@ -141,20 +141,20 @@ int proc_qtrim(Context &ctx, const Request &req, Response *resp){
 
 	int64_t begin = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	int64_t end = req[3].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 
 	int ret = serv->db->ltrim(ctx, req[1], begin, end);
 
 	if (ret < 0){
-		resp->resp.clear();
-		reply_err_return(ret);
+		resp->resp_arr.clear();
+        addReplyErrorCodeReturn(ret);
 	} else {
 		resp->reply_status(ret);
 	}
@@ -170,20 +170,20 @@ int proc_qslice(Context &ctx, const Request &req, Response *resp){
 
 	int64_t begin = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	int64_t end = req[3].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	resp->reply_list_ready();
-	int ret = serv->db->lrange(ctx, req[1], begin, end, resp->resp);
+	int ret = serv->db->lrange(ctx, req[1], begin, end, resp->resp_arr);
 
 	if (ret < 0){
-		resp->resp.clear();
-		reply_err_return(ret);
+		resp->resp_arr.clear();
+        addReplyErrorCodeReturn(ret);
 	}
 
 	return 0;
@@ -195,14 +195,14 @@ int proc_qget(Context &ctx, const Request &req, Response *resp){
 
 	int64_t index = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	std::pair<std::string, bool> val;
 	int ret = serv->db->LIndex(ctx, req[1], index, val);
 
     if (ret < 0) {
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second) {
 			resp->reply_get(1, &val.first);
@@ -221,17 +221,17 @@ int proc_qset(Context &ctx, const Request &req, Response *resp){
 	const Bytes &name = req[1];
 	int64_t index = req[2].Int64();
 	if (errno == EINVAL){
-		reply_err_return(INVALID_INT);
+        addReplyErrorCodeReturn(INVALID_INT);
 	}
 
 	const Bytes &item = req[3];
 	int ret = serv->db->LSet(ctx, name, index, item);
 
 	if(ret < 0){
-		reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
 	} else if ( ret == 0) {
 		//???
-		reply_errinfo_return("ERR no such key");
+        addReplyErrorInfoReturn("ERR no such key");
 	} else{
 		//TODO CHECK HERE
 		resp->reply_ok();

@@ -3,10 +3,10 @@
 int main(int argc, char **argv) {
 
     Application applicationServer;
-    applicationServer.parse(argc, argv);
+    applicationServer.Parse(argc, argv);
 
-    applicationServer.init();
-    applicationServer.run();
+    applicationServer.Init();
+    applicationServer.Run();
 
     return 0;
 }

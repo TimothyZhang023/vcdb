@@ -21,20 +21,15 @@ class Application {
 public:
 
     Application() = default;;
-
     virtual ~Application();
 
-    int parse(int argc, char **argv);
-
-    int run();
-
-    int init();
-
-    void signalSetup();
+    int Parse(int argc, char **argv);
+    int Run();
+    int Init();
+    void SignalSetup();
 
 private:
     int usage(int argc, char **argv);
-
 
     AppArgs appArgs;
     Config *conf = nullptr;

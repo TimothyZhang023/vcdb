@@ -290,7 +290,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
         std::string res;
         int ret = serv->db->digest(&res);
         if (ret < 0) {
-            reply_err_return(ret);
+            addReplyErrorCodeReturn(ret);
         }
 
         resp->reply_ok();
@@ -355,7 +355,7 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
 
     int64_t ttl = req[2].Int64();
     if (errno == EINVAL || ttl < 0) {
-        reply_err_return(INVALID_EX_TIME);
+        addReplyErrorCodeReturn(INVALID_EX_TIME);
     }
 
     bool replace = false;
@@ -365,7 +365,7 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
         if (q4 == "REPLACE") {
             replace = true;
         } else {
-            reply_err_return(SYNTAX_ERR);
+            addReplyErrorCodeReturn(SYNTAX_ERR);
         }
     }
 
@@ -378,7 +378,7 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         log_warn("%s, %s : %s", GetErrorInfo(ret).c_str(), hexmem(req[1].data(), req[1].size()).c_str(),
                  hexmem(req[3].data(), req[3].size()).c_str());
-        reply_err_return(ret);
+        addReplyErrorCodeReturn(ret);
     } else {
         resp->reply_get(ret, &val);
     }
@@ -600,7 +600,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
         {//total_calls
             int64_t calls = 0;
             proc_map_t::iterator it;
-            for (it = ctx.serv->proc_map.begin(); it != ctx.serv->proc_map.end(); it++) {
+            for (it = ctx.serv->procMap.begin(); it != ctx.serv->procMap.end(); it++) {
                 Command *cmd = it->second;
                 calls += cmd->calls;
             }
@@ -629,7 +629,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
     }
 
     if (selected == "cmd") {
-        for_each(serv->proc_map.begin(), ctx.serv->proc_map.end(), [&](std::pair<const Bytes, Command *> it) {
+        for_each(serv->procMap.begin(), ctx.serv->procMap.end(), [&](std::pair<const Bytes, Command *> it) {
             Command *cmd = it.second;
             resp->push_back("cmd." + cmd->name);
             char buf[128];

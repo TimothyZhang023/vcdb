@@ -45,11 +45,11 @@ int Application::usage(int argc, char **argv) {
 }
 
 
-int Application::parse(int argc, char **argv) {
+int Application::Parse(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "-d") {
-            appArgs.isDaemon = true;
+            appArgs.is_daemon = true;
         } else if (arg == "-v") {
             exit(0);
         } else if (arg == "-h") {
@@ -77,29 +77,29 @@ int Application::parse(int argc, char **argv) {
                 exit(1);
             }
         } else {
-            appArgs.confFile = argv[i];
+            appArgs.conf_file = argv[i];
         }
     }
 
     return 0;
 }
 
-int Application::init() {
+int Application::Init() {
 
 
-    if ((!appArgs.confFile.empty()) && (!is_file(appArgs.confFile))) {
-        fprintf(stderr, "'%s' is not a file or not exists!\n", appArgs.confFile.c_str());
+    if ((!appArgs.conf_file.empty()) && (!is_file(appArgs.conf_file))) {
+        fprintf(stderr, "'%s' is not a file or not exists!\n", appArgs.conf_file.c_str());
         exit(1);
     }
 
-    conf = Config::load(appArgs.confFile.c_str());
+    conf = Config::load(appArgs.conf_file.c_str());
     if (!conf) {
-        fprintf(stderr, "error loading conf file: '%s'\n", appArgs.confFile.c_str());
+        fprintf(stderr, "error loading conf file: '%s'\n", appArgs.conf_file.c_str());
         exit(1);
     }
 
     {
-        std::string conf_dir = real_dirname(appArgs.confFile.c_str());
+        std::string conf_dir = real_dirname(appArgs.conf_file.c_str());
         if (chdir(conf_dir.c_str()) == -1) {
             fprintf(stderr, "error chdir: %s\n", conf_dir.c_str());
             exit(1);
@@ -107,20 +107,20 @@ int Application::init() {
     }
 
     { //pid
-        appArgs.pidFile = conf->get_str("pidfile", "/tmp/vcdb.pid");
+        appArgs.pid_file = conf->get_str("pidfile", "/tmp/vcdb.pid");
 
         if (appArgs.action == "stop") {
-            appArgs.killByPidFile();
+            appArgs.KillByPidFile();
             exit(0);
         }
 
         if (appArgs.action == "restart") {
-            if (file_exists(appArgs.pidFile)) {
-                appArgs.killByPidFile();
+            if (file_exists(appArgs.pid_file)) {
+                appArgs.KillByPidFile();
             }
         }
 
-        appArgs.checkPidFile();
+        appArgs.CheckPidFile();
     }
 
 
@@ -145,42 +145,42 @@ int Application::init() {
     appArgs.port = conf->get_num("server.port", appArgs.port);
     appArgs.ip = conf->get_str("server.ip", appArgs.ip.c_str());
 
-    appArgs.workDir = conf->get_str("work_dir");
-    if (appArgs.workDir.empty()) {
-        appArgs.workDir = ".";
+    appArgs.work_dir = conf->get_str("work_dir");
+    if (appArgs.work_dir.empty()) {
+        appArgs.work_dir = ".";
     }
-    if (!is_dir(appArgs.workDir)) {
-        fprintf(stderr, "'%s' is not a directory or not exists!\n", appArgs.workDir.c_str());
+    if (!is_dir(appArgs.work_dir)) {
+        fprintf(stderr, "'%s' is not a directory or not exists!\n", appArgs.work_dir.c_str());
         exit(1);
     }
 
     // WARN!!!
     // deamonize() MUST be called before any thread is created!
-    if (appArgs.isDaemon) {
+    if (appArgs.is_daemon) {
         daemonize();
     }
 
 }
 
-int Application::run() {
-    appArgs.writePid();
+int Application::Run() {
+    appArgs.WritePid();
     go();
-    appArgs.removePidFile();
+    appArgs.RemovePidFile();
 }
 
 int Application::go() {
-    this->signalSetup();
+    this->SignalSetup();
 
 
     Options option;
     option.load(conf);
 
-    std::string data_db_dir = appArgs.workDir;
+    std::string data_db_dir = appArgs.work_dir;
 
 //    log_info("vcdb-server %s", APP_VERSION);
 //    log_info("build_version %s", APP_GIT_BUILD);
 //    log_info("build_date %s", APP_BUILD_DATE);
-    log_info("conf_file        : %s", appArgs.confFile.c_str());
+    log_info("conf_file        : %s", appArgs.conf_file.c_str());
     log_info("log_level        : %s", Logger::shared()->level_name().c_str());
     log_info("log_output       : %s", Logger::shared()->output_name().c_str());
     log_info("log_rotate_size  : %"
@@ -226,7 +226,7 @@ int Application::go() {
     running.store(true);
 
     log_info("vcdb server is ready.");
-    log_info("pidfile: %s, pid: %d", appArgs.pidFile.c_str(), (int) getpid());
+    log_info("pidfile: %s, pid: %d", appArgs.pid_file.c_str(), (int) getpid());
     log_info("vcdb server started.");
 
     while (running.load()) {
@@ -237,7 +237,7 @@ int Application::go() {
     log_info("server stopped");
 }
 
-void Application::signalSetup() {
+void Application::SignalSetup() {
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     signal(SIGINT, &IntSigHandle);

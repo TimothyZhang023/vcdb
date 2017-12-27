@@ -57,7 +57,6 @@ struct RedisRequestDesc
 typedef std::unordered_map<std::string, RedisRequestDesc> RedisRequestConvertTable;
 static RedisRequestConvertTable cmd_table;
 
-
 struct RedisCommand_raw
 {
     int strategy;
@@ -68,26 +67,11 @@ struct RedisCommand_raw
 
 static RedisCommand_raw cmds_raw[] = {
         {STRATEGY_PING, "ping",		 "ping",		REPLY_OK_STATUS},
-        {STRATEGY_PING, "checkpoint","ping",		REPLY_OK_STATUS},
-        {STRATEGY_PING, "dreply",	"dreply",		REPLY_OK_STATUS},
-        {STRATEGY_AUTO, "info",		"info",			REPLY_INFO},
+        {STRATEGY_AUTO, "info",		 "info",		REPLY_INFO},
 
         {STRATEGY_AUTO, "dump",		"dump",			REPLY_BULK},
         {STRATEGY_AUTO, "restore",	"restore",  	REPLY_OK_STATUS},
-        {STRATEGY_AUTO, "restore-asking", "restore",  	REPLY_OK_STATUS},
-
-
-        {STRATEGY_AUTO, "redis_req_dump",		"redis_req_dump",		REPLY_OK_STATUS},
-        {STRATEGY_AUTO, "redis_req_restore",	"redis_req_restore",  	REPLY_OK_STATUS},
-
-        {STRATEGY_AUTO, "rr_flushall_check",	"rr_flushall_check",  	REPLY_BULK},
-        {STRATEGY_AUTO, "rr_do_flushall",	    "rr_do_flushall",  	    REPLY_BULK},
-        {STRATEGY_AUTO, "rr_check_write",	    "rr_check_write",  	    REPLY_BULK},
-        {STRATEGY_AUTO, "rr_make_snapshot",	    "rr_make_snapshot",  	REPLY_BULK},
-        {STRATEGY_AUTO, "rr_transfer_snapshot",	"rr_transfer_snapshot", REPLY_BULK},
-        {STRATEGY_AUTO, "rr_del_snapshot",	    "rr_del_snapshot",  	REPLY_BULK},
-        {STRATEGY_AUTO, "rr_info",	"info",			REPLY_INFO},
-
+        {STRATEGY_AUTO, "restore-asking", "restore",REPLY_OK_STATUS},
 
         {STRATEGY_AUTO, "select",	"select",		REPLY_OK_STATUS},
         {STRATEGY_AUTO, "migrate",	 "migrate",		REPLY_OK_STATUS},
@@ -210,7 +194,7 @@ class RedisJob {
 
 
 public:
-    RedisJob(const std::vector<std::string> &recv_string);
+    RedisJob(const std::vector<std::string> &recv_string, std::string* response);
     Request req;
     Response response;
     std::string cmd;
@@ -219,9 +203,6 @@ public:
     int convert_resq();
 
     virtual ~RedisJob();
-
-    Buffer *output;
-
 };
 
 
