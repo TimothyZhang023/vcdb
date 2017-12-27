@@ -21,8 +21,8 @@ public:
     ~VcClientConn() override;
 
 protected:
-    int DealMessage() override;
-    int ReplyError(const std::string& msg);
+    int DealMessage(pink::RedisCmdArgsType& argv, std::string* response) override;
+    int ReplyError(const std::string& msg, std::string* response);
 
 private:
 

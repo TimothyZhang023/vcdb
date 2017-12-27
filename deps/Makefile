@@ -151,7 +151,7 @@ clean:
 	make -C $(SLASH_PATH)/slash/ clean
 	make -C $(JEMALLOC_PATH)/ clean
 	make -C $(ROCKSDB_PATH)/ clean
-	make -C $(ZLIB_PATH)/ clean
+	make -C $(ZLIB_PATH)/ distclean
 	make -C $(SNAPPY_PATH)/ clean
 	make -C $(BZIP2_PATH)/ clean
 .PHONY: clean

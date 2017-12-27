@@ -20,35 +20,26 @@ VcClientConn::~VcClientConn() {
     delete ctx;
 }
 
-int VcClientConn::ReplyError(const std::string& msg) {
-    ExpandWbufTo(static_cast<uint32_t>(msg.size()) + 3);
-
-    memcpy(wbuf_ + wbuf_len_, "-", 1);
-    wbuf_len_ += 1;
-
-    memcpy(wbuf_ + wbuf_len_, msg.data(), static_cast<size_t>(msg.size()));
-    wbuf_len_ += msg.size();
-
-    memcpy(wbuf_ + wbuf_len_, "\r\n", 2);
-    wbuf_len_ += 2;
-
-    set_is_reply(true);
+int VcClientConn::ReplyError(const std::string& msg, std::string* response) {
+    response->append("-");
+    response->append(msg);
+    response->append("\r\n");
 }
 
-int VcClientConn::DealMessage() {
-    if (argv_.empty()) {
-        ReplyError("empty request");
+int VcClientConn::DealMessage(pink::RedisCmdArgsType& argv, std::string* response) {
+    if (argv.empty()) {
+        ReplyError("empty request", response);
         return -2;
     }
 
     if (!server->status) {
-        ReplyError("server not serving ~");
+        ReplyError("server not serving ~", response);
         return -2;
     }
 
     int64_t start_us = slash::NowMicros();
 
-    RedisJob request(argv_);
+    RedisJob request(argv);
     request.convert_req();
 
     if(log_level() >= Logger::LEVEL_DEBUG) {
@@ -57,23 +48,20 @@ int VcClientConn::DealMessage() {
 
     Command *cmd = server->proc_map.getProc(slash::StringToLower(request.cmd));
     if (!cmd) {
-        ReplyError("command not found");
+        ReplyError("command not found", response);
         return -2;
     }
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
 
     if (request.response.redisResponse != nullptr) {
-        request.output->append(request.response.redisResponse->toRedis());
+        response->append(request.response.redisResponse->toRedis());
         delete request.response.redisResponse;
         request.response.redisResponse = nullptr;
     } else {
         request.convert_resq();
+        response->append(request.output->data(), request.output->size());
     }
-
-    ExpandWbufTo(static_cast<uint32_t>(request.output->size()));
-    memcpy(wbuf_ + wbuf_len_, request.output->data(), static_cast<size_t>(request.output->size()));
-    wbuf_len_ += request.output->size();
 
 
     int64_t time_proc = slash::NowMicros() - start_us;
@@ -82,7 +70,5 @@ int VcClientConn::DealMessage() {
               serialize_req(request.req).c_str(),
               serialize_req(request.response.resp).c_str());
 
-
-    set_is_reply(true);
     return 0;
 }
