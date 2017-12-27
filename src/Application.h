@@ -17,18 +17,12 @@ void IntSigHandle(int sig);
 
 class Config;
 
-
 class Application {
 public:
 
     Application() = default;;
 
-    virtual ~Application() {
-        if (conf != nullptr) {
-            delete conf;
-            conf = nullptr;
-        }
-    }
+    virtual ~Application();
 
     int parse(int argc, char **argv);
 

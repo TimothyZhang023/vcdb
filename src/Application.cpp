@@ -245,6 +245,13 @@ void Application::signalSetup() {
     signal(SIGTERM, &IntSigHandle);
 }
 
+Application::~Application() {
+    if (conf != nullptr) {
+        delete conf;
+        conf = nullptr;
+    }
+}
+
 
 void IntSigHandle(const int sig) {
     log_info("catch signal %d, cleanup...", sig);

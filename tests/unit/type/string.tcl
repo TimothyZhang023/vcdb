@@ -9,11 +9,11 @@ start_server {tags {"string"}} {
         r get x
     } {}
 
-#    test {Very big payload in GET/SET} {
-#        set buf [string repeat "abcd" 1000000]
-#        r set foo $buf
-#        r get foo
-#    } [string repeat "abcd" 1000000]
+    test {Very big payload in GET/SET} {
+        set buf [string repeat "abcd" 1000000]
+        r set foo $buf
+        r get foo
+    } [string repeat "abcd" 1000000]
 
     tags {"slow"} {
         test {Very big payload random access} {
