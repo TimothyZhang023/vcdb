@@ -19,9 +19,7 @@
 #include "util/daemon.h"
 
 
-extern std::atomic<bool> running;
-
-class RdcProxyServerHandle : public pink::ServerHandle {
+class VcServerHandle : public pink::ServerHandle {
 
     //Client
 
@@ -73,7 +71,7 @@ int Application::parse(int argc, char **argv) {
         } else if (arg == "-p") {
             if (argc > i + 1) {
                 i++;
-                appArgs.port = str_to_int(argv[i]) ;
+                appArgs.port = str_to_int(argv[i]);
             } else {
                 usage(argc, argv);
                 exit(1);
@@ -108,20 +106,22 @@ int Application::init() {
         }
     }
 
-    appArgs.pidFile = conf->get_str("pidfile");
+    { //pid
+        appArgs.pidFile = conf->get_str("pidfile", "/tmp/vcdb.pid");
 
-    if (appArgs.action == "stop") {
-        appArgs.killByPidFile();
-        exit(0);
-    }
-    if (appArgs.action == "restart") {
-        if (file_exists(appArgs.pidFile)) {
+        if (appArgs.action == "stop") {
             appArgs.killByPidFile();
+            exit(0);
         }
+
+        if (appArgs.action == "restart") {
+            if (file_exists(appArgs.pidFile)) {
+                appArgs.killByPidFile();
+            }
+        }
+
+        appArgs.checkPidFile();
     }
-
-
-    appArgs.checkPidFile();
 
 
     { // logger
@@ -129,17 +129,13 @@ int Application::init() {
         std::string log_level_;
         int64_t log_rotate_size;
 
-        log_level_ = conf->get_str("logger.level");
+        log_level_ = conf->get_str("logger.level", "debug");
         strtolower(&log_level_);
-        if (log_level_.empty()) {
-            log_level_ = "debug";
-        }
         int level = Logger::get_level(log_level_.c_str());
+
         log_rotate_size = conf->get_int64("logger.rotate_size", 99999999999);
-        log_output = conf->get_str("logger.output");
-        if (log_output.empty()) {
-            log_output = "stdout";
-        }
+        log_output = conf->get_str("logger.output", "stdout");
+
         if (log_open(log_output.c_str(), level, true, log_rotate_size) == -1) {
             fprintf(stderr, "error opening log file: %s\n", log_output.c_str());
             exit(1);
@@ -147,6 +143,7 @@ int Application::init() {
     }
 
     appArgs.port = conf->get_num("server.port", appArgs.port);
+    appArgs.ip = conf->get_str("server.ip", appArgs.ip.c_str());
 
     appArgs.workDir = conf->get_str("work_dir");
     if (appArgs.workDir.empty()) {
@@ -206,49 +203,37 @@ int Application::go() {
     ss << option;
     log_info("config           : %s", ss.str().c_str());
 
-
-    SSDB *data_db = nullptr;
-    data_db = SSDB::open(option, data_db_dir);
+    std::unique_ptr<SSDB> data_db(SSDB::open(option, data_db_dir));
     if (!data_db) {
         log_fatal("could not open data db: %s", data_db_dir.c_str());
         fprintf(stderr, "could not open data db: %s\n", data_db_dir.c_str());
         exit(1);
     }
 
-
-    VcServer *server;
-    server = new VcServer(data_db);
+    std::unique_ptr<VcServer> server(new VcServer(data_db.get()));
 
     log_info("vcdb server starting on 0.0.0.0:%d", appArgs.port);
 
-    std::unique_ptr<pink::ConnFactory> my_conn_factory = std::unique_ptr<pink::ConnFactory>(
-            new VcServerConnFactory(server));
-    pink::ServerHandle *rdcProxyServerHandle = new RdcProxyServerHandle();
+    std::unique_ptr<pink::ConnFactory> connFactory(new VcServerConnFactory(server.get()));
+    std::unique_ptr<pink::ServerHandle> serverHandle(new VcServerHandle());
+    std::unique_ptr<pink::ServerThread> serverThread(
+            pink::NewDispatchThread(appArgs.ip, appArgs.port, 10, connFactory.get(), 1000, 1000, serverHandle.get()));
 
-    pink::ServerThread *st = NewDispatchThread(appArgs.port, 10, my_conn_factory.get(), 1000, 1000, rdcProxyServerHandle);
-
-    if (st->StartThread() != 0) {
-        printf("StartThread error happened!\n");
+    if (serverThread->StartThread() != 0) {
+        fprintf(stderr, "StartThread error happened!");
         exit(-1);
     }
     running.store(true);
 
-    log_info("vcdb server ready.");
+    log_info("vcdb server is ready.");
     log_info("pidfile: %s, pid: %d", appArgs.pidFile.c_str(), (int) getpid());
     log_info("vcdb server started.");
 
     while (running.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    st->StopThread();
 
-    delete st;
-    delete rdcProxyServerHandle;
-
-    delete server;
-    delete data_db;
-    delete conf;
-
+    serverThread->StopThread();
     log_info("server stopped");
 }
 
@@ -262,7 +247,7 @@ void Application::signalSetup() {
 
 
 void IntSigHandle(const int sig) {
-    log_info("catch signal %d, cleanup...\n", sig);
+    log_info("catch signal %d, cleanup...", sig);
     running.store(false);
     log_info("server exiting");
 }

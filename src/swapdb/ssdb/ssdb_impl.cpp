@@ -60,7 +60,6 @@ SSDB *SSDB::open(const Options &opt, const std::string &dir) {
     ssdb->options.max_open_files = opt.max_open_files;
 
 
-
     {
         //BlockBasedTableOptions
         rocksdb::BlockBasedTableOptions op;
@@ -85,9 +84,6 @@ SSDB *SSDB::open(const Options &opt, const std::string &dir) {
         ssdb->options.table_factory = std::shared_ptr<rocksdb::TableFactory>(rocksdb::NewBlockBasedTableFactory(op));
     }
 
-//    {
-//        ssdb->options.memtable_factory = std::shared_ptr<rocksdb::SkipListFactory>(new rocksdb::SkipListFactory);
-//    }
 
     ssdb->options.compaction_readahead_size = opt.compaction_readahead_size * UNIT_MB;
 

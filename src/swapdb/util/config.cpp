@@ -258,6 +258,14 @@ const char *Config::get_str(const char *key) const {
     return c->str();
 }
 
+const char *Config::get_str(const char *key, const char *default_val) const {
+    const Config *c = this->get(key);
+    if (!c) {
+        return default_val;
+    }
+    return c->str();
+}
+
 int Config::save(FILE *fp) const {
     for (int i = 0; i < (int) children.size(); i++) {
         Config *c = children[i];

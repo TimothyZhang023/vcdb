@@ -22,11 +22,18 @@ class Application {
 public:
 
     Application() = default;;
-    virtual ~Application() = default;
+
+    virtual ~Application() {
+        if (conf != nullptr) {
+            delete conf;
+            conf = nullptr;
+        }
+    }
 
     int parse(int argc, char **argv);
 
     int run();
+
     int init();
 
     void signalSetup();

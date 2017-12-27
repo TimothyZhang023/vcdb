@@ -7,15 +7,10 @@
 #include "ClientConn.h"
 #include "RedisJob.h"
 
-#include <swapdb/serv.h>
-
-
-static std::map<std::string, std::string> db;
-
 
 VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread, void *worker_specific_data)
         : RedisConn(fd, ip_port, thread) {
-    // Handle worker_specific_data ...
+
     server = static_cast<VcServer *>(worker_specific_data);
     ctx = new Context();
     ctx->serv = server;

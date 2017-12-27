@@ -26,6 +26,7 @@ public:
 public:
     bool isDaemon;
     int port = 6379;
+    std::string ip = "0.0.0.0";
     std::string pidFile;
     std::string confFile;
     std::string workDir;

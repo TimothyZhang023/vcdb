@@ -49,40 +49,32 @@ void Options::load(Config *conf) {
 
 std::ostream &operator<<(std::ostream &os, const Options &options) {
     os
-            << "\n create_if_missing: " << options.create_if_missing
-            << "\n create_missing_column_families: " << options.create_missing_column_families
-            << "\n write_buffer_size: " << options.write_buffer_size
+            << "\n\t ============================Config=================================="
+            << "\n\t| create_if_missing: " << options.create_if_missing
+            << "\n\t| create_missing_column_families: " << options.create_missing_column_families
+            << "\n\t| write_buffer_size: " << options.write_buffer_size
+            << "\n\t| max_open_files: " << options.max_open_files
+            << "\n\t| compression: " << options.compression
+            << "\n\t| rdb_compression: " << options.rdb_compression
+            << "\n\t| transfer_compression: " << options.transfer_compression
+            << "\n\t| level_compaction_dynamic_level_bytes: " << options.level_compaction_dynamic_level_bytes
+            << "\n\t| use_direct_reads: " << options.use_direct_reads
+            << "\n\t| optimize_filters_for_hits: " << options.optimize_filters_for_hits
+            << "\n\t| max_write_buffer_number: " << options.max_write_buffer_number
+            << "\n\t| max_background_flushes: " << options.max_background_flushes
+            << "\n\t| max_background_compactions: " << options.max_background_compactions
+            << "\n\t| sim_cache: " << options.sim_cache
+            << "\n\t| cache_size: " << options.cache_size
+            << "\n\t| block_size: " << options.block_size
+            << "\n\t| compaction_readahead_size: " << options.compaction_readahead_size
+            << "\n\t| max_bytes_for_level_base: " << options.max_bytes_for_level_base
+            << "\n\t| max_bytes_for_level_multiplier: " << options.max_bytes_for_level_multiplier
+            << "\n\t| target_file_size_base: " << options.target_file_size_base
+            << "\n\t| level0_file_num_compaction_trigger: " << options.level0_file_num_compaction_trigger
+            << "\n\t| level0_slowdown_writes_trigger: " << options.level0_slowdown_writes_trigger
+            << "\n\t| level0_stop_writes_trigger: " << options.level0_stop_writes_trigger
+            << "\n\t ============================Config=================================="
+            ;
 
-            << "\n max_open_files: " << options.max_open_files
-            << "\n compression: " << options.compression
-
-            << "\n rdb_compression: " << options.rdb_compression
-            << "\n transfer_compression: " << options.transfer_compression
-
-            << "\n level_compaction_dynamic_level_bytes: " << options.level_compaction_dynamic_level_bytes
-
-            << "\n use_direct_reads: " << options.use_direct_reads
-            << "\n optimize_filters_for_hits: " << options.optimize_filters_for_hits
-
-            << "\n max_write_buffer_number: " << options.max_write_buffer_number
-            << "\n max_background_flushes: " << options.max_background_flushes
-            << "\n max_background_compactions: " << options.max_background_compactions
-
-            << "\n sim_cache: " << options.sim_cache
-            << "\n cache_size: " << options.cache_size
-            << "\n block_size: " << options.block_size
-            << "\n compaction_readahead_size: " << options.compaction_readahead_size
-
-            << "\n max_bytes_for_level_base: " << options.max_bytes_for_level_base
-            << "\n max_bytes_for_level_multiplier: " << options.max_bytes_for_level_multiplier
-            << "\n target_file_size_base: " << options.target_file_size_base
-
-            << "\n level0_file_num_compaction_trigger: " << options.level0_file_num_compaction_trigger
-
-            << "\n level0_slowdown_writes_trigger: " << options.level0_slowdown_writes_trigger
-
-            << "\n level0_stop_writes_trigger: " << options.level0_stop_writes_trigger
-
-            << "\n c: " << options.c;
     return os;
 }
