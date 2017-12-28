@@ -23,7 +23,7 @@ int proc_sadd(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_int(ret, num);
+        resp->addReplyInt( num);
     }
 
     return 0;
@@ -43,7 +43,7 @@ int proc_srem(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_int(ret, num);
+        resp->addReplyInt( num);
     }
 
     return 0;
@@ -60,7 +60,7 @@ int proc_scard(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_int(ret, len);
+        resp->addReplyInt(len);
     }
 
     return 0;

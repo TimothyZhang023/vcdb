@@ -420,7 +420,8 @@ int proc_compact(Context &ctx, const Request &req, Response *resp) {
 int proc_dbsize(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     uint64_t size = serv->db->size();
-    resp->reply_int(1, size);
+
+    resp->addReplyInt(size);
 
     return 0;
 }

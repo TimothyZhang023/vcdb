@@ -16,7 +16,7 @@ int proc_qsize(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
-		resp->reply_int(ret, len);
+		resp->addReplyInt(len);
 	}
 
 	return 0;
@@ -34,7 +34,7 @@ int proc_qpush_frontx(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
-		resp->reply_int(ret, len);
+		resp->addReplyInt(len);
 	}
 
 	return 0;
@@ -51,7 +51,7 @@ int proc_qpush_front(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
-		resp->reply_int(ret, len);
+		resp->addReplyInt(len);
 	}
 
 	return 0;
@@ -67,7 +67,7 @@ int proc_qpush_backx(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
-		resp->reply_int(ret, len);
+		resp->addReplyInt(len);
 	}
 
 	return 0;
@@ -83,7 +83,7 @@ int proc_qpush_back(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
-		resp->reply_int(ret, len);
+		resp->addReplyInt(len);
 	}
 
 	return 0;

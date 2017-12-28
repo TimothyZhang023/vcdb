@@ -61,7 +61,7 @@ int VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *respons
     int64_t time_proc = slash::NowMicros() - start_us;
 
     if (log_level() >= Logger::LEVEL_DEBUG) {
-        log_debug("[result] p:%d, req: %s, resp: %s,", time_proc, serialize_req(request.req).c_str(), hexcstr(*response));
+        log_debug("[result] p:%d, req: %s, resp: %s", time_proc, serialize_req(request.req).c_str(), hexcstr(*response));
     }
 
     return 0;

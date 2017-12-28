@@ -29,22 +29,12 @@ public:
     void emplace_back(std::string &&s);
 
 
-    void add(int64_t s);
-
-    void add(uint64_t s);
-
     void add(const std::string &s);
 
 
     void reply_status(int status);
 
     void reply_bool(int status);
-
-    void reply_int(int status, uint64_t val);
-
-    void reply_int(int status, int64_t val);
-
-    void reply_int(int status, int val);
 
 
     void reply_scan_ready();
@@ -64,6 +54,8 @@ public:
 
     void addStatus(const std::string &msg);
 
+    void addStatusOK();
+
     void addReplyString(const std::string &msg);
 
     void addReplyBulkCBuffer(const void *p, size_t len);
@@ -73,6 +65,12 @@ public:
     void addReplyHumanLongDouble(long double d);
 
     void addReplyDouble(double d);
+
+    void addReplyInt(uint64_t i);
+
+    void addReplyInt(int64_t i);
+
+    void addReplyInt(int i);
 
 };
 

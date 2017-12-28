@@ -46,9 +46,9 @@ int proc_hmset(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else {
+        resp->addStatusOK();
     }
-
-    resp->reply_int(0, 1);
 
     return 0;
 }
@@ -71,7 +71,7 @@ int proc_hdel(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, deleted);
+    resp->addReplyInt(deleted);
     return 0;
 }
 
@@ -128,7 +128,7 @@ int proc_hsize(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_int(ret, size);
+        resp->addReplyInt(size);
     }
 
     return 0;
@@ -345,7 +345,7 @@ int proc_hincr(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_int(ret, new_val);
+        resp->addReplyInt(new_val);
     }
     return 0;
 

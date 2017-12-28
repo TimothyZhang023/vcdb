@@ -107,7 +107,7 @@ int proc_multi_zset(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, num);
+    resp->addReplyInt( num);
 
     return 0;
 }
@@ -130,7 +130,7 @@ int proc_multi_zdel(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, count);
+    resp->addReplyInt( count);
     return 0;
 }
 
@@ -145,7 +145,7 @@ int proc_zsize(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     }
-    resp->reply_int(ret, size);
+    resp->addReplyInt(size);
     return 0;
 }
 
@@ -178,7 +178,7 @@ int proc_zrank(Context &ctx, const Request &req, Response *resp) {
     } else if (ret == 0 || rank == -1) {
         resp->addReplyNil();
     } else {
-        resp->reply_int(ret, rank);
+        resp->addReplyInt( rank);
     }
     return 0;
 }
@@ -195,7 +195,7 @@ int proc_zrrank(Context &ctx, const Request &req, Response *resp) {
     } else if (ret == 0 || rank == -1) {
         resp->addReplyNil();
     } else {
-        resp->reply_int(ret, rank);
+        resp->addReplyInt( rank);
     }
     return 0;
 }
@@ -366,7 +366,7 @@ int proc_zcount(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, count);
+    resp->addReplyInt( count);
     return 0;
 }
 
@@ -381,7 +381,7 @@ int proc_zremrangebyscore(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, count);
+    resp->addReplyInt( count);
     return 0;
 }
 
@@ -395,7 +395,7 @@ int proc_zremrangebyrank(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_int(0, ret);
+        resp->addReplyInt(ret);
         return 0;
     }
 
@@ -411,7 +411,7 @@ int proc_zremrangebyrank(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, count);
+    resp->addReplyInt(count);
 
     return 0;
 }
@@ -472,7 +472,7 @@ int proc_zremrangebylex(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_int(0, count);
+    resp->addReplyInt( count);
 
     return 0;
 }
@@ -494,7 +494,7 @@ int proc_zlexcount(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(SYNTAX_ERR);
     }
 
-    resp->reply_int(0, count);
+    resp->addReplyInt( count);
 
     return 0;
 }

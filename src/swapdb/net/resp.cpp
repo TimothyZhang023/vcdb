@@ -19,19 +19,6 @@ void Response::emplace_back(std::string &&s) {
 }
 
 
-void Response::add(int64_t s) {
-    char buf[22] = {0};
-    sprintf(buf, "%" PRId64 "", s);
-    resp_arr.emplace_back(buf);
-}
-
-void Response::add(uint64_t s) {
-    char buf[22] = {0};
-    sprintf(buf, "%" PRIu64 "", s);
-    resp_arr.emplace_back(buf);
-}
-
-
 void Response::add(const std::string &s) {
     resp_arr.push_back(s);
 }
@@ -59,28 +46,6 @@ void Response::reply_bool(int status) {
     } else {
         resp_arr.emplace_back("ok");
         resp_arr.emplace_back("1");
-    }
-}
-
-void Response::reply_int(int status, uint64_t val) {
-    if (status == -1) {
-        resp_arr.emplace_back("error");
-    } else {
-        resp_arr.emplace_back("ok");
-        this->add(val);
-    }
-}
-
-void Response::reply_int(int status, int val) {
-    return reply_int(status, static_cast<int64_t >(val));
-}
-
-void Response::reply_int(int status, int64_t val) {
-    if (status == -1) {
-        resp_arr.emplace_back("error");
-    } else {
-        resp_arr.emplace_back("ok");
-        this->add(val);
     }
 }
 
@@ -127,6 +92,10 @@ void Response::addStatus(const std::string &msg) {
     output->append("\r\n");
 }
 
+void Response::addStatusOK() {
+    output->append("+OK\r\n");
+}
+
 
 void Response::addReplyString(const std::string &msg) {
     char buf[32];
@@ -162,6 +131,24 @@ void Response::addReplyDouble(double d) {
     char buf[128];
     int len = ld2string(buf, sizeof(buf), d, 0);
     addReplyBulkCBuffer(buf, static_cast<size_t>(len));
+}
+
+
+void Response::addReplyInt(uint64_t i) {
+    char buf[24] = {0};
+    snprintf(buf, sizeof(buf), ":%" PRIu64 "\r\n", i);
+    output->append(buf);
+}
+
+void Response::addReplyInt(int64_t i) {
+    char buf[24] = {0};
+    snprintf(buf, sizeof(buf), ":%" PRId64 "\r\n", i);
+    output->append(buf);
+
+}
+
+void Response::addReplyInt(int i) {
+    addReplyInt(static_cast<int64_t>(i));
 }
 
 
