@@ -53,10 +53,10 @@ int VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *respons
     }
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
-
-    if (response->empty()) {
-        request.convert_resq();
-    }
+//
+//    if (response->empty()) {
+//        request.convert_resq();
+//    }
 
     //-------response---------debug--------
     if (response->empty()) {
