@@ -58,6 +58,13 @@ int VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *respons
         request.convert_resq();
     }
 
+    //-------response---------debug--------
+    if (response->empty()) {
+        log_error("bug detected?");
+        ReplyError("empty response got for " + serialize_req(request.req), response);
+    }
+    //-------response---------debug--------
+
     int64_t time_proc = slash::NowMicros() - start_us;
 
     if (log_level() >= Logger::LEVEL_DEBUG) {

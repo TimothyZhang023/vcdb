@@ -29,7 +29,6 @@ DEF_PROC(getrange);
 DEF_PROC(setrange);
 DEF_PROC(strlen);
 DEF_PROC(bitcount);
-DEF_PROC(del);
 DEF_PROC(incr);
 DEF_PROC(incrbyfloat);
 DEF_PROC(decr);
@@ -125,7 +124,6 @@ void VcServer::regProcs() {
     REG_PROC(get, "rt");
     REG_PROC(set, "wt");
     REG_PROC(append, "wt");
-    REG_PROC(del, "wt");
     REG_PROC(setx, "wt");
     REG_PROC(psetx, "wt");
     REG_PROC(setnx, "wt");
@@ -238,7 +236,7 @@ int proc_flushdb(Context &ctx, const Request &req, Response *resp) {
 
     log_warn("[!!!] do flushdb");
     serv->db->flushdb(ctx);
-    resp->reply_ok();
+    resp->addReplyStatusOK();
 
     return 0;
 }
@@ -247,19 +245,19 @@ int proc_flush(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
 
     serv->db->flush(ctx);
-    resp->reply_ok();
+    resp->addReplyStatusOK();
 
     return 0;
 }
 
 int proc_select(Context &ctx, const Request &req, Response *resp) {
-    resp->reply_ok();
+    resp->addReplyStatusOK();
     return 0;
 }
 
 
 int proc_client(Context &ctx, const Request &req, Response *resp) {
-    resp->reply_ok();
+    resp->addReplyStatusOK();
     return 0;
 }
 
@@ -293,9 +291,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
             addReplyErrorCodeReturn(ret);
         }
 
-        resp->reply_ok();
-        resp->add(res);
-
+        resp->addReplyString(res);
         return 0;
     } else if (action == "populate") {
         CHECK_MIN_PARAMS(3);
@@ -338,13 +334,13 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
         timer.end(str(count) + " keys");
     }
 
-    resp->reply_ok();
+    resp->addReplyStatusOK();
     return 0;
 }
 
 
 int proc_quit(Context &ctx, const Request &req, Response *resp) {
-    resp->reply_ok();
+    resp->addReplyStatusOK();
     return 0;
 }
 
@@ -380,7 +376,7 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
                  hexmem(req[3].data(), req[3].size()).c_str());
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_get(ret, &val);
+        resp->addReplyString(val);
     }
 
     return 0;
@@ -392,11 +388,16 @@ int proc_dump(Context &ctx, const Request &req, Response *resp) {
 
     std::string val;
 
-    PTST(dump, 0.01)
     int ret = serv->db->dump(ctx, req[1], &val, nullptr, true);
-    PTE(dump, hexstr(req[1]))
 
-    resp->reply_get(ret, &val);
+    if (ret < 0) {
+        addReplyErrorCodeReturn(ret);
+    } else if (ret == 0) {
+        resp->addReplyNil();
+    } else {
+        resp->addReplyString(val);
+    }
+
     return 0;
 }
 
@@ -413,7 +414,7 @@ int proc_cursor_cleanup(Context &ctx, const Request &req, Response *resp) {
 int proc_compact(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     serv->db->compact();
-    resp->reply_ok();
+    resp->addReplyStatusOK();
     return 0;
 }
 
@@ -559,7 +560,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
     }
 
     if (all || selected == "persistence") {//filesize
-        resp->push_back("# Persistence");
+        resp->emplace_back("#Persistence");
 
         std::string val;
         FastGetPropertyHuman(leveldb::DB::Properties::kTotalSstFilesSize, "sst_file_size");
@@ -584,7 +585,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
 
 
     if (all || selected == "snapshot") {//snapshot
-        resp->push_back("# Snapshot");
+        resp->emplace_back("#Snapshot");
 
         std::string val;
         FastGetProperty(leveldb::DB::Properties::kNumSnapshots, "live_snapshots");
@@ -595,7 +596,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
 
 
     if (all || selected == "stats") {//Stats
-        resp->push_back("# Stats");
+        resp->emplace_back("#Stats");
         resp->emplace_back("total_connections_received:0"); //Todo Fake
 
         {//total_calls
@@ -612,7 +613,7 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
     }
 
     if (all || selected == "keyspace") {//Keyspace
-        resp->push_back("# Keyspace");
+        resp->emplace_back("#Keyspace");
 
         uint64_t size = serv->db->size();
         resp->emplace_back("db0:keys=" + str(size) + ",expires=0,avg_ttl=0");

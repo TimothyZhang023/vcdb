@@ -103,9 +103,9 @@ int proc_qpop_front(Context &ctx, const Request &req, Response *resp){
         addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second) {
-			resp->reply_get(1, &val.first);
+			resp->addReplyString(val.first);
 		} else {
-			resp->reply_get(0, &val.first);
+			resp->addReplyNil();
 		};
 
 	}
@@ -124,9 +124,9 @@ int proc_qpop_back(Context &ctx, const Request &req, Response *resp){
         addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second) {
-			resp->reply_get(1, &val.first);
+			resp->addReplyString(val.first);
 		} else {
-			resp->reply_get(0, &val.first);
+			resp->addReplyNil();
 		};
 
 	}
@@ -156,7 +156,7 @@ int proc_qtrim(Context &ctx, const Request &req, Response *resp){
 		resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
 	} else {
-		resp->reply_status(ret);
+		resp->addReplyStatusOK();
 	}
 
 	return 0;
@@ -205,9 +205,9 @@ int proc_qget(Context &ctx, const Request &req, Response *resp){
         addReplyErrorCodeReturn(ret);
 	} else {
 		if (val.second) {
-			resp->reply_get(1, &val.first);
+			resp->addReplyString(val.first);
 		} else {
-			resp->reply_get(0, &val.first);
+			resp->addReplyNil();
 		}
 	}
 
@@ -230,11 +230,9 @@ int proc_qset(Context &ctx, const Request &req, Response *resp){
 	if(ret < 0){
         addReplyErrorCodeReturn(ret);
 	} else if ( ret == 0) {
-		//???
         addReplyErrorInfoReturn("ERR no such key");
 	} else{
-		//TODO CHECK HERE
-		resp->reply_ok();
+		resp->addReplyStatusOK();
 	}
 	return 0;
 }

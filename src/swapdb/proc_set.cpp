@@ -5,7 +5,7 @@ found in the LICENSE file.
 */
 #include "serv.h"
 
-int proc_sadd(Context &ctx, const Request &req, Response *resp){
+int proc_sadd(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
     VcServer *serv = ctx.serv;
 
@@ -23,13 +23,13 @@ int proc_sadd(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->addReplyInt( num);
+        resp->addReplyInt(num);
     }
 
     return 0;
 }
 
-int proc_srem(Context &ctx, const Request &req, Response *resp){
+int proc_srem(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
     VcServer *serv = ctx.serv;
 
@@ -43,13 +43,13 @@ int proc_srem(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->addReplyInt( num);
+        resp->addReplyInt(num);
     }
 
     return 0;
 }
 
-int proc_scard(Context &ctx, const Request &req, Response *resp){
+int proc_scard(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
@@ -67,7 +67,7 @@ int proc_scard(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_sismember(Context &ctx, const Request &req, Response *resp){
+int proc_sismember(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
     VcServer *serv = ctx.serv;
 
@@ -77,23 +77,23 @@ int proc_sismember(Context &ctx, const Request &req, Response *resp){
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_bool(ret);
+        resp->addReplyInt(0);
     } else {
-        resp->reply_bool(ismember?1:0);
+        resp->addReplyInt(ismember ? 1 : 0);
     }
 
     return 0;
 }
 
-int proc_smembers(Context &ctx, const Request &req, Response *resp){
+int proc_smembers(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
     VcServer *serv = ctx.serv;
 
     resp->reply_list_ready();
 
-    int ret = serv->db->smembers(ctx, req[1],  resp->resp_arr);
+    int ret = serv->db->smembers(ctx, req[1], resp->resp_arr);
 
-    if (ret < 0){
+    if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
@@ -102,14 +102,14 @@ int proc_smembers(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_spop(Context &ctx, const Request &req, Response *resp){
+int proc_spop(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
     VcServer *serv = ctx.serv;
 
     int64_t pop_count = 1;
-    if (req.size() >2) {
+    if (req.size() > 2) {
         pop_count = req[2].Int64();
-        if (errno == EINVAL){
+        if (errno == EINVAL) {
             addReplyErrorCodeReturn(INVALID_INT);
         }
     }
@@ -118,7 +118,7 @@ int proc_spop(Context &ctx, const Request &req, Response *resp){
 
     int ret = serv->db->spop(ctx, req[1], resp->resp_arr, pop_count);
 
-    if (ret < 0){
+    if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
@@ -128,14 +128,14 @@ int proc_spop(Context &ctx, const Request &req, Response *resp){
     return 0;
 }
 
-int proc_srandmember(Context &ctx, const Request &req, Response *resp){
+int proc_srandmember(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
     VcServer *serv = ctx.serv;
 
     int64_t count = 1;
-    if (req.size() >2) {
+    if (req.size() > 2) {
         count = req[2].Int64();
-        if (errno == EINVAL){
+        if (errno == EINVAL) {
             addReplyErrorCodeReturn(INVALID_INT);
         }
     }
@@ -144,7 +144,7 @@ int proc_srandmember(Context &ctx, const Request &req, Response *resp){
 
     int ret = serv->db->srandmember(ctx, req[1], resp->resp_arr, count);
 
-    if (ret < 0){
+    if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
@@ -153,7 +153,7 @@ int proc_srandmember(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_sscan(Context &ctx, const Request &req, Response *resp){
+int proc_sscan(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
     VcServer *serv = ctx.serv;
 
@@ -163,7 +163,7 @@ int proc_sscan(Context &ctx, const Request &req, Response *resp){
     Bytes cursor = req[cursorIndex];
 
     cursor.Uint64();
-    if (errno == EINVAL){
+    if (errno == EINVAL) {
         addReplyErrorCodeReturn(INVALID_INT);
     }
 
@@ -175,7 +175,7 @@ int proc_sscan(Context &ctx, const Request &req, Response *resp){
     }
 
     resp->reply_scan_ready();
-    ret =  serv->db->sscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
+    ret = serv->db->sscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
     if (ret < 0) {
         resp->resp_arr.clear();

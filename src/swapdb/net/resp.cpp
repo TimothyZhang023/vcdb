@@ -18,52 +18,6 @@ void Response::emplace_back(std::string &&s) {
     resp_arr.emplace_back(s);
 }
 
-
-void Response::add(const std::string &s) {
-    resp_arr.push_back(s);
-}
-
-
-void Response::reply_ok() {
-    resp_arr.emplace_back("ok");
-}
-
-
-void Response::reply_status(int status) {
-    if (status == -1) {
-        resp_arr.emplace_back("error");
-    } else {
-        resp_arr.emplace_back("ok");
-    }
-}
-
-void Response::reply_bool(int status) {
-    if (status == -1) {
-        resp_arr.emplace_back("error");
-    } else if (status == 0) {
-        resp_arr.emplace_back("ok");
-        resp_arr.emplace_back("0");
-    } else {
-        resp_arr.emplace_back("ok");
-        resp_arr.emplace_back("1");
-    }
-}
-
-
-void Response::reply_get(int status, const std::string *val) {
-    if (status < 0) {
-        resp_arr.emplace_back("error");
-    } else if (status == 0) {
-        resp_arr.emplace_back("not_found");
-    } else {
-        resp_arr.emplace_back("ok");
-        if (val) {
-            resp_arr.emplace_back(*val);
-        }
-        return;
-    }
-}
-
 void Response::reply_scan_ready() {
     resp_arr.clear();
     resp_arr.emplace_back("ok");
@@ -81,18 +35,24 @@ void Response::addReplyError(const std::string &err_msg) {
     output->append("\r\n");
 }
 
+void Response::addReplyError(const char *err_msg) {
+    output->append("-");
+    output->append(err_msg);
+    output->append("\r\n");
+}
+
 void Response::addReplyNil() {
     output->append("$-1\r\n");
 }
 
 
-void Response::addStatus(const std::string &msg) {
+void Response::addReplyStatus(const std::string &msg) {
     output->append("+");
     output->append(msg);
     output->append("\r\n");
 }
 
-void Response::addStatusOK() {
+void Response::addReplyStatusOK() {
     output->append("+OK\r\n");
 }
 

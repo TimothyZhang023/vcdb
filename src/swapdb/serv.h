@@ -30,16 +30,14 @@
 
 #define CHECK_MIN_PARAMS(n) do{ \
         if(req.size() < (n)){ \
-            resp->push_back("client_error"); \
-            resp->push_back("ERR wrong number of arguments"); \
+            resp->addReplyError("ERR wrong number of arguments"); \
             return 0; \
         } \
     }while(0)
 
 #define CHECK_MAX_PARAMS(n) do{ \
         if(req.size() > (n)){ \
-            resp->push_back("client_error"); \
-            resp->push_back("ERR wrong number of arguments"); \
+            resp->addReplyError("ERR wrong number of arguments"); \
             return 0; \
         } \
     }while(0)

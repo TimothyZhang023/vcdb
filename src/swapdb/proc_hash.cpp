@@ -18,9 +18,13 @@ int proc_hexists(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_bool(0);
+        resp->addReplyInt(0);
     } else {
-        resp->reply_bool(val.second);
+        if (val.second) {
+            resp->addReplyInt(1);
+        } else {
+            resp->addReplyInt(0);
+        }
     }
 
     return 0;
@@ -47,7 +51,7 @@ int proc_hmset(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->addStatusOK();
+        resp->addReplyStatusOK();
     }
 
     return 0;
@@ -144,9 +148,9 @@ int proc_hset(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_bool(ret);
+        resp->addReplyInt(0);
     } else {
-        resp->reply_bool(added);
+        resp->addReplyInt(added);
     }
 
     return 0;
@@ -161,10 +165,10 @@ int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
-    } else if (ret == 0) {
-        resp->reply_bool(ret);
+    }  else if (ret == 0) {
+        resp->addReplyInt(0);
     } else {
-        resp->reply_bool(added);
+        resp->addReplyInt(added);
     }
 
     return 0;
@@ -182,9 +186,9 @@ int proc_hget(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     } else {
         if (val.second) {
-            resp->reply_get(1, &val.first);
+            resp->addReplyString(val.first);
         } else {
-            resp->reply_get(0, &val.first);
+            resp->addReplyNil();
         }
     }
 

@@ -28,33 +28,21 @@ public:
 
     void emplace_back(std::string &&s);
 
-
-    void add(const std::string &s);
-
-
-    void reply_status(int status);
-
-    void reply_bool(int status);
-
-
     void reply_scan_ready();
 
     void reply_list_ready();
-
-    // the same as Redis.REPLY_BULK
-    void reply_get(int status, const std::string *val = nullptr);
-
-    void reply_ok();
 
 
 
     void addReplyError(const std::string &err_msg);
 
+    void addReplyError(const char *err_msg);
+
     void addReplyNil();
 
-    void addStatus(const std::string &msg);
+    void addReplyStatus(const std::string &msg);
 
-    void addStatusOK();
+    void addReplyStatusOK();
 
     void addReplyString(const std::string &msg);
 

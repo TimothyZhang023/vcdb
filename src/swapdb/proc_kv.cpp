@@ -18,7 +18,7 @@ int proc_type(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_get(1, &val);
+    resp->addReplyString(val);
 
     return 0;
 }
@@ -33,7 +33,7 @@ int proc_get(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_get(ret, &val);
+        resp->addReplyString(val);
     }
 
     return 0;
@@ -50,9 +50,9 @@ int proc_getset(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     } else {
         if (val.second) {
-            resp->reply_get(1, &val.first);
+            resp->addReplyString(val.first);
         } else {
-            resp->reply_get(0, &val.first);
+            resp->addReplyNil();
         }
     }
 
@@ -136,10 +136,21 @@ int proc_set(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else {
+        if (flags & OBJ_SET_NX) {
+            if (added == 0) {
+                resp->addReplyNil();
+                return 0;
+            }
+        } else if (flags & OBJ_SET_XX) {
+            if (added == 0) {
+                resp->addReplyNil();
+                return 0;
+            }
+        }
+
+        resp->addReplyStatusOK();
     }
-
-    resp->reply_bool(added);
-
 
     return 0;
 }
@@ -154,7 +165,7 @@ int proc_setnx(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_bool(added);
+        resp->addReplyInt(added);
     }
 
     return 0;
@@ -184,9 +195,9 @@ int proc_setx(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else {
+        resp->addReplyStatusOK();
     }
-
-    resp->reply_bool(1);
 
     return 0;
 }
@@ -215,9 +226,10 @@ int proc_psetx(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else {
+        resp->addReplyStatusOK();
     }
 
-    resp->reply_bool(1);
 
     return 0;
 }
@@ -261,11 +273,10 @@ int proc_pexpire(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->expiration->expire(ctx, req[1], (int64_t) when, TimeUnit::Millisecond);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
-    } else if (ret < 2) {
-
+    } else {
+        resp->addReplyInt(ret);
     }
 
-    resp->reply_bool(ret);
     return 0;
 }
 
@@ -282,11 +293,9 @@ int proc_expire(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->expiration->expire(ctx, req[1], (int64_t) when, TimeUnit::Second);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
-    } else if (ret < 2) {
-
+    } else {
+        resp->addReplyInt(ret == 0 ? 0 : 1);
     }
-
-    resp->reply_bool(ret);
 
     return 0;
 }
@@ -304,12 +313,9 @@ int proc_expireat(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->expiration->expireAt(ctx, req[1], (int64_t) ts_ms * 1000);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
-    } else if (ret < 2) {
-
+    } else {
+        resp->addReplyInt(ret);
     }
-
-    resp->reply_bool(ret);
-
     return 0;
 }
 
@@ -322,9 +328,9 @@ int proc_persist(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else {
+        resp->addReplyInt(ret);
     }
-
-    resp->reply_bool(ret);
     return 0;
 }
 
@@ -341,11 +347,9 @@ int proc_pexpireat(Context &ctx, const Request &req, Response *resp) {
     int ret = serv->db->expiration->expireAt(ctx, req[1], (int64_t) ts_ms);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
-    } else if (ret < 2) {
-
+    } else {
+        resp->addReplyInt(ret);
     }
-
-    resp->reply_bool(ret);
 
     return 0;
 }
@@ -424,22 +428,6 @@ int proc_multi_get(Context &ctx, const Request &req, Response *resp) {
             resp->push_back(val);
         }
     }
-    return 0;
-}
-
-int proc_del(Context &ctx, const Request &req, Response *resp) {
-    VcServer *serv = ctx.serv;
-    CHECK_MIN_PARAMS(2);
-
-    int ret = serv->db->del(ctx, req[1]);
-
-    if (ret < 0) {
-        addReplyErrorCodeReturn(ret);
-    }
-
-    std::string res = str(ret);
-    resp->reply_get(ret, &res);
-
     return 0;
 }
 
@@ -644,7 +632,7 @@ int proc_getbit(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_bool(res);
+        resp->addReplyInt(res);
     }
 
     return 0;
@@ -671,8 +659,10 @@ int proc_setbit(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else if (res == 0) {
+        resp->addReplyInt(0);
     } else {
-        resp->reply_bool(res);
+        resp->addReplyInt(1);
     }
 
     return 0;
@@ -766,7 +756,7 @@ int proc_getrange(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->reply_get(1, &val.first);
+        resp->addReplyString(val.first);
     }
     return 0;
 }
