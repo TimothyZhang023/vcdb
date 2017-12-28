@@ -17,3 +17,5 @@
 *.out
 
 make_config.mk
+log.txt
+var/

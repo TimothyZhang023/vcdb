@@ -21,11 +21,15 @@ class Application {
 public:
 
     Application() = default;;
+
     virtual ~Application();
 
     int Parse(int argc, char **argv);
+
     int Run();
+
     int Init();
+
     void SignalSetup();
 
 private:

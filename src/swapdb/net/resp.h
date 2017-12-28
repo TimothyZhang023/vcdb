@@ -1,28 +1,21 @@
-/*
-Copyright (c) 2012-2014 The SSDB Authors. All rights reserved.
-Use of this source code is governed by a BSD-style license that can be
-found in the LICENSE file.
-*/
 #ifndef NET_RESP_H_
 #define NET_RESP_H_
 
 #include <unistd.h>
-#include <inttypes.h>
 #include <string>
 #include <vector>
 #include <map>
-#include "redis/reponse_redis.h"
 
 #define addReplyErrorCodeReturn(n) resp->addReplyError(GetErrorInfo(n)); return 0
 #define addReplyErrorInfoReturn(c) resp->addReplyError((c)); return 0
 
 
 class Response {
-public:
-    Response(std::string *output);
-
-    std::vector<std::string> resp_arr;
+private:
     std::string *output = nullptr;
+
+public:
+    explicit Response(std::string *output);
 
 
     void addReplyError(const std::string &err_msg);
@@ -51,13 +44,17 @@ public:
 
     void addReplyInt(int i);
 
+    void addReplyListEmpty();
+
+    void addReplyListHead(int size);
+
+
+    std::vector<std::string> resp_arr;
+
     void convertReplyToList();
 
     void convertReplyToScanResult();
 
-    void addReplyListEmpty();
-
-    void addReplyListHead(int size);
 
 };
 

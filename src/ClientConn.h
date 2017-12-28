@@ -11,25 +11,26 @@
 #include <swapdb/common/context.hpp>
 
 class VcServer;
+
 class Buffer;
 
 class VcClientConn : public pink::RedisConn {
 public:
     VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread,
-                  void *worker_specific_data);
+                 void *worker_specific_data);
 
     ~VcClientConn() override;
 
 protected:
-    int DealMessage(pink::RedisCmdArgsType& argv, std::string* response) override;
-    int ReplyError(const std::string& msg, std::string* response);
+    int DealMessage(pink::RedisCmdArgsType &argv, std::string *response) override;
+
+    int ReplyError(const std::string &msg, std::string *response);
 
 private:
 
     VcServer *server = nullptr;
     Context *ctx = nullptr;
 };
-
 
 
 class VcServerConnFactory : public pink::ConnFactory {
@@ -40,13 +41,11 @@ public:
     explicit VcServerConnFactory(void *data) : data(data) {}
 
     pink::PinkConn *NewPinkConn(int connfd, const std::string &ip_port,
-                                        pink::ServerThread *thread,
-                                        void *worker_specific_data) const override {
+                                pink::ServerThread *thread,
+                                void *worker_specific_data) const override {
         return new VcClientConn(connfd, ip_port, thread, data);
     }
 };
-
-
 
 
 #endif //VCDB_CONN_H

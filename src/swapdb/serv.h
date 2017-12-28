@@ -18,7 +18,6 @@
 #include "codec/internal_error.h"
 #include "codec/error.h"
 #include "net/resp.h"
-#include "net/redis/reponse_redis.h"
 #include "util/bytes.h"
 #include "util/strings.h"
 

@@ -15,10 +15,13 @@ public:
     }
 
     int ReadPid();
+
     void WritePid();
 
     void CheckPidFile();
+
     void RemovePidFile();
+
     void KillByPidFile();
 
 public:
