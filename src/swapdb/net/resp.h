@@ -10,6 +10,7 @@ found in the LICENSE file.
 #include <inttypes.h>
 #include <string>
 #include <vector>
+#include <map>
 #include "redis/reponse_redis.h"
 
 #define addReplyErrorCodeReturn(n) resp->addReplyError(GetErrorInfo(n)); return 0
@@ -22,16 +23,6 @@ public:
 
     std::vector<std::string> resp_arr;
     std::string *output = nullptr;
-
-
-    void push_back(const std::string &s);
-
-    void emplace_back(std::string &&s);
-
-    void reply_scan_ready();
-
-    void reply_list_ready();
-
 
 
     void addReplyError(const std::string &err_msg);
@@ -59,6 +50,14 @@ public:
     void addReplyInt(int64_t i);
 
     void addReplyInt(int i);
+
+    void convertReplyToList();
+
+    void convertReplyToScanResult();
+
+    void addReplyListEmpty();
+
+    void addReplyListHead(int size);
 
 };
 

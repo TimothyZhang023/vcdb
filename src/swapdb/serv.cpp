@@ -14,109 +14,212 @@ extern "C" {
 }
 
 DEF_PROC(type);
+
 DEF_PROC(get);
+
 DEF_PROC(set);
+
 DEF_PROC(append);
+
 DEF_PROC(setx);
+
 DEF_PROC(psetx);
+
 DEF_PROC(setnx);
+
 DEF_PROC(getset);
+
 DEF_PROC(getbit);
+
 DEF_PROC(setbit);
+
 DEF_PROC(countbit);
+
 DEF_PROC(substr);
+
 DEF_PROC(getrange);
+
 DEF_PROC(setrange);
+
 DEF_PROC(strlen);
+
 DEF_PROC(bitcount);
+
 DEF_PROC(incr);
+
 DEF_PROC(incrbyfloat);
+
 DEF_PROC(decr);
+
 DEF_PROC(scan);
+
 DEF_PROC(keys);
+
 DEF_PROC(exists);
+
 DEF_PROC(multi_get);
+
 DEF_PROC(multi_set);
+
 DEF_PROC(multi_del);
+
 DEF_PROC(ttl);
+
 DEF_PROC(pttl);
+
 DEF_PROC(expire);
+
 DEF_PROC(pexpire);
+
 DEF_PROC(expireat);
+
 DEF_PROC(pexpireat);
+
 DEF_PROC(persist);
+
 DEF_PROC(hsize);
+
 DEF_PROC(hget);
+
 DEF_PROC(hset);
+
 DEF_PROC(hsetnx);
+
 DEF_PROC(hdel);
+
 DEF_PROC(hincr);
+
 DEF_PROC(hincrbyfloat);
+
 DEF_PROC(hgetall);
+
 DEF_PROC(hscan);
+
 DEF_PROC(hkeys);
+
 DEF_PROC(hvals);
+
 DEF_PROC(hexists);
+
 DEF_PROC(hmget);
+
 DEF_PROC(hmset);
+
 DEF_PROC(sadd);
+
 DEF_PROC(srem);
+
 DEF_PROC(scard);
+
 DEF_PROC(sismember);
+
 DEF_PROC(smembers);
+
 DEF_PROC(spop);
+
 DEF_PROC(srandmember);
+
 DEF_PROC(sscan);
+
 DEF_PROC(zrank);
+
 DEF_PROC(zrrank);
+
 DEF_PROC(zrange);
+
 DEF_PROC(zrrange);
+
 DEF_PROC(zrangebyscore);
+
 DEF_PROC(zrevrangebyscore);
+
 DEF_PROC(zsize);
+
 DEF_PROC(zget);
+
 DEF_PROC(zincr);
+
 DEF_PROC(zscan);
+
 DEF_PROC(zcount);
+
 DEF_PROC(zremrangebyrank);
+
 DEF_PROC(zremrangebyscore);
+
 DEF_PROC(multi_zset);
+
 DEF_PROC(multi_zdel);
+
 DEF_PROC(zlexcount);
+
 DEF_PROC(zrangebylex);
+
 DEF_PROC(zremrangebylex);
+
 DEF_PROC(zrevrangebylex);
+
 DEF_PROC(qsize);
+
 DEF_PROC(qpush_front);
+
 DEF_PROC(qpush_frontx);
+
 DEF_PROC(qpush_back);
+
 DEF_PROC(qpush_backx);
+
 DEF_PROC(qpop_front);
+
 DEF_PROC(qpop_back);
+
 DEF_PROC(qslice);
+
 DEF_PROC(qtrim);
+
 DEF_PROC(qget);
+
 DEF_PROC(qset);
+
 DEF_PROC(info);
+
 DEF_PROC(save);
+
 DEF_PROC(version);
+
 DEF_PROC(dbsize);
+
 DEF_PROC(filesize);
+
 DEF_PROC(compact);
+
 DEF_PROC(flush);
+
 DEF_PROC(flushdb);
+
+DEF_PROC(flushall);
+
 DEF_PROC(dreply);
+
 DEF_PROC(cursor_cleanup);
+
 DEF_PROC(debug);
+
 DEF_PROC(dump);
+
 DEF_PROC(restore);
+
 DEF_PROC(select);
+
 DEF_PROC(client);
+
 DEF_PROC(quit);
 
-DEF_PROC(ssdb_scan);
-DEF_PROC(ssdb_dbsize);
+DEF_PROC(ping);
 
+DEF_PROC(ssdb_scan);
+
+DEF_PROC(ssdb_dbsize);
 
 
 void VcServer::regProcs() {
@@ -217,7 +320,9 @@ void VcServer::regProcs() {
 //    REG_PROC(migrate, "rt");
     REG_PROC(client, "r");
     REG_PROC(quit, "r");
+    REG_PROC(ping, "r");
     REG_PROC(flushdb, "wt");
+    REG_PROC(flushall, "wt");
     REG_PROC(flush, "wt");
 
     REG_PROC(info, "r");
@@ -241,6 +346,10 @@ int proc_flushdb(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
+int proc_flushall(Context &ctx, const Request &req, Response *resp) {
+    return proc_flushdb(ctx, req, resp);
+}
+
 int proc_flush(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
 
@@ -260,7 +369,6 @@ int proc_client(Context &ctx, const Request &req, Response *resp) {
     resp->addReplyStatusOK();
     return 0;
 }
-
 
 
 int proc_debug(Context &ctx, const Request &req, Response *resp) {
@@ -291,7 +399,7 @@ int proc_debug(Context &ctx, const Request &req, Response *resp) {
             addReplyErrorCodeReturn(ret);
         }
 
-        resp->addReplyString(res);
+        resp->addReplyStatus(res);
         return 0;
     } else if (action == "populate") {
         CHECK_MIN_PARAMS(3);
@@ -344,6 +452,11 @@ int proc_quit(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
+int proc_ping(Context &ctx, const Request &req, Response *resp) {
+    resp->addReplyStatus("PONG");
+    return 0;
+}
+
 
 int proc_restore(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
@@ -368,15 +481,14 @@ int proc_restore(Context &ctx, const Request &req, Response *resp) {
     std::string val;
 
     PTST(restore, 0.01)
-    int ret = serv->db->restore(ctx, req[1], ttl, req[3], replace, &val);
-    PTE(restore, hexstr(req[1]))
+    int ret = serv->db->restore(ctx, req[1], ttl, req[3], replace, &val);PTE(restore, hexstr(req[1]))
 
     if (ret < 0) {
         log_warn("%s, %s : %s", GetErrorInfo(ret).c_str(), hexmem(req[1].data(), req[1].size()).c_str(),
                  hexmem(req[3].data(), req[3].size()).c_str());
         addReplyErrorCodeReturn(ret);
     } else {
-        resp->addReplyString(val);
+        resp->addReplyStatus(val);
     }
 
     return 0;
@@ -432,9 +544,9 @@ int proc_save(Context &ctx, const Request &req, Response *resp) {
 
     int ret = serv->db->save(ctx);
     if (ret < 0) {
-        resp->push_back("error");
+        addReplyErrorCodeReturn(ret);
     } else {
-        resp->push_back("ok");
+        resp->addReplyStatusOK();
     }
 
     return 0;
@@ -442,29 +554,31 @@ int proc_save(Context &ctx, const Request &req, Response *resp) {
 
 
 #define ReplyWtihSize(name_size) \
-    resp->emplace_back(#name_size":" + str(name_size));
+    resp_arr->emplace_back(#name_size":" + str(name_size));
 
 #define ReplyWtihHuman(name_size) \
-    resp->emplace_back(#name_size":" + str(name_size));\
-    resp->emplace_back(#name_size"_human:" + bytesToHuman((int64_t) name_size));
+    resp_arr->emplace_back(#name_size":" + str(name_size));\
+    resp_arr->emplace_back(#name_size"_human:" + bytesToHuman((int64_t) name_size));
 
 
 #define FastGetProperty(key, name) \
     if (serv->db->getLdb()->GetProperty((key), &val)) {\
     uint64_t temp_size = Bytes(val).Uint64();\
-    resp->emplace_back(name":" + str(temp_size));\
+    resp_arr->emplace_back(name":" + str(temp_size));\
 }
 
 #define FastGetPropertyHuman(key, name) \
     if (serv->db->getLdb()->GetProperty(key, &val)) {\
     uint64_t temp_size = Bytes(val).Uint64();\
-    resp->emplace_back(name":" + str(temp_size));\
-    resp->emplace_back(name"_human:" + bytesToHuman((int64_t) temp_size));\
+    resp_arr->emplace_back(name":" + str(temp_size));\
+    resp_arr->emplace_back(name"_human:" + bytesToHuman((int64_t) temp_size));\
 }
 
 int proc_info(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
 
+
+    auto resp_arr = &resp->resp_arr;
 
     static struct utsname name;
     static int call_uname = 1;
@@ -483,35 +597,35 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
     }
 
 
-    resp->emplace_back("ok");
+    resp_arr->emplace_back("ok");
 
     if (all || selected == "server") {
         //# Server
-        resp->emplace_back("# Server");
-        resp->emplace_back("os:" + str(name.sysname) + " " + str(name.release) + " " + str(name.machine));
-        resp->emplace_back("arch_bits:" + str((sizeof(long) == 8) ? 64 : 32));
+        resp_arr->emplace_back("# Server");
+        resp_arr->emplace_back("os:" + str(name.sysname) + " " + str(name.release) + " " + str(name.machine));
+        resp_arr->emplace_back("arch_bits:" + str((sizeof(long) == 8) ? 64 : 32));
 #ifdef __GNUC__
-        resp->emplace_back("gcc_version:" + str(__GNUC__) + "." + str(__GNUC_MINOR__) + "." + str(__GNUC_PATCHLEVEL__));
+        resp_arr->emplace_back("gcc_version:" + str(__GNUC__) + "." + str(__GNUC_MINOR__) + "." + str(__GNUC_PATCHLEVEL__));
 #else
         resp->emplace_back("gcc_version: 0.0.0");
 #endif
-        resp->emplace_back("pid:" + str(getpid()));
+        resp_arr->emplace_back("pid:" + str(getpid()));
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     };
 
     if (all || selected == "clients") {
         //# Clients
-        resp->emplace_back("# Clients");
+        resp_arr->emplace_back("# Clients");
 //        resp->emplace_back("connected_clients:" + str(ctx.net->link_count));
-        resp->emplace_back("blocked_clients: 0");
+        resp_arr->emplace_back("blocked_clients: 0");
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     };
 
 
     if (all || selected == "memory") {//memory
-        resp->emplace_back("# Memory");
+        resp_arr->emplace_back("# Memory");
 
         uint64_t used_memory_rss = zmalloc_get_rss();
         uint64_t used_memory = used_memory_rss;
@@ -556,11 +670,11 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
 
         }
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
     if (all || selected == "persistence") {//filesize
-        resp->emplace_back("#Persistence");
+        resp_arr->emplace_back("#Persistence");
 
         std::string val;
         FastGetPropertyHuman(leveldb::DB::Properties::kTotalSstFilesSize, "sst_file_size");
@@ -576,28 +690,28 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
         FastGetProperty(leveldb::DB::Properties::kNumRunningCompactions, "num_running_compactions");
 
 
-        resp->emplace_back("bgsave_in_progress:0"); //Todo Fake
-        resp->emplace_back("aof_rewrite_in_progress:0"); //Todo Fake
-        resp->emplace_back("loading:0"); //Todo Fake
+        resp_arr->emplace_back("bgsave_in_progress:0"); //Todo Fake
+        resp_arr->emplace_back("aof_rewrite_in_progress:0"); //Todo Fake
+        resp_arr->emplace_back("loading:0"); //Todo Fake
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
 
     if (all || selected == "snapshot") {//snapshot
-        resp->emplace_back("#Snapshot");
+        resp_arr->emplace_back("#Snapshot");
 
         std::string val;
         FastGetProperty(leveldb::DB::Properties::kNumSnapshots, "live_snapshots");
         FastGetProperty(leveldb::DB::Properties::kOldestSnapshotTime, "oldest_snapshot");
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
 
     if (all || selected == "stats") {//Stats
-        resp->emplace_back("#Stats");
-        resp->emplace_back("total_connections_received:0"); //Todo Fake
+        resp_arr->emplace_back("#Stats");
+        resp_arr->emplace_back("total_connections_received:0"); //Todo Fake
 
         {//total_calls
             int64_t calls = 0;
@@ -606,43 +720,43 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
                 Command *cmd = it->second;
                 calls += cmd->calls;
             }
-            resp->emplace_back("total_commands_processed:" + str(calls));
+            resp_arr->emplace_back("total_commands_processed:" + str(calls));
         }
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
     if (all || selected == "keyspace") {//Keyspace
-        resp->emplace_back("#Keyspace");
+        resp_arr->emplace_back("#Keyspace");
 
         uint64_t size = serv->db->size();
-        resp->emplace_back("db0:keys=" + str(size) + ",expires=0,avg_ttl=0");
+        resp_arr->emplace_back("db0:keys=" + str(size) + ",expires=0,avg_ttl=0");
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
 
     if (selected == "leveldb" || selected == "rocksdb") {
         for (auto const &block : serv->db->info()) {
-            resp->push_back(block);
+            resp_arr->push_back(block);
         }
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
     if (selected == "cmd") {
         for_each(serv->procMap.begin(), ctx.serv->procMap.end(), [&](std::pair<const Bytes, Command *> it) {
             Command *cmd = it.second;
-            resp->push_back("cmd." + cmd->name);
+            resp_arr->emplace_back("cmd." + cmd->name);
             char buf[128];
             snprintf(buf, sizeof(buf), "calls: %" PRIu64 "\ttime_wait: %.0f\ttime_proc: %.0f",
                      cmd->calls, cmd->time_wait, cmd->time_proc);
-            resp->push_back(buf);
+            resp_arr->emplace_back(buf);
         });
 
-        resp->emplace_back("");
+        resp_arr->emplace_back("");
     }
 
-    resp->push_back("");
+    resp_arr->emplace_back("");
     return 0;
 }

@@ -319,7 +319,7 @@ int SSDBImpl::zrrank(Context &ctx, const Bytes &name, const Bytes &key, int64_t 
     return 1;
 }
 
-int SSDBImpl::zrangeGeneric(Context &ctx, const Bytes &name, const Bytes &begin, const Bytes &limit,
+int SSDBImpl::zrangeGeneric(Context &ctx, const Bytes &name, const Bytes &begin, const Bytes &limit, bool withscore,
                             std::vector<string> &key_score,
                             int reverse) {
     long long start, end;
@@ -376,7 +376,9 @@ int SSDBImpl::zrangeGeneric(Context &ctx, const Bytes &name, const Bytes &begin,
         it->skip(start);
         while (it->next()) {
             key_score.emplace_back(it->key.String());
-            key_score.push_back(str(it->score));
+            if (withscore) {
+                key_score.push_back(str(it->score));
+            }
         }
         delete it;
         it = NULL;
@@ -385,14 +387,14 @@ int SSDBImpl::zrangeGeneric(Context &ctx, const Bytes &name, const Bytes &begin,
     return 1;
 }
 
-int SSDBImpl::zrange(Context &ctx, const Bytes &name, const Bytes &begin, const Bytes &limit,
+int SSDBImpl::zrange(Context &ctx, const Bytes &name, const Bytes &begin, const Bytes &limit, bool withscore,
                      std::vector<std::string> &key_score) {
-    return zrangeGeneric(ctx, name, begin, limit, key_score, 0);
+    return zrangeGeneric(ctx, name, begin, limit, withscore, key_score, 0);
 }
 
-int SSDBImpl::zrrange(Context &ctx, const Bytes &name, const Bytes &begin, const Bytes &limit,
+int SSDBImpl::zrrange(Context &ctx, const Bytes &name, const Bytes &begin, const Bytes &limit, bool withscore,
                       std::vector<std::string> &key_score) {
-    return zrangeGeneric(ctx, name, begin, limit, key_score, 1);
+    return zrangeGeneric(ctx, name, begin, limit, withscore, key_score, 1);
 }
 
 /* Struct to hold a inclusive/exclusive range spec by score comparison. */
@@ -1095,6 +1097,9 @@ int SSDBImpl::zscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
         return ret;
     }
 
+    resp.emplace_back("0");
+
+
     std::string start;
     if (cursor == "0") {
 //        start = encode_zset_key(name, "", hv.version);
@@ -1111,7 +1116,7 @@ int SSDBImpl::zscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
     if (!end) {
         //get new;
         uint64_t tCursor = redisCursorService.GetNewRedisCursor(iter->key().String()); //we already got it->next
-        resp[1] = str(tCursor);
+        resp[0] = str(tCursor);
     }
 
     return 1;

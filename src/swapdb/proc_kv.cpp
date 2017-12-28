@@ -18,7 +18,7 @@ int proc_type(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->addReplyString(val);
+    resp->addReplyStatus(val);
 
     return 0;
 }
@@ -32,6 +32,8 @@ int proc_get(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
+    } else if (ret == 0) {
+        resp->addReplyNil();
     } else {
         resp->addReplyString(val);
     }
@@ -415,19 +417,18 @@ int proc_multi_get(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
-    resp->reply_list_ready();
+    resp->addReplyListHead(static_cast<int>(req.size() -1));
+
     for (int i = 1; i < req.size(); i++) {
         std::string val;
         int ret = serv->db->get(ctx, req[i], &val);
-//		if(ret < 0){
-//			resp->resp.clear();
-//			addReplyErrorCodeReturn(ret);
-//		}
-        if (ret == 1) {
-            resp->push_back(req[i].String());
-            resp->push_back(val);
+        if (ret < 1) {
+            resp->addReplyNil();
+        } else {
+            resp->addReplyString(val);
         }
     }
+
     return 0;
 }
 
@@ -452,9 +453,9 @@ int proc_scan(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_scan_ready();
-
     serv->db->scan(cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
+
+    resp->convertReplyToScanResult();
 
     return 0;
 }
@@ -512,15 +513,17 @@ int proc_ssdb_scan(Context &ctx, const Request &req, Response *resp) {
     }
     bool fulliter = (pattern == "*");
 
+    auto resp_arr = &resp->resp_arr;
+
+
     auto ssdb_it = std::unique_ptr<Iterator>(serv->db->iterator("", "", -1));
-    resp->reply_list_ready();
     while (ssdb_it->next()) {
 
         if (fulliter ||
             stringmatchlen(pattern.data(), pattern.length(), ssdb_it->key().data(), ssdb_it->key().size(), 0)) {
-            resp->push_back(hexmem(ssdb_it->key().data(), ssdb_it->key().size()));
+            resp_arr->emplace_back(hexmem(ssdb_it->key().data(), ssdb_it->key().size()));
             if (need_value) {
-                resp->push_back(hexmem(ssdb_it->val().data(), ssdb_it->val().size()));
+                resp_arr->emplace_back(hexmem(ssdb_it->val().data(), ssdb_it->val().size()));
             }
 
             limit--;
@@ -534,12 +537,16 @@ int proc_ssdb_scan(Context &ctx, const Request &req, Response *resp) {
 
     }
 
+    resp->convertReplyToList();
+
+
     return 0;
 }
 
 int proc_keys(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
 
+    auto resp_arr = &resp->resp_arr;
 
     std::string pattern = "*";
     if (req.size() > 1) {
@@ -552,15 +559,16 @@ int proc_keys(Context &ctx, const Request &req, Response *resp) {
     start.append(1, DataType::META);
 
     auto mit = std::unique_ptr<MIterator>(new MIterator(serv->db->iterator(start, "", -1)));
-    resp->reply_list_ready();
     while (mit->next()) {
         if (fulliter || stringmatchlen(pattern.data(), pattern.size(), mit->key.data(), mit->key.size(), 0)) {
-            resp->emplace_back(mit->key.String());
+            resp_arr->emplace_back(mit->key.String());
         } else {
             //skip
         }
 
     }
+
+    resp->convertReplyToList();
 
     return 0;
 }

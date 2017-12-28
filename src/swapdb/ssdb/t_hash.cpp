@@ -195,7 +195,7 @@ int SSDBImpl::hget(Context &ctx, const Bytes &name, const Bytes &key, std::pair<
 }
 
 
-int SSDBImpl::hgetall(Context &ctx, const Bytes &name, std::map<std::string, std::string> &val) {
+int SSDBImpl::hgetall(Context &ctx, const Bytes &name, std::vector<std::string> &list, bool save_key , bool save_value) {
     HashMetaVal hv;
     const rocksdb::Snapshot *snapshot = nullptr;
 
@@ -214,9 +214,14 @@ int SSDBImpl::hgetall(Context &ctx, const Bytes &name, std::map<std::string, std
     std::unique_ptr<HIterator> it(hscan_internal(ctx, name, hv.version, snapshot));
 
     while (it->next()) {
-        val[it->key.String()] = it->val.String();
-    }
+        if(save_key) {
+            list.emplace_back(it->key.String());
+        }
 
+        if(save_value) {
+            list.emplace_back(it->val.String());
+        }
+    }
     return 1;
 }
 
@@ -424,6 +429,7 @@ int SSDBImpl::hscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
         return ret;
     }
 
+    resp.emplace_back("0");
 
     std::string start;
     if (cursor == "0") {
@@ -442,7 +448,7 @@ int SSDBImpl::hscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
     if (!end) {
         //get new;
         uint64_t tCursor = redisCursorService.GetNewRedisCursor(iter->key().String()); //we already got it->next
-        resp[1] = str(tCursor);
+        resp[0] = str(tCursor);
     }
 
     return 1;

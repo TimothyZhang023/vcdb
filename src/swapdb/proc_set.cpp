@@ -89,14 +89,15 @@ int proc_smembers(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
     VcServer *serv = ctx.serv;
 
-    resp->reply_list_ready();
-
     int ret = serv->db->smembers(ctx, req[1], resp->resp_arr);
 
     if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
+
+    resp->convertReplyToList();
+
 
     return 0;
 }
@@ -114,16 +115,17 @@ int proc_spop(Context &ctx, const Request &req, Response *resp) {
         }
     }
 
-    resp->reply_list_ready();
 
     int ret = serv->db->spop(ctx, req[1], resp->resp_arr, pop_count);
 
     if (ret < 0) {
-        resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
 
     }
+
+    resp->convertReplyToList();
+
 
     return 0;
 }
@@ -140,14 +142,13 @@ int proc_srandmember(Context &ctx, const Request &req, Response *resp) {
         }
     }
 
-    resp->reply_list_ready();
-
     int ret = serv->db->srandmember(ctx, req[1], resp->resp_arr, count);
 
     if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
+    resp->convertReplyToList();
 
     return 0;
 }
@@ -174,14 +175,14 @@ int proc_sscan(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_scan_ready();
     ret = serv->db->sscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
     if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
-    } else if (ret == 0) {
     }
+
+    resp->convertReplyToScanResult();
 
     return 0;
 }

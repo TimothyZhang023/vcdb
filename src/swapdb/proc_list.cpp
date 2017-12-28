@@ -178,13 +178,13 @@ int proc_qslice(Context &ctx, const Request &req, Response *resp){
         addReplyErrorCodeReturn(INVALID_INT);
 	}
 
-	resp->reply_list_ready();
 	int ret = serv->db->lrange(ctx, req[1], begin, end, resp->resp_arr);
 
 	if (ret < 0){
-		resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
 	}
+
+	resp->convertReplyToList();
 
 	return 0;
 }

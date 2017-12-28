@@ -65,6 +65,10 @@ int SSDBImpl::sscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
     if (ret != 1) {
         return ret;
     }
+
+    resp.emplace_back("0");
+
+
     std::string start;
     if (cursor == "0") {
         start = encode_set_key(name, "", sv.version);
@@ -82,7 +86,7 @@ int SSDBImpl::sscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
     if (!end) {
         //get new;
         uint64_t tCursor = redisCursorService.GetNewRedisCursor(iter->key().String()); //we already got it->next
-        resp[1] = str(tCursor);
+        resp[0] = str(tCursor);
     }
 
     return 1;

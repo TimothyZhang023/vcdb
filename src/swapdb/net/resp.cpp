@@ -9,26 +9,6 @@ found in the LICENSE file.
 #include <iomanip>
 #include <util/strings.h>
 
-
-void Response::push_back(const std::string &s) {
-    resp_arr.push_back(s);
-}
-
-void Response::emplace_back(std::string &&s) {
-    resp_arr.emplace_back(s);
-}
-
-void Response::reply_scan_ready() {
-    resp_arr.clear();
-    resp_arr.emplace_back("ok");
-    resp_arr.emplace_back("0");
-}
-
-void Response::reply_list_ready() {
-    resp_arr.emplace_back("ok");
-}
-
-
 void Response::addReplyError(const std::string &err_msg) {
     output->append("-");
     output->append(err_msg);
@@ -82,13 +62,13 @@ void Response::addReplyBulkCString(const char *s) {
 }
 
 void Response::addReplyHumanLongDouble(long double d) {
-    char buf[256];
+    char buf[256] = {0};
     int len = ld2string(buf, sizeof(buf), d, 1);
     addReplyBulkCBuffer(buf, static_cast<size_t>(len));
 }
 
 void Response::addReplyDouble(double d) {
-    char buf[128];
+    char buf[128] = {0};
     int len = ld2string(buf, sizeof(buf), d, 0);
     addReplyBulkCBuffer(buf, static_cast<size_t>(len));
 }
@@ -111,5 +91,58 @@ void Response::addReplyInt(int i) {
     addReplyInt(static_cast<int64_t>(i));
 }
 
+void Response::addReplyListEmpty() {
+    output->append("*0\r\n");
+}
+
+void Response::addReplyListHead(int size) {
+    {
+        char buf[32] = {0};
+        snprintf(buf, sizeof(buf), "*%d\r\n", size);
+        output->append(buf);
+    }
+}
+
+
+void Response::convertReplyToList() {
+
+    {
+        char buf[32] = {0};
+        snprintf(buf, sizeof(buf), "*%d\r\n", (int) resp_arr.size());
+        output->append(buf);
+    }
+
+    for (const auto &val : resp_arr) {
+        char buf[32] = {0};
+        snprintf(buf, sizeof(buf), "$%d\r\n", (int) val.size());
+        output->append(buf);
+        output->append(val.data(), val.size());
+        output->append("\r\n");
+    }
+}
+
+
+void Response::convertReplyToScanResult() {
+    addReplyListHead(2);
+
+    {
+        addReplyString(resp_arr[0]);
+    }
+    {
+        {
+            char buf[32] = {0};
+            snprintf(buf, sizeof(buf), "*%d\r\n", (int) resp_arr.size() - 1);
+            output->append(buf);
+        }
+        for (int i = 1; i < resp_arr.size(); i++) {
+            auto val = resp_arr[i];
+            char buf[32] = {0};
+            snprintf(buf, sizeof(buf), "$%d\r\n", (int) val.size());
+            output->append(buf);
+            output->append(val.data(), val.size());
+            output->append("\r\n");
+        }
+    }
+}
 
 Response::Response(std::string *output) : output(output) {}

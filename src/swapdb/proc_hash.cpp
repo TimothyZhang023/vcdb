@@ -96,27 +96,22 @@ int proc_hmget(Context &ctx, const Request &req, Response *resp) {
 
     int ret = serv->db->hmget(ctx, name, reqKeys, resMap);
 
-    if (ret == 1) {
-        resp->reply_list_ready();
+    if (ret < 0) {
+        addReplyErrorCodeReturn(ret);
+
+    } else {
+
+        resp->addReplyListHead(static_cast<int>(reqKeys.size()));
 
         for (const auto &reqKey : reqKeys) {
-
             auto pos = resMap.find(reqKey);
             if (pos == resMap.end()) {
-                //
+                resp->addReplyNil();
             } else {
-                resp->push_back(pos->first);
-                resp->push_back(pos->second);
+                resp->addReplyString(pos->second);
             }
-
         }
 
-    } else if (ret == 0) {
-        resp->reply_list_ready();
-
-        //nothing
-    } else {
-        addReplyErrorCodeReturn(ret);
     }
 
     return 0;
@@ -144,7 +139,7 @@ int proc_hset(Context &ctx, const Request &req, Response *resp) {
 
     int added = 0;
     int ret = serv->db->hset(ctx, req[1], req[2], req[3], &added);
-//
+
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
@@ -165,7 +160,7 @@ int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
-    }  else if (ret == 0) {
+    } else if (ret == 0) {
         resp->addReplyInt(0);
     } else {
         resp->addReplyInt(added);
@@ -202,22 +197,14 @@ int proc_hgetall(Context &ctx, const Request &req, Response *resp) {
 
 
     std::map<std::string, std::string> resMap;
-    int ret = serv->db->hgetall(ctx, req[1], resMap);
+    int ret = serv->db->hgetall(ctx, req[1], resp->resp_arr, true, true);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_list_ready();
-
-        //nothing
+        resp->addReplyListEmpty();
     } else {
-        resp->reply_list_ready();
-
-        for (const auto &res : resMap) {
-            resp->push_back(res.first);
-            resp->push_back(res.second);
-        }
-
+        resp->convertReplyToList();
     }
 
     return 0;
@@ -243,15 +230,14 @@ int proc_hscan(Context &ctx, const Request &req, Response *resp) {
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     }
-    resp->reply_scan_ready();
 
     ret = serv->db->hscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
     if (ret < 0) {
-        resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
-    } else if (ret == 0) {
     }
+
+    resp->convertReplyToScanResult();
 
     return 0;
 }
@@ -264,22 +250,15 @@ int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
 //	uint64_t limit = recv_bytes[4].Uint64();
 
     std::map<std::string, std::string> resMap;
-    int ret = serv->db->hgetall(ctx, req[1], resMap);
+    int ret = serv->db->hgetall(ctx, req[1], resp->resp_arr, true, false);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_list_ready();
+        resp->addReplyListEmpty();
 
-        //nothing
     } else {
-        resp->reply_list_ready();
-
-        for (const auto &res : resMap) {
-            //TODO 这里同时处理了kv 只是没有返回.
-            resp->push_back(res.first);
-//            resp->push_back(res.second);
-        }
+        resp->convertReplyToList();
     }
 
 
@@ -293,22 +272,15 @@ int proc_hvals(Context &ctx, const Request &req, Response *resp) {
 //	uint64_t limit = recv_bytes[4].Uint64();
 
     std::map<std::string, std::string> resMap;
-    int ret = serv->db->hgetall(ctx, req[1], resMap);
+    int ret = serv->db->hgetall(ctx, req[1], resp->resp_arr, false, true);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else if (ret == 0) {
-        resp->reply_list_ready();
+        resp->addReplyListEmpty();
 
-        //nothing
     } else {
-        resp->reply_list_ready();
-
-        for (const auto &res : resMap) {
-            //TODO 这里同时处理了kv 只是没有返回.
-//            resp->push_back(res.first);
-            resp->push_back(res.second);
-        }
+        resp->convertReplyToList();
     }
 
     return 0;

@@ -699,6 +699,7 @@ int SSDBImpl::scan(const Bytes& cursor, const std::string &pattern, uint64_t lim
         redisCursorService.FindElementByRedisCursor(cursor.String(), start);
     }
 
+    resp.emplace_back("0");
 
     Iterator* iter = iterator(start, "", -1);
 
@@ -709,7 +710,7 @@ int SSDBImpl::scan(const Bytes& cursor, const std::string &pattern, uint64_t lim
     if (!end) {
         //get new;
         uint64_t tCursor = redisCursorService.GetNewRedisCursor(iter->key().String()); //we already got it->next
-        resp[1] = str(tCursor);
+        resp[0] = str(tCursor);
     }
 
     return 1;

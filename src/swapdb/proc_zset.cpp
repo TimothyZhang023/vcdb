@@ -204,13 +204,22 @@ int proc_zrange(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 
-    resp->reply_list_ready();
-    int ret = serv->db->zrange(ctx, req[1], req[2], req[3], resp->resp_arr);
+    bool withscore = false;
+    if (req.size() == 5) {
+        auto arg= req[4].String();
+        strtolower(&arg);
+        if (arg == "withscores") {
+            withscore = true;
+        }
+    }
+
+    int ret = serv->db->zrange(ctx, req[1], req[2], req[3], withscore, resp->resp_arr);
 
     if (ret < 0) {
-        resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
+
+    resp->convertReplyToList();
 
     return 0;
 }
@@ -219,13 +228,22 @@ int proc_zrrange(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 
-    resp->reply_list_ready();
-    int ret = serv->db->zrrange(ctx, req[1], req[2], req[3], resp->resp_arr);
+    bool withscore = false;
+    if (req.size() == 5) {
+        auto arg= req[4].String();
+        strtolower(&arg);
+        if (arg == "withscores") {
+            withscore = true;
+        }
+    }
+
+    int ret = serv->db->zrrange(ctx, req[1], req[2], req[3], withscore, resp->resp_arr);
 
     if (ret < 0) {
-        resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
+
+    resp->convertReplyToList();
 
     return 0;
 }
@@ -270,7 +288,6 @@ static int _zrangebyscore(Context &ctx, SSDB *ssdb, const Request &req, Response
         }
     }
 
-    resp->reply_list_ready();
     if (reverse) {
         ret = ssdb->zrevrangebyscore(ctx, req[1], req[2], req[3], resp->resp_arr, withscores, offset, limit);
     } else {
@@ -278,9 +295,10 @@ static int _zrangebyscore(Context &ctx, SSDB *ssdb, const Request &req, Response
     }
 
     if (ret < 0) {
-        resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
+
+    resp->convertReplyToList();
 
     return 0;
 }
@@ -316,15 +334,15 @@ int proc_zscan(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->reply_scan_ready();
 
     ret = serv->db->zscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
     if (ret < 0) {
         resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
-    } else if (ret == 0) {
     }
+
+    resp->convertReplyToScanResult();
 
     return 0;
 }
@@ -390,7 +408,7 @@ int proc_zremrangebyrank(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(4);
 
     std::vector<std::string> key_score;
-    int ret = serv->db->zrange(ctx, req[1], req[2], req[3], key_score);
+    int ret = serv->db->zrange(ctx, req[1], req[2], req[3], false, key_score);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -400,7 +418,7 @@ int proc_zremrangebyrank(Context &ctx, const Request &req, Response *resp) {
     }
 
     std::set<Bytes> keys;
-    for (int i = 0; i < key_score.size(); i += 2) {
+    for (int i = 0; i < key_score.size(); i += 1) {
         keys.insert(Bytes(key_score[i]));
     }
 
@@ -440,7 +458,6 @@ static int _zrangebylex(Context &ctx, SSDB *ssdb, const Request &req, Response *
         }
     }
 
-    resp->reply_list_ready();
     if (direction == DIRECTION::BACKWARD) {
         ret = ssdb->zrevrangebylex(ctx, req[1], req[2], req[3], resp->resp_arr, offset, limit);
     } else {
@@ -448,9 +465,10 @@ static int _zrangebylex(Context &ctx, SSDB *ssdb, const Request &req, Response *
     }
 
     if (ret < 0) {
-        resp->resp_arr.clear();
         addReplyErrorCodeReturn(ret);
     }
+
+    resp->convertReplyToList();
 
     return 0;
 }
