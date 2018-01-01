@@ -14,38 +14,40 @@ class VcServer;
 
 class Buffer;
 
-class VcClientConn : public pink::RedisConn {
-public:
-    VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread,
-                 void *worker_specific_data);
+namespace vcdb {
 
-    ~VcClientConn() override;
+    class VcClientConn : public pink::RedisConn {
+    public:
+        VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread,
+                     void *worker_specific_data);
 
-protected:
-    int DealMessage(pink::RedisCmdArgsType &argv, std::string *response) override;
+        ~VcClientConn() override;
 
-    int ReplyError(const std::string &msg, std::string *response);
+    protected:
+        int DealMessage(pink::RedisCmdArgsType &argv, std::string *response) override;
 
-private:
+        int ReplyError(const std::string &msg, std::string *response);
 
-    VcServer *server = nullptr;
-    Context *ctx = nullptr;
-};
+    private:
+
+        VcServer *server = nullptr;
+        Context *ctx = nullptr;
+    };
 
 
-class VcServerConnFactory : public pink::ConnFactory {
-private:
-    void *data = nullptr;
+    class VcServerConnFactory : public pink::ConnFactory {
+    private:
+        void *data = nullptr;
 
-public:
-    explicit VcServerConnFactory(void *data) : data(data) {}
+    public:
+        explicit VcServerConnFactory(void *data) : data(data) {}
 
-    pink::PinkConn *NewPinkConn(int connfd, const std::string &ip_port,
-                                pink::ServerThread *thread,
-                                void *worker_specific_data) const override {
-        return new VcClientConn(connfd, ip_port, thread, data);
-    }
-};
-
+        pink::PinkConn *NewPinkConn(int connfd, const std::string &ip_port,
+                                    pink::ServerThread *thread,
+                                    void *worker_specific_data) const override {
+            return new VcClientConn(connfd, ip_port, thread, data);
+        }
+    };
+}
 
 #endif //VCDB_CONN_H

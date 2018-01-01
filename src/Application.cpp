@@ -18,23 +18,25 @@
 #include "ClientConn.h"
 #include "util/daemon.h"
 
+namespace vcdb {
 
-class VcServerHandle : public pink::ServerHandle {
+    class VcServerHandle : public pink::ServerHandle {
 
-    //Client
+        //Client
 
-    int CreateWorkerSpecificData(void **data) const override {
-        UNUSED(data);
-        return 0;
-    }
+        int CreateWorkerSpecificData(void **data) const override {
+            UNUSED(data);
+            return 0;
+        }
 
-    int DeleteWorkerSpecificData(void *data) const override {
-        UNUSED(data);
-        return 0;
-    }
-};
+        int DeleteWorkerSpecificData(void *data) const override {
+            UNUSED(data);
+            return 0;
+        }
+    };
+}
 
-int Application::usage(int argc, char **argv) {
+int vcdb::Application::usage(int argc, char **argv) {
     printf("Usage:\n");
     printf("    %s [-d] /path/to/app.conf [-s start|stop|restart]\n", argv[0]);
     printf("Options:\n");
@@ -45,7 +47,7 @@ int Application::usage(int argc, char **argv) {
 }
 
 
-int Application::Parse(int argc, char **argv) {
+int vcdb::Application::Parse(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "-d") {
@@ -84,7 +86,7 @@ int Application::Parse(int argc, char **argv) {
     return 0;
 }
 
-int Application::Init() {
+int vcdb::Application::Init() {
 
 
     if ((!appArgs.conf_file.empty()) && (!is_file(appArgs.conf_file))) {
@@ -162,13 +164,13 @@ int Application::Init() {
 
 }
 
-int Application::Run() {
+int vcdb::Application::Run() {
     appArgs.WritePid();
     go();
     appArgs.RemovePidFile();
 }
 
-int Application::go() {
+int vcdb::Application::go() {
     this->SignalSetup();
 
 
@@ -217,7 +219,8 @@ int Application::go() {
     std::unique_ptr<pink::ConnFactory> connFactory(new VcServerConnFactory(server.get()));
     std::unique_ptr<pink::ServerHandle> serverHandle(new VcServerHandle());
     std::unique_ptr<pink::ServerThread> serverThread(
-            pink::NewDispatchThread(appArgs.ip, appArgs.port, 10, connFactory.get(), 1000, 1000, serverHandle.get()));
+            pink::NewDispatchThread(appArgs.ip, appArgs.port, 10, connFactory.get(), 1000, 1000,
+                                    serverHandle.get()));
 
     if (serverThread->StartThread() != 0) {
         fprintf(stderr, "StartThread error happened!");
@@ -237,7 +240,7 @@ int Application::go() {
     log_info("server stopped");
 }
 
-void Application::SignalSetup() {
+void vcdb::Application::SignalSetup() {
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     signal(SIGINT, &IntSigHandle);
@@ -245,7 +248,7 @@ void Application::SignalSetup() {
     signal(SIGTERM, &IntSigHandle);
 }
 
-Application::~Application() {
+vcdb::Application::~Application() {
     if (conf != nullptr) {
         delete conf;
         conf = nullptr;
@@ -253,10 +256,9 @@ Application::~Application() {
 }
 
 
-void IntSigHandle(const int sig) {
+void vcdb::IntSigHandle(const int sig) {
     log_info("catch signal %d, cleanup...", sig);
     running.store(false);
     log_info("server exiting");
 }
-
 

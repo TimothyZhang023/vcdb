@@ -11,36 +11,40 @@
 #include <util/file.h>
 #include "AppArgs.h"
 
-static std::atomic<bool> running(false);
-
-void IntSigHandle(int sig);
-
 class Config;
 
-class Application {
-public:
+namespace vcdb {
 
-    Application() = default;;
+    static std::atomic<bool> running(false);
 
-    virtual ~Application();
+    void IntSigHandle(int sig);
 
-    int Parse(int argc, char **argv);
 
-    int Run();
+    class Application {
+    public:
 
-    int Init();
+        Application() = default;;
 
-    void SignalSetup();
+        virtual ~Application();
 
-private:
-    int usage(int argc, char **argv);
+        int Parse(int argc, char **argv);
 
-    AppArgs appArgs;
-    Config *conf = nullptr;
+        int Run();
 
-    int go();
+        int Init();
 
-};
+        void SignalSetup();
 
+    private:
+        int usage(int argc, char **argv);
+
+        AppArgs appArgs;
+        Config *conf = nullptr;
+
+        int go();
+
+    };
+
+}
 
 #endif //VCDB_APP_H

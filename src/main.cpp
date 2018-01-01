@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv) {
 
-    Application applicationServer;
+    vcdb::Application applicationServer;
     applicationServer.Parse(argc, argv);
 
     applicationServer.Init();
