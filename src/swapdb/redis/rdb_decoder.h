@@ -9,9 +9,9 @@ found in the LICENSE file.
 
 #include <cstring>
 #include "string"
-#include "rdb.h"
+#include "redis/rdb.h"
 extern "C" {
-#include "crc64.h"
+#include "redis/crc64.h"
 };
 
 

@@ -8,20 +8,10 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <Commands.h>
 
-class Command;
-class Context;
-class Bytes;
-class Response;
-
-typedef std::vector<Bytes> Request;
 
 typedef std::unordered_map<std::string, Command *> proc_map_t;
-typedef int (*proc_t)(Context &ctx, const Request &req, Response *resp);
-
-
-#define REG_PROC(c, f)  procMap.regProc(#c, f, proc_##c)
-
 
 class ProcMap {
 private:
@@ -32,7 +22,7 @@ public:
 
     ~ProcMap();
 
-    void regProc(const std::string &cmd, const char *sflags, proc_t proc);
+    void regProc(Command *c);
 
     Command *getProc(const std::string &str);
 
@@ -44,31 +34,6 @@ public:
         return proc_map.end();
     }
 };
-
-
-
-struct Command {
-    static const int FLAG_READ = (1 << 0);
-    static const int FLAG_WRITE = (1 << 1);
-    static const int FLAG_BACKEND = (1 << 2);
-    static const int FLAG_THREAD = (1 << 3);
-
-    std::string name;
-    int flags;
-    proc_t proc;
-    uint64_t calls;
-    double time_wait;
-    double time_proc;
-
-    Command() {
-        flags = 0;
-        proc = nullptr;
-        calls = 0;
-        time_wait = 0;
-        time_proc = 0;
-    }
-};
-
 
 
 #endif //VCDB_PROC_H

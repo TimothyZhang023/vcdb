@@ -6,7 +6,7 @@ found in the LICENSE file.
 /* queue */
 #include "serv.h"
 
-int proc_qsize(Context &ctx, const Request &req, Response *resp){
+int proc_llen(Context &ctx, const Request &req, Response *resp){
 	VcServer *serv = ctx.serv;
 	CHECK_MIN_PARAMS(2);
 
@@ -23,7 +23,7 @@ int proc_qsize(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_qpush_frontx(Context &ctx, const Request &req, Response *resp){
+int proc_lpushx(Context &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
 	VcServer *serv = ctx.serv;
 
@@ -41,7 +41,7 @@ int proc_qpush_frontx(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_qpush_front(Context &ctx, const Request &req, Response *resp){
+int proc_lpush(Context &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
 	VcServer *serv = ctx.serv;
 
@@ -57,7 +57,7 @@ int proc_qpush_front(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_qpush_backx(Context &ctx, const Request &req, Response *resp){
+int proc_rpushx(Context &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
 	VcServer *serv = ctx.serv;
 
@@ -74,7 +74,7 @@ int proc_qpush_backx(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_qpush_back(Context &ctx, const Request &req, Response *resp){
+int proc_rpush(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(3);
     VcServer *serv = ctx.serv;
 
@@ -90,7 +90,7 @@ int proc_qpush_back(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_qpop_front(Context &ctx, const Request &req, Response *resp){
+int proc_lpop(Context &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(2);
 	VcServer *serv = ctx.serv;
 
@@ -113,7 +113,7 @@ int proc_qpop_front(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_qpop_back(Context &ctx, const Request &req, Response *resp){
+int proc_rpop(Context &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(2);
     VcServer *serv = ctx.serv;
 
@@ -135,7 +135,7 @@ int proc_qpop_back(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_qtrim(Context &ctx, const Request &req, Response *resp){
+int proc_ltrim(Context &ctx, const Request &req, Response *resp){
 	VcServer *serv = ctx.serv;
 	CHECK_MIN_PARAMS(4);
 
@@ -164,7 +164,7 @@ int proc_qtrim(Context &ctx, const Request &req, Response *resp){
 
 
 
-int proc_qslice(Context &ctx, const Request &req, Response *resp){
+int proc_lrange(Context &ctx, const Request &req, Response *resp){
 	VcServer *serv = ctx.serv;
 	CHECK_MIN_PARAMS(4);
 
@@ -189,7 +189,7 @@ int proc_qslice(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_qget(Context &ctx, const Request &req, Response *resp){
+int proc_lindex(Context &ctx, const Request &req, Response *resp){
 	VcServer *serv = ctx.serv;
 	CHECK_MIN_PARAMS(3);
 
@@ -214,7 +214,7 @@ int proc_qget(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_qset(Context &ctx, const Request &req, Response *resp){
+int proc_lset(Context &ctx, const Request &req, Response *resp){
 	VcServer *serv = ctx.serv;
 	CHECK_MIN_PARAMS(4);
 

@@ -22,10 +22,8 @@
 #include "util/strings.h"
 
 #include <climits>
+#include "procs.h"
 
-
-
-#define DEF_PROC(f) int proc_##f(Context &ctx, const Request &req, Response *resp)
 
 #define CHECK_MIN_PARAMS(n) do{ \
         if(req.size() < (n)){ \

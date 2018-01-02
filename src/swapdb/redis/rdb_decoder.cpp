@@ -11,10 +11,10 @@ found in the LICENSE file.
 #include <memory>
 
 extern "C" {
-#include "lzf.h"
-#include "endianconv.h"
-#include "util.h"
-#include "zmalloc.h"
+#include "redis/lzf.h"
+#include "redis/endianconv.h"
+#include "redis/util.h"
+#include "redis/zmalloc.h"
 };
 
 

@@ -19,3 +19,6 @@
 [submodule "deps/bzip2"]
 	path = deps/bzip2
 	url = https://github.com/osrf/bzip2_cmake.git
+[submodule "deps/crcspeed"]
+	path = deps/crcspeed
+	url = https://github.com/mattsta/crcspeed.git

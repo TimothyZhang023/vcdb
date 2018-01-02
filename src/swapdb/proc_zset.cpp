@@ -7,7 +7,7 @@ found in the LICENSE file.
 #include "serv.h"
 
 
-int proc_multi_zset(Context &ctx, const Request &req, Response *resp) {
+int proc_zadd(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(4);
 
     VcServer *serv = ctx.serv;
@@ -112,7 +112,7 @@ int proc_multi_zset(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_multi_zdel(Context &ctx, const Request &req, Response *resp) {
+int proc_zrem(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(3);
 
@@ -135,7 +135,7 @@ int proc_multi_zdel(Context &ctx, const Request &req, Response *resp) {
 }
 
 
-int proc_zsize(Context &ctx, const Request &req, Response *resp) {
+int proc_zcard(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
@@ -149,7 +149,7 @@ int proc_zsize(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_zget(Context &ctx, const Request &req, Response *resp) {
+int proc_zscore(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(3);
 
@@ -183,7 +183,7 @@ int proc_zrank(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_zrrank(Context &ctx, const Request &req, Response *resp) {
+int proc_zrevrank(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(3);
 
@@ -224,7 +224,7 @@ int proc_zrange(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_zrrange(Context &ctx, const Request &req, Response *resp) {
+int proc_zrevrange(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 
@@ -348,7 +348,7 @@ int proc_zscan(Context &ctx, const Request &req, Response *resp) {
 }
 
 
-int proc_zincr(Context &ctx, const Request &req, Response *resp) {
+int proc_zincrby(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(4);
     CHECK_MAX_PARAMS(4);
 

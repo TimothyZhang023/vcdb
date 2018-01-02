@@ -13,324 +13,37 @@ extern "C" {
 #include "redis/zmalloc.h"
 }
 
-DEF_PROC(type);
-
-DEF_PROC(get);
-
-DEF_PROC(set);
-
-DEF_PROC(append);
-
-DEF_PROC(setx);
-
-DEF_PROC(psetx);
-
-DEF_PROC(setnx);
-
-DEF_PROC(getset);
-
-DEF_PROC(getbit);
-
-DEF_PROC(setbit);
-
-DEF_PROC(countbit);
-
-DEF_PROC(substr);
-
-DEF_PROC(getrange);
-
-DEF_PROC(setrange);
-
-DEF_PROC(strlen);
-
-DEF_PROC(bitcount);
-
-DEF_PROC(incr);
-
-DEF_PROC(incrbyfloat);
-
-DEF_PROC(decr);
-
-DEF_PROC(scan);
-
-DEF_PROC(keys);
-
-DEF_PROC(exists);
-
-DEF_PROC(multi_get);
-
-DEF_PROC(multi_set);
-
-DEF_PROC(multi_del);
-
-DEF_PROC(ttl);
-
-DEF_PROC(pttl);
-
-DEF_PROC(expire);
-
-DEF_PROC(pexpire);
-
-DEF_PROC(expireat);
-
-DEF_PROC(pexpireat);
-
-DEF_PROC(persist);
-
-DEF_PROC(hsize);
-
-DEF_PROC(hget);
-
-DEF_PROC(hset);
-
-DEF_PROC(hsetnx);
-
-DEF_PROC(hdel);
-
-DEF_PROC(hincr);
-
-DEF_PROC(hincrbyfloat);
-
-DEF_PROC(hgetall);
-
-DEF_PROC(hscan);
-
-DEF_PROC(hkeys);
-
-DEF_PROC(hvals);
-
-DEF_PROC(hexists);
-
-DEF_PROC(hmget);
-
-DEF_PROC(hmset);
-
-DEF_PROC(sadd);
-
-DEF_PROC(srem);
-
-DEF_PROC(scard);
-
-DEF_PROC(sismember);
-
-DEF_PROC(smembers);
-
-DEF_PROC(spop);
-
-DEF_PROC(srandmember);
-
-DEF_PROC(sscan);
-
-DEF_PROC(zrank);
-
-DEF_PROC(zrrank);
-
-DEF_PROC(zrange);
-
-DEF_PROC(zrrange);
-
-DEF_PROC(zrangebyscore);
-
-DEF_PROC(zrevrangebyscore);
-
-DEF_PROC(zsize);
-
-DEF_PROC(zget);
-
-DEF_PROC(zincr);
-
-DEF_PROC(zscan);
-
-DEF_PROC(zcount);
-
-DEF_PROC(zremrangebyrank);
-
-DEF_PROC(zremrangebyscore);
-
-DEF_PROC(multi_zset);
-
-DEF_PROC(multi_zdel);
-
-DEF_PROC(zlexcount);
-
-DEF_PROC(zrangebylex);
-
-DEF_PROC(zremrangebylex);
-
-DEF_PROC(zrevrangebylex);
-
-DEF_PROC(qsize);
-
-DEF_PROC(qpush_front);
-
-DEF_PROC(qpush_frontx);
-
-DEF_PROC(qpush_back);
-
-DEF_PROC(qpush_backx);
-
-DEF_PROC(qpop_front);
-
-DEF_PROC(qpop_back);
-
-DEF_PROC(qslice);
-
-DEF_PROC(qtrim);
-
-DEF_PROC(qget);
-
-DEF_PROC(qset);
-
-DEF_PROC(info);
-
-DEF_PROC(save);
-
-DEF_PROC(version);
-
-DEF_PROC(dbsize);
-
-DEF_PROC(filesize);
-
-DEF_PROC(compact);
-
-DEF_PROC(flush);
-
-DEF_PROC(flushdb);
-
-DEF_PROC(flushall);
-
-DEF_PROC(dreply);
-
-DEF_PROC(cursor_cleanup);
-
-DEF_PROC(debug);
-
-DEF_PROC(dump);
-
-DEF_PROC(restore);
-
-DEF_PROC(select);
-
-DEF_PROC(client);
-
-DEF_PROC(quit);
-
-DEF_PROC(ping);
-
-DEF_PROC(ssdb_scan);
-
-DEF_PROC(ssdb_dbsize);
-
-
 void VcServer::regProcs() {
-    REG_PROC(type, "rt");
-    REG_PROC(get, "rt");
-    REG_PROC(set, "wt");
-    REG_PROC(append, "wt");
-    REG_PROC(setx, "wt");
-    REG_PROC(psetx, "wt");
-    REG_PROC(setnx, "wt");
-    REG_PROC(getset, "wt");
-    REG_PROC(getbit, "rt");
-    REG_PROC(setbit, "wt");
-    REG_PROC(countbit, "rt");
-    REG_PROC(substr, "rt");
-    REG_PROC(getrange, "rt");
-    REG_PROC(setrange, "wt");
-    REG_PROC(strlen, "rt");
-    REG_PROC(bitcount, "rt");
-    REG_PROC(incr, "wt");
-    REG_PROC(incrbyfloat, "wt");
-    REG_PROC(decr, "wt");
-    REG_PROC(scan, "rt");
-    REG_PROC(keys, "rt");
-    REG_PROC(exists, "rt");
-    REG_PROC(multi_get, "rt");
-    REG_PROC(multi_set, "wt");
-    REG_PROC(multi_del, "wt");
-    REG_PROC(ttl, "rt");
-    REG_PROC(pttl, "rt");
-    REG_PROC(expire, "wt");
-    REG_PROC(pexpire, "wt");
-    REG_PROC(expireat, "wt");
-    REG_PROC(pexpireat, "wt");
-    REG_PROC(persist, "wt");
+    int j;
+    int numcommands = sizeof(redisCommandTable)/sizeof(struct redisCommand);
 
-    REG_PROC(hsize, "rt");
-    REG_PROC(hget, "rt");
-    REG_PROC(hset, "wt");
-    REG_PROC(hsetnx, "wt");
-    REG_PROC(hincr, "wt");
-    REG_PROC(hincrbyfloat, "wt");
-    REG_PROC(hgetall, "rt");
-    REG_PROC(hscan, "rt");
-    REG_PROC(hkeys, "rt");
-    REG_PROC(hvals, "rt");
-    REG_PROC(hexists, "rt");
-    REG_PROC(hmget, "rt");
-    REG_PROC(hmset, "wt");
-    REG_PROC(hdel, "wt");
+    for (j = 0; j < numcommands; j++) {
+        struct redisCommand *c = redisCommandTable+j;
 
-    REG_PROC(sadd, "wt");
-    REG_PROC(srem, "wt");
-    REG_PROC(scard, "rt");
-    REG_PROC(sismember, "rt");
-    REG_PROC(smembers, "rt");
-    REG_PROC(spop, "wt");
-    REG_PROC(srandmember, "rt");
-    REG_PROC(sscan, "rt");
+        for (const char f : c->sflags) {
+            switch(f) {
+                case 'w': c->flags |= CMD_WRITE; break;
+                case 'r': c->flags |= CMD_READONLY; break;
+                case 'm': c->flags |= CMD_DENYOOM; break;
+                case 'a': c->flags |= CMD_ADMIN; break;
+                case 'p': c->flags |= CMD_PUBSUB; break;
+                case 's': c->flags |= CMD_NOSCRIPT; break;
+                case 'R': c->flags |= CMD_RANDOM; break;
+                case 'S': c->flags |= CMD_SORT_FOR_SCRIPT; break;
+                case 'l': c->flags |= CMD_LOADING; break;
+                case 't': c->flags |= CMD_STALE; break;
+                case 'M': c->flags |= CMD_SKIP_MONITOR; break;
+                case 'k': c->flags |= CMD_ASKING; break;
+                case 'F': c->flags |= CMD_FAST; break;
+                default: assert("Unsupported command flag"); break;
+            }
+        }
 
-    REG_PROC(zrank, "rt");
-    REG_PROC(zrrank, "rt");
-    REG_PROC(zrange, "rt");
-    REG_PROC(zrrange, "rt");
-    REG_PROC(zrangebyscore, "rt");
-    REG_PROC(zrevrangebyscore, "rt");
-    REG_PROC(zsize, "rt");
-    REG_PROC(zget, "rt");
-    REG_PROC(zincr, "wt");
-    REG_PROC(zscan, "rt");
-    REG_PROC(zcount, "rt");
-    REG_PROC(zremrangebyrank, "wt");
-    REG_PROC(zremrangebyscore, "wt");
-    REG_PROC(multi_zset, "wt");
-    REG_PROC(multi_zdel, "wt");
-    REG_PROC(zlexcount, "rt");
-    REG_PROC(zrangebylex, "rt");
-    REG_PROC(zremrangebylex, "wt");
-    REG_PROC(zrevrangebylex, "rt");
+        procMap.regProc(c);
 
-    REG_PROC(qsize, "rt");
-    REG_PROC(qpush_frontx, "wt");
-    REG_PROC(qpush_front, "wt");
-    REG_PROC(qpush_back, "wt");
-    REG_PROC(qpush_backx, "wt");
-    REG_PROC(qpop_front, "wt");
-    REG_PROC(qpop_back, "wt");
-    REG_PROC(qslice, "rt");
-    REG_PROC(qget, "rt");
-    REG_PROC(qset, "wt");
-    REG_PROC(qtrim, "wt");
 
-    REG_PROC(cursor_cleanup, "rt");
-    REG_PROC(dump, "wt");
-    REG_PROC(restore, "wt");
+    }
 
-    REG_PROC(select, "rt");
-//    REG_PROC(migrate, "rt");
-    REG_PROC(client, "r");
-    REG_PROC(quit, "r");
-    REG_PROC(ping, "r");
-    REG_PROC(flushdb, "wt");
-    REG_PROC(flushall, "wt");
-    REG_PROC(flush, "wt");
-
-    REG_PROC(info, "r");
-    REG_PROC(dbsize, "rt");
-    REG_PROC(save, "rt");
-
-    REG_PROC(compact, "rt");
-    REG_PROC(debug, "wt");
 
 }
 
@@ -749,8 +462,8 @@ int proc_info(Context &ctx, const Request &req, Response *resp) {
             Command *cmd = it.second;
             resp_arr->emplace_back("cmd." + cmd->name);
             char buf[128];
-            snprintf(buf, sizeof(buf), "calls: %" PRIu64 "\ttime_wait: %.0f\ttime_proc: %.0f",
-                     cmd->calls, cmd->time_wait, cmd->time_proc);
+            snprintf(buf, sizeof(buf), "calls: %" PRIu64 "",
+                     cmd->calls);
             resp_arr->emplace_back(buf);
         });
 

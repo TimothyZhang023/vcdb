@@ -11,12 +11,12 @@ found in the LICENSE file.
 #include <cfloat>
 #include <codec/util.h>
 #include "redis_encoder.h"
-#include "rdb.h"
+#include "redis/rdb.h"
 #include "util/cfree.h"
 
 extern "C" {
-#include "lzf.h"
-#include "endianconv.h"
+#include "redis/lzf.h"
+#include "redis/endianconv.h"
 };
 
 

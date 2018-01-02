@@ -8,13 +8,13 @@ found in the LICENSE file.
 #define SSDB_RDB_ENCODER_H
 
 #include <string>
-#include "rdb.h"
+#include "redis/rdb.h"
 #include "redis_encoder.h"
 
 
 extern "C" {
-#include "crc64.h"
-#include "endianconv.h"
+#include "redis/crc64.h"
+#include "redis/endianconv.h"
 };
 
 
