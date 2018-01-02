@@ -117,7 +117,7 @@ int proc_hmget(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hsize(Context &ctx, const Request &req, Response *resp) {
+int proc_hlen(Context &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
     VcServer *serv = ctx.serv;
 
@@ -306,7 +306,7 @@ int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
 
 }
 
-int proc_hincr(Context &ctx, const Request &req, Response *resp) {
+int proc_hincrby(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 

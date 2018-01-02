@@ -10,6 +10,7 @@ SET(ROCKSDB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/rocksdb)
 SET(SNAPPY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/snappy)
 SET(ZLIB_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/zlib)
 SET(BZIP2_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/bzip2)
+SET(CRCSPEED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/deps/crcspeed)
 
 
 ADD_DEFINITIONS(-D__XDEBUG_H_)
@@ -46,6 +47,7 @@ INCLUDE_DIRECTORIES(
         ${ROCKSDB_PATH}
         ${ZLIB_PATH}
         ${BZIP2_PATH}
+        ${CRCSPEED_PATH}
 )
 
 
@@ -57,24 +59,34 @@ LINK_DIRECTORIES(
         ${SNAPPY_PATH}/
         ${BZIP2_PATH}/
         ${ZLIB_PATH}/
+        ${CRCSPEED_PATH}/
 )
 
 
 SET(RDB_OBJS
-        src/swapdb/redis/crc/crc64speed.c
-        src/swapdb/redis/crc/crcspeed.c
-        src/swapdb/redis/ziplist.c
-        src/swapdb/redis/intset.c
-        src/swapdb/redis/lzf_c.c
-        src/swapdb/redis/lzf_d.c
-        src/swapdb/redis/endianconv.c
-        src/swapdb/redis/zmalloc.c
+        src/redis/ziplist.c
+        src/redis/intset.c
+        src/redis/lzf_c.c
+        src/redis/lzf_d.c
+        src/redis/endianconv.c
+        src/redis/zmalloc.c
+        src/redis/sha1.c
         src/swapdb/redis/redis_encoder.cpp
         src/swapdb/redis/rdb_decoder.cpp
-        src/swapdb/redis/sha1.c
         )
 ADD_LIBRARY(librdb STATIC ${RDB_OBJS})
 set_target_properties(librdb PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 OUTPUT_NAME "rdb")
+
+
+
+SET(CRCSPEED_SRC
+        ${CRCSPEED_PATH}/crc64speed.c
+        ${CRCSPEED_PATH}/crc16speed.c
+        ${CRCSPEED_PATH}/crcspeed.c
+        )
+ADD_LIBRARY(libcrcspeed STATIC ${CRCSPEED_SRC})
+set_target_properties(libcrcspeed PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 OUTPUT_NAME "crcspeed")
+
 
 set(SWAPDB_SOURCE_FILES
         src/swapdb/serv.cpp
@@ -123,4 +135,4 @@ set(SOURCE_FILES ${SWAPDB_SOURCE_FILES}
 
 add_executable(vcdb ${SOURCE_FILES})
 
-TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb librdb snappy z bz2)
+TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb librdb snappy z bz2 libcrcspeed)

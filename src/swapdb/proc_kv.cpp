@@ -173,7 +173,7 @@ int proc_setnx(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_setx(Context &ctx, const Request &req, Response *resp) {
+int proc_setex(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 
@@ -204,7 +204,7 @@ int proc_setx(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_psetx(Context &ctx, const Request &req, Response *resp) {
+int proc_psetex(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(4);
 
@@ -377,7 +377,7 @@ int proc_exists(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_multi_set(Context &ctx, const Request &req, Response *resp) {
+int proc_mset(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     if (req.size() < 3 || req.size() % 2 != 1) {
         addReplyErrorInfoReturn("ERR wrong number of arguments for MSET");
@@ -392,7 +392,7 @@ int proc_multi_set(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_multi_del(Context &ctx, const Request &req, Response *resp) {
+int proc_del(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 
@@ -413,7 +413,7 @@ int proc_multi_del(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_multi_get(Context &ctx, const Request &req, Response *resp) {
+int proc_mget(Context &ctx, const Request &req, Response *resp) {
     VcServer *serv = ctx.serv;
     CHECK_MIN_PARAMS(2);
 

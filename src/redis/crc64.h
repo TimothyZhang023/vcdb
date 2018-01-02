@@ -1,7 +1,7 @@
 #ifndef CRC64_H
 #define CRC64_H
 
-#include "redis/crc/crc64speed.h"
+#include "crc64speed.h"
 
 /* Run the init() function exactly once.  If pthread.h is not included, then
    this macro will use a simple static state variable for the purpose, which is
