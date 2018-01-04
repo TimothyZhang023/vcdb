@@ -8,7 +8,7 @@
 #include <swapdb/ssdb/options.h>
 #include <sstream>
 #include <swapdb/ssdb/ssdb.h>
-#include <swapdb/util/log.h>
+#include <util/log.h>
 #include <swapdb/serv.h>
 
 #include "pink/include/redis_conn.h"
@@ -16,6 +16,7 @@
 
 #include "Application.h"
 #include "ClientConn.h"
+#include "common/ServerContext.hpp"
 #include "util/daemon.h"
 
 namespace vcdb {
@@ -212,7 +213,7 @@ int vcdb::Application::go() {
         exit(1);
     }
 
-    std::unique_ptr<VcServer> server(new VcServer(data_db.get()));
+    std::unique_ptr<ServerContext> server(new ServerContext(data_db.get()));
 
     log_info("vcdb server starting on 0.0.0.0:%d", appArgs.port);
 

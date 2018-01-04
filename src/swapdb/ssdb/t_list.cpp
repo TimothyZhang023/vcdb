@@ -52,7 +52,7 @@ uint64_t getSeqByIndex(int64_t index, const ListMetaVal &meta_val) {
     return seq;
 }
 
-int SSDBImpl::LIndex(Context &ctx, const Bytes &key, int64_t index, std::pair<std::string, bool> &val) {
+int SSDBImpl::LIndex(ClientContext &ctx, const Bytes &key, int64_t index, std::pair<std::string, bool> &val) {
     uint64_t sequence = 0;
     ListMetaVal lv;
     std::string meta_key = encode_meta_key(key);
@@ -69,7 +69,7 @@ int SSDBImpl::LIndex(Context &ctx, const Bytes &key, int64_t index, std::pair<st
     return s;
 }
 
-int SSDBImpl::LLen(Context &ctx, const Bytes &key, uint64_t *llen) {
+int SSDBImpl::LLen(ClientContext &ctx, const Bytes &key, uint64_t *llen) {
     *llen = 0;
     ListMetaVal lv;
     std::string meta_key = encode_meta_key(key);
@@ -80,7 +80,7 @@ int SSDBImpl::LLen(Context &ctx, const Bytes &key, uint64_t *llen) {
     return s;
 }
 
-int SSDBImpl::LPop(Context &ctx, const Bytes &key, std::pair<std::string, bool> &val) {
+int SSDBImpl::LPop(ClientContext &ctx, const Bytes &key, std::pair<std::string, bool> &val) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -100,7 +100,7 @@ int SSDBImpl::LPop(Context &ctx, const Bytes &key, std::pair<std::string, bool> 
     return ret;
 }
 
-int SSDBImpl::RPop(Context &ctx, const Bytes &key, std::pair<std::string, bool> &val) {
+int SSDBImpl::RPop(ClientContext &ctx, const Bytes &key, std::pair<std::string, bool> &val) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -120,7 +120,7 @@ int SSDBImpl::RPop(Context &ctx, const Bytes &key, std::pair<std::string, bool> 
     return ret;
 }
 
-int SSDBImpl::doListPop(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch, ListMetaVal &lv,
+int SSDBImpl::doListPop(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch, ListMetaVal &lv,
                         std::string &meta_key, LIST_POSITION lp, std::pair<std::string, bool> &val) {
 
     uint64_t item_seq;
@@ -180,7 +180,7 @@ int SSDBImpl::doListPop(Context &ctx, const Bytes &key, rocksdb::WriteBatch &bat
 }
 
 
-int SSDBImpl::LPushX(Context &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
+int SSDBImpl::LPushX(ClientContext &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -202,7 +202,7 @@ int SSDBImpl::LPushX(Context &ctx, const Bytes &key, const std::vector<Bytes> &v
     return ret;
 }
 
-int SSDBImpl::LPush(Context &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
+int SSDBImpl::LPush(ClientContext &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
 
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
@@ -223,7 +223,7 @@ int SSDBImpl::LPush(Context &ctx, const Bytes &key, const std::vector<Bytes> &va
 }
 
 template <typename T>
-int SSDBImpl::doListPush(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const std::vector<T> &val, int offset, std::string &meta_key,
+int SSDBImpl::doListPush(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const std::vector<T> &val, int offset, std::string &meta_key,
                       ListMetaVal &meta_val, LIST_POSITION lp) {
 
     int size = (int)val.size();
@@ -288,7 +288,7 @@ int SSDBImpl::doListPush(Context &ctx, const Bytes &key, rocksdb::WriteBatch &ba
 }
 
 
-int SSDBImpl::RPushX(Context &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
+int SSDBImpl::RPushX(ClientContext &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -310,7 +310,7 @@ int SSDBImpl::RPushX(Context &ctx, const Bytes &key, const std::vector<Bytes> &v
     return ret;
 }
 
-int SSDBImpl::RPush(Context &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
+int SSDBImpl::RPush(ClientContext &ctx, const Bytes &key, const std::vector<Bytes> &val, int offset, uint64_t *llen) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -371,7 +371,7 @@ int SSDBImpl::GetListMetaVal(const std::string &meta_key, ListMetaVal &lv) {
 }
 
 
-int SSDBImpl::LSet(Context &ctx, const Bytes &key, int64_t index, const Bytes &val) {
+int SSDBImpl::LSet(ClientContext &ctx, const Bytes &key, int64_t index, const Bytes &val) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -408,7 +408,7 @@ int SSDBImpl::LSet(Context &ctx, const Bytes &key, int64_t index, const Bytes &v
     return 1;
 }
 
-int SSDBImpl::ltrim(Context &ctx, const Bytes &key, int64_t start, int64_t end) {
+int SSDBImpl::ltrim(ClientContext &ctx, const Bytes &key, int64_t start, int64_t end) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -501,7 +501,7 @@ int SSDBImpl::ltrim(Context &ctx, const Bytes &key, int64_t start, int64_t end) 
 }
 
 
-int SSDBImpl::lrange(Context &ctx, const Bytes &key, int64_t start, int64_t end, std::vector<std::string> &list){
+int SSDBImpl::lrange(ClientContext &ctx, const Bytes &key, int64_t start, int64_t end, std::vector<std::string> &list){
 
     int ret;
 

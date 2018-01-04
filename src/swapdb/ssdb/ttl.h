@@ -6,12 +6,16 @@ found in the LICENSE file.
 #ifndef SSDB_TTL_H_
 #define SSDB_TTL_H_
 
-#include "ssdb_impl.h"
 #include "util/thread.h"
 #include "util/sorted_set.h"
 #include <string>
+#include <rocksdb/write_batch.h>
 
 class SSDBImpl;
+
+class Bytes;
+
+class ClientContext;
 
 enum TimeUnit {
     Second,
@@ -27,21 +31,21 @@ public:
     ~ExpirationHandler();
 
 
-    int64_t pttl(Context &ctx, const Bytes &key, TimeUnit tu);
+    int64_t pttl(ClientContext &ctx, const Bytes &key, TimeUnit tu);
 
     int convert2ms(int64_t *ttl, TimeUnit tu);
 
     // The caller must hold mutex before calling set/del functions
-    int persist(Context &ctx, const Bytes &key);
+    int persist(ClientContext &ctx, const Bytes &key);
 
-    int expire(Context &ctx, const Bytes &key, int64_t ttl, TimeUnit tu);
+    int expire(ClientContext &ctx, const Bytes &key, int64_t ttl, TimeUnit tu);
 
-    int expireAt(Context &ctx, const Bytes &key, int64_t pexpireat_ms) {
+    int expireAt(ClientContext &ctx, const Bytes &key, int64_t pexpireat_ms) {
         rocksdb::WriteBatch batch;
         return expireAt(ctx, key, pexpireat_ms, batch);
     }
 
-    int expireAt(Context &ctx, const Bytes &key, int64_t pexpireat_ms, rocksdb::WriteBatch &batch, bool lock = true);
+    int expireAt(ClientContext &ctx, const Bytes &key, int64_t pexpireat_ms, rocksdb::WriteBatch &batch, bool lock = true);
 
     int contrlExpiration(bool if_enable);
 
@@ -52,7 +56,7 @@ public:
     int clear();
 
 
-    int cancelExpiration(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch);
+    int cancelExpiration(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch);
 
 private:
     SSDBImpl *ssdb;

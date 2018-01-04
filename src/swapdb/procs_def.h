@@ -5,11 +5,12 @@
 #ifndef VCDB_PROCS_H
 #define VCDB_PROCS_H
 
-class Context;
+#include "common/ClientContext.hpp"
+#include "common/Response.h"
+#include "common/Request.h"
 
-class Response;
 
-#define DEF_PROC(f) int proc_##f(Context &ctx, const Request &req, Response *resp)
+#define DEF_PROC(f) int proc_##f(ClientContext &ctx, const Request &req, Response *resp)
 
 DEF_PROC(type);
 

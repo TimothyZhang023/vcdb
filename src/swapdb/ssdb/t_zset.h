@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 
 template<typename T>
-int SSDBImpl::quickZset(Context &ctx, const Bytes &name, const std::string &meta_key, const std::string &meta_val,
+int SSDBImpl::quickZset(ClientContext &ctx, const Bytes &name, const std::string &meta_key, const std::string &meta_val,
                         T lambda) {
 
 
@@ -77,7 +77,7 @@ int SSDBImpl::quickZset(Context &ctx, const Bytes &name, const std::string &meta
 }
 
 template <typename T>
-int SSDBImpl::zsetNoLock(Context &ctx, const Bytes &name, const std::map<T, T> &sortedSet, int flags, int64_t *num) {
+int SSDBImpl::zsetNoLock(ClientContext &ctx, const Bytes &name, const std::map<T, T> &sortedSet, int flags, int64_t *num) {
     int incr = (flags & ZADD_INCR) != 0;
     int nx = (flags & ZADD_NX) != 0;
     int xx = (flags & ZADD_XX) != 0;

@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <swapdb/util/bytes.h>
+#include <util/bytes.h>
 #include <swapdb/serv.h>
 
 class RedisJob {

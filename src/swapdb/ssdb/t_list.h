@@ -9,7 +9,7 @@ found in the LICENSE file.
 #include "ssdb_impl.h"
 
 template<typename T>
-int SSDBImpl::quickList(Context &ctx, const Bytes &name, const std::string &meta_key, const std::string &meta_val,
+int SSDBImpl::quickList(ClientContext &ctx, const Bytes &name, const std::string &meta_key, const std::string &meta_val,
                         T lambda) {
 
 

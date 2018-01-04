@@ -7,7 +7,7 @@ found in the LICENSE file.
 #include "ssdb_impl.h"
 
 
-int SSDBImpl::edel_one(Context &ctx, const Bytes &key,rocksdb::WriteBatch &batch) {
+int SSDBImpl::edel_one(ClientContext &ctx, const Bytes &key,rocksdb::WriteBatch &batch) {
 
     int64_t old_ts = 0;
 
@@ -27,7 +27,7 @@ int SSDBImpl::edel_one(Context &ctx, const Bytes &key,rocksdb::WriteBatch &batch
     return 1;
 }
 
-int SSDBImpl::eget(Context &ctx, const Bytes &key, int64_t *ts) {
+int SSDBImpl::eget(ClientContext &ctx, const Bytes &key, int64_t *ts) {
     *ts = 0;
 
     std::string str_score;
@@ -53,7 +53,7 @@ int SSDBImpl::eget(Context &ctx, const Bytes &key, int64_t *ts) {
 
 
 
-int SSDBImpl::eset_one(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch, int64_t ts_ms) {
+int SSDBImpl::eset_one(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch, int64_t ts_ms) {
 
     int ret = 1;
 
@@ -90,7 +90,7 @@ int SSDBImpl::eset_one(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batc
 
 }
 
-int SSDBImpl::check_meta_key(Context &ctx, const Bytes &key) {
+int SSDBImpl::check_meta_key(ClientContext &ctx, const Bytes &key) {
     std::string meta_key = encode_meta_key(key);
     std::string meta_val;
     rocksdb::Status s = ldb->Get(rocksdb::ReadOptions(), meta_key, &meta_val);

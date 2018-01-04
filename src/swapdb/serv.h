@@ -8,21 +8,20 @@
 #include <unordered_map>
 
 #include "proc_scan.h"
-#include "proc.h"
 
 #include "ssdb/ssdb_impl.h"
-#include "common/context.hpp"
-#include "codec/decode.h"
-#include "codec/encode.h"
+#include "common/ClientContext.hpp"
+#include "common/Response.h"
+#include "common/Request.h"
+
 #include "codec/util.h"
 #include "codec/internal_error.h"
 #include "codec/error.h"
-#include "net/resp.h"
 #include "util/bytes.h"
 #include "util/strings.h"
+#include "util/time.h"
 
 #include <climits>
-#include "procs.h"
 
 
 #define CHECK_MIN_PARAMS(n) do{ \
@@ -42,37 +41,19 @@
 const static int MAX_PACKET_SIZE = 128 * 1024 * 1024;
 
 
-static inline int64_t time_ms() {
-    struct timeval now;
-    gettimeofday(&now, nullptr);
-    return (int64_t) now.tv_sec * 1000 + (int64_t) now.tv_usec / 1000;
-}
-
-
-
 class VcServer {
 public:
     VcServer(SSDB *ssdb) {
         this->db = (SSDBImpl *) ssdb;
-        this->regProcs();
         this->status = true;
     }
 
-    ~VcServer() {
-
-    }
+    ~VcServer() = default;
 
     SSDBImpl *db = nullptr;
-    ProcMap procMap;
 
     atomic<bool> status;
 
-    void regProcs();
-
 };
-
-const double ZSET_SCORE_MAX = std::numeric_limits<double>::max();
-const double ZSET_SCORE_MIN = std::numeric_limits<double>::min();
-const double eps = 1e-15;
 
 #endif //VCDB_SERV_H

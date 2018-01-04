@@ -6,12 +6,12 @@
 #define VCDB_CONTEXT_H
 
 
-class VcServer;
+class SSDBImpl;
 
 
-class Context {
+class ClientContext {
 public:
-    VcServer *serv = nullptr;
+    SSDBImpl *db = nullptr;
 };
 
 

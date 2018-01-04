@@ -44,7 +44,7 @@ int SSDBImpl::GetKvMetaVal(const std::string &meta_key, KvMetaVal &kv) {
     }
 }
 
-int SSDBImpl::SetGeneric(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const Bytes &val, int flags, int64_t expire_ms, int *added){
+int SSDBImpl::SetGeneric(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const Bytes &val, int flags, int64_t expire_ms, int *added){
     if (flags & OBJ_SET_EX || flags & OBJ_SET_PX) {
         if (expire_ms <= 0){
             return INVALID_EX_TIME; //NOT USED
@@ -100,7 +100,7 @@ int SSDBImpl::SetGeneric(Context &ctx, const Bytes &key, rocksdb::WriteBatch &ba
     return ret;
 }
 
-int SSDBImpl::multi_set(Context &ctx, const std::vector<Bytes> &kvs, int offset){
+int SSDBImpl::multi_set(ClientContext &ctx, const std::vector<Bytes> &kvs, int offset){
 	rocksdb::WriteBatch batch;
 	std::set<Bytes> lock_key;
 	std::set<Bytes>::const_iterator iter;
@@ -136,7 +136,7 @@ int SSDBImpl::multi_set(Context &ctx, const std::vector<Bytes> &kvs, int offset)
 	return rval;
 }
 
-int SSDBImpl::multi_del(Context &ctx, const std::set<std::string> &distinct_keys, int64_t *num){
+int SSDBImpl::multi_del(ClientContext &ctx, const std::set<std::string> &distinct_keys, int64_t *num){
 	rocksdb::WriteBatch batch;
 
     RecordLocks<Mutex> ls(&mutex_record_, distinct_keys);
@@ -160,7 +160,7 @@ int SSDBImpl::multi_del(Context &ctx, const std::set<std::string> &distinct_keys
 }
 
 
-int SSDBImpl::quickKv(Context &ctx, const Bytes &key, const Bytes &val, const std::string &meta_key,
+int SSDBImpl::quickKv(ClientContext &ctx, const Bytes &key, const Bytes &val, const std::string &meta_key,
                       const std::string &meta_val, int64_t expire_ms) {
 
     rocksdb::WriteBatch batch;
@@ -198,7 +198,7 @@ int SSDBImpl::quickKv(Context &ctx, const Bytes &key, const Bytes &val, const st
 
 }
 
-int SSDBImpl::setNoLock(Context &ctx, const Bytes &key, const Bytes &val, int flags, int64_t expire_ms, int *added) {
+int SSDBImpl::setNoLock(ClientContext &ctx, const Bytes &key, const Bytes &val, int flags, int64_t expire_ms, int *added) {
     rocksdb::WriteBatch batch;
 
     int ret = SetGeneric(ctx, key, batch, val, flags, expire_ms, added);
@@ -217,13 +217,13 @@ int SSDBImpl::setNoLock(Context &ctx, const Bytes &key, const Bytes &val, int fl
     return ((*added + ret) > 0) ? 1 : 0;
 }
 
-int SSDBImpl::set(Context &ctx, const Bytes &key, const Bytes &val, int flags, const int64_t expire_ms, int *added) {
+int SSDBImpl::set(ClientContext &ctx, const Bytes &key, const Bytes &val, int flags, const int64_t expire_ms, int *added) {
 	RecordKeyLock l(&mutex_record_, key.String());
 
     return setNoLock(ctx, key, val, flags, expire_ms, added);
 }
 
-int SSDBImpl::getset(Context &ctx, const Bytes &key, std::pair<std::string, bool> &val, const Bytes &newval){
+int SSDBImpl::getset(ClientContext &ctx, const Bytes &key, std::pair<std::string, bool> &val, const Bytes &newval){
 	RecordKeyLock l(&mutex_record_, key.String());
 	rocksdb::WriteBatch batch;
 
@@ -252,7 +252,7 @@ int SSDBImpl::getset(Context &ctx, const Bytes &key, std::pair<std::string, bool
 	return 1;
 }
 
-int SSDBImpl::del_key_internal(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch) {
+int SSDBImpl::del_key_internal(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch) {
     std::string meta_key = encode_meta_key(key);
     std::string meta_val;
     rocksdb::ReadOptions readOptions = rocksdb::ReadOptions();
@@ -273,7 +273,7 @@ int SSDBImpl::del_key_internal(Context &ctx, const Bytes &key, rocksdb::WriteBat
     }
 }
 
-int SSDBImpl::mark_key_deleted(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const std::string &meta_key, std::string &meta_val) {
+int SSDBImpl::mark_key_deleted(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const std::string &meta_key, std::string &meta_val) {
 
     if (meta_val[POS_DEL] == KEY_ENABLED_MASK) {
         meta_val[POS_DEL] = KEY_DELETE_MASK;
@@ -293,7 +293,7 @@ int SSDBImpl::mark_key_deleted(Context &ctx, const Bytes &key, rocksdb::WriteBat
 }
 
 
-int SSDBImpl::del(Context &ctx, const Bytes &key){
+int SSDBImpl::del(ClientContext &ctx, const Bytes &key){
 	RecordKeyLock l(&mutex_record_, key.String());
 	rocksdb::WriteBatch batch;
 
@@ -312,7 +312,7 @@ int SSDBImpl::del(Context &ctx, const Bytes &key){
 }
 
 
-int SSDBImpl::incrbyfloat(Context &ctx, const Bytes &key, long double by, long double *new_val) {
+int SSDBImpl::incrbyfloat(ClientContext &ctx, const Bytes &key, long double by, long double *new_val) {
 
     auto func = [&](rocksdb::WriteBatch &batch, const KvMetaVal &kv, std::string *new_str, int ret) {
 
@@ -347,7 +347,7 @@ int SSDBImpl::incrbyfloat(Context &ctx, const Bytes &key, long double by, long d
 }
 
 
-int SSDBImpl::incr(Context &ctx, const Bytes &key, int64_t by, int64_t *new_val){
+int SSDBImpl::incr(ClientContext &ctx, const Bytes &key, int64_t by, int64_t *new_val){
 
     auto func = [&] (rocksdb::WriteBatch &batch, const KvMetaVal &kv, std::string *new_str, int ret) {
 
@@ -373,7 +373,7 @@ int SSDBImpl::incr(Context &ctx, const Bytes &key, int64_t by, int64_t *new_val)
     return this->updateKvCommon<decltype(func)>(ctx, key, func);
 }
 
-int SSDBImpl::get(Context &ctx, const Bytes &key, std::string *val) {
+int SSDBImpl::get(ClientContext &ctx, const Bytes &key, std::string *val) {
     std::string meta_key = encode_meta_key(key);
     KvMetaVal kv;
     int ret = GetKvMetaVal(meta_key, kv);
@@ -388,7 +388,7 @@ int SSDBImpl::get(Context &ctx, const Bytes &key, std::string *val) {
 
 
 
-int SSDBImpl::append(Context &ctx, const Bytes &key, const Bytes &value, uint64_t *llen) {
+int SSDBImpl::append(ClientContext &ctx, const Bytes &key, const Bytes &value, uint64_t *llen) {
 
     auto func = [&] (rocksdb::WriteBatch &batch, KvMetaVal &kv, std::string *new_str, int ret) {
 
@@ -407,7 +407,7 @@ int SSDBImpl::append(Context &ctx, const Bytes &key, const Bytes &value, uint64_
 
 
 
-int SSDBImpl::setbit(Context &ctx, const Bytes &key, int64_t bitoffset, int on, int *res){
+int SSDBImpl::setbit(ClientContext &ctx, const Bytes &key, int64_t bitoffset, int on, int *res){
 
     auto func = [&](rocksdb::WriteBatch &batch, KvMetaVal &kv, std::string *new_str, int ret) {
 
@@ -435,7 +435,7 @@ int SSDBImpl::setbit(Context &ctx, const Bytes &key, int64_t bitoffset, int on, 
     return this->updateKvCommon<decltype(func)>(ctx, key, func);
 }
 
-int SSDBImpl::getbit(Context &ctx, const Bytes &key, int64_t bitoffset, int *res) {
+int SSDBImpl::getbit(ClientContext &ctx, const Bytes &key, int64_t bitoffset, int *res) {
     std::string val;
     int ret = this->get(ctx, key, &val);
     if (ret < 0) {
@@ -460,7 +460,7 @@ int SSDBImpl::getbit(Context &ctx, const Bytes &key, int64_t bitoffset, int *res
     return 1;
 }
 
-int SSDBImpl::setrange(Context &ctx, const Bytes &key, int64_t start, const Bytes &value, uint64_t *new_len) {
+int SSDBImpl::setrange(ClientContext &ctx, const Bytes &key, int64_t start, const Bytes &value, uint64_t *new_len) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -528,7 +528,7 @@ int SSDBImpl::setrange(Context &ctx, const Bytes &key, int64_t start, const Byte
     return 1;
 }
 
-int SSDBImpl::getrange(Context &ctx, const Bytes &key, int64_t start, int64_t end, std::pair<std::string, bool> &res) {
+int SSDBImpl::getrange(ClientContext &ctx, const Bytes &key, int64_t start, int64_t end, std::pair<std::string, bool> &res) {
     std::string val;
     int ret = this->get(ctx, key, &val);
     if (ret < 0) {

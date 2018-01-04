@@ -6,7 +6,7 @@ found in the LICENSE file.
 #ifndef SSDB_DECODE_H
 #define SSDB_DECODE_H
 
-#include "util.h"
+#include "codec/util.h"
 #include "util/bytes.h"
 
 class MetaKey{
@@ -105,19 +105,5 @@ public:
     string      key;
 };
 
-
-
-/*
- * decode delete key class
- */
-class RepoKey{
-public:
-        int DecodeRepoKey(const Bytes& str);
-
-public:
-    char        type;
-    uint64_t    id;
-    uint64_t    timestamp;
-};
 
 #endif //SSDB_DECODE_H

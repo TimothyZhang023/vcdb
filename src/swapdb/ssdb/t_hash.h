@@ -10,7 +10,7 @@ found in the LICENSE file.
 #include "ssdb_impl.h"
 
 template<typename T>
-int SSDBImpl::quickHash(Context &ctx, const Bytes &name, const std::string &meta_key, const std::string &meta_val,
+int SSDBImpl::quickHash(ClientContext &ctx, const Bytes &name, const std::string &meta_key, const std::string &meta_val,
                        T lambda) {
 
     rocksdb::WriteBatch batch;
@@ -75,7 +75,7 @@ int SSDBImpl::quickHash(Context &ctx, const Bytes &name, const std::string &meta
 
 
 template <typename T>
-int SSDBImpl::hmsetNoLock(Context &ctx, const Bytes &name, const std::map<T ,T> &kvs, bool check_exists) {
+int SSDBImpl::hmsetNoLock(ClientContext &ctx, const Bytes &name, const std::map<T ,T> &kvs, bool check_exists) {
 
     rocksdb::WriteBatch batch;
 
@@ -127,7 +127,7 @@ int SSDBImpl::hmsetNoLock(Context &ctx, const Bytes &name, const std::map<T ,T> 
 
 
 template <typename L>
-int SSDBImpl::hincrCommon(Context &ctx, const Bytes &name, const Bytes &key, L lambda) {
+int SSDBImpl::hincrCommon(ClientContext &ctx, const Bytes &name, const Bytes &key, L lambda) {
 
     RecordKeyLock l(&mutex_record_, name.String());
     rocksdb::WriteBatch batch;

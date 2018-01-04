@@ -4,7 +4,7 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 #include "iterator.h"
-#include "codec/decode.h"
+#include "codec/kv/decode.h"
 
 #include "rocksdb/iterator.h"
 

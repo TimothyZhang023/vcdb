@@ -7,8 +7,7 @@ found in the LICENSE file.
 #include <sstream>
 #include "internal_error.h"
 
-
-std::map<int, std::string> SSDBErrMap = {
+static std::map<int, std::string> errMap = {
         {SUCCESS,                     "success"},
 //        {ERR,              "ERR              "},
         {STORAGE_ERR,                 "ERR STORAGE_ERR      "},
@@ -39,8 +38,8 @@ std::map<int, std::string> SSDBErrMap = {
 
 std::string GetErrorInfo(int ret) {
 
-    auto pos = SSDBErrMap.find(ret);
-    if (pos == SSDBErrMap.end()) {
+    auto pos = errMap.find(ret);
+    if (pos == errMap.end()) {
         std::stringstream convert;
         convert << ret;
         return "ERR server error with error code : " + convert.str();

@@ -5,6 +5,7 @@ found in the LICENSE file.
 */
 #include "options.h"
 #include "util/strings.h"
+#include "util/config.h"
 
 
 void Options::load(Config *conf) {

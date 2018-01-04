@@ -71,12 +71,9 @@ SET(RDB_OBJS
         src/redis/endianconv.c
         src/redis/zmalloc.c
         src/redis/sha1.c
-        src/swapdb/redis/redis_encoder.cpp
-        src/swapdb/redis/rdb_decoder.cpp
         )
 ADD_LIBRARY(librdb STATIC ${RDB_OBJS})
 set_target_properties(librdb PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 OUTPUT_NAME "rdb")
-
 
 
 SET(CRCSPEED_SRC
@@ -90,7 +87,6 @@ set_target_properties(libcrcspeed PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 O
 
 set(SWAPDB_SOURCE_FILES
         src/swapdb/serv.cpp
-        src/swapdb/proc.cpp
         src/swapdb/proc_hash.cpp
         src/swapdb/proc_kv.cpp
         src/swapdb/proc_list.cpp
@@ -109,28 +105,45 @@ set(SWAPDB_SOURCE_FILES
         src/swapdb/ssdb/t_set.cpp
         src/swapdb/ssdb/ttl.cpp
         src/swapdb/ssdb/t_zset.cpp
+        )
 
-        src/swapdb/util/config.cpp
-        src/swapdb/util/bytes.cpp
-        src/swapdb/util/log.cpp
+set(CODEC_SOURCE_FILES
+        src/codec/kv/decode.cpp
+        src/codec/kv/encode.cpp
 
-        src/swapdb/net/resp.cpp
+        src/codec/internal_error.cpp
 
-        src/swapdb/codec/decode.cpp
-        src/swapdb/codec/encode.cpp
-        src/swapdb/codec/internal_error.cpp
-        src/swapdb/codec/util.cpp
+        src/codec/rdb/RdbEncoder.cpp
+        src/codec/rdb/RdbDecoder.cpp
 
+        src/codec/util.cpp
+        )
+
+set(UTIL_SOURCE_FILES
+        src/common/Response.cpp
+
+        src/util/config.cpp
+        src/util/bytes.cpp
+        src/util/log.cpp
         )
 
 
-set(SOURCE_FILES ${SWAPDB_SOURCE_FILES}
+set(SOURCE_FILES ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} ${UTIL_SOURCE_FILES}
         src/main.cpp
         src/RedisJob.cpp
         src/Application.cpp
         src/ClientConn.cpp
         src/AppArgs.cpp
-)
+
+        src/Constant.h
+
+        src/common/ProcMap.cpp
+        src/common/ClientContext.hpp
+        src/common/ServerContext.hpp
+        src/common/Commands.h
+        src/common/Request.h
+
+        )
 
 
 add_executable(vcdb ${SOURCE_FILES})

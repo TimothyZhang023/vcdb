@@ -4,7 +4,7 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 
-#include "rdb_decoder.h"
+#include "RdbDecoder.h"
 #include "util/bytes.h"
 #include "util/cfree.h"
 #include <netinet/in.h>

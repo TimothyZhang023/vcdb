@@ -5,15 +5,10 @@
 #define VCDB_COMMANDS_H
 
 #include "Constant.h"
-#include "swapdb/util/bytes.h"
+#include "swapdb/procs_def.h"
 
-class Context;
 
-typedef std::vector<Bytes> Request;
-
-class Response;
-
-typedef int redisCommandProc(Context &ctx, const Request &req, Response *resp);
+typedef int redisCommandProc(ClientContext &ctx, const Request &req, Response *resp);
 
 typedef int *redisGetKeysProc(struct redisCommand *cmd, const Request &req, int *numkeys);
 
@@ -30,7 +25,7 @@ struct redisCommand {
     int firstkey; /* The first argument that's a key (0 = no keys) */
     int lastkey;  /* The last argument that's a key */
     int keystep;  /* The step between first and last key */
-    long long microseconds, calls;
+    int64_t microseconds, calls;
 };
 
 struct expiretimeInfo {
@@ -40,7 +35,6 @@ struct expiretimeInfo {
     int time_arg_index;
 };
 
-#include "swapdb/procs.h"
 
 /* Our command table.
  *

@@ -5,8 +5,8 @@
 #ifndef SSDB_UTIL_H
 #define SSDB_UTIL_H
 
-#include <stdlib.h>
-#include <stdint.h>
+#include <cstdlib>
+#include <cstdint>
 #include <string>
 
 using namespace std;

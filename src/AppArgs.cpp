@@ -4,8 +4,8 @@
 
 #include "AppArgs.h"
 #include <util/file.h>
-#include <swapdb/util/strings.h>
-#include <swapdb/util/log.h>
+#include <util/strings.h>
+#include <util/log.h>
 
 namespace vcdb {
 

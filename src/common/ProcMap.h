@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <Commands.h>
 
+#include "common/Commands.h"
 
 typedef std::unordered_map<std::string, Command *> proc_map_t;
 
@@ -18,7 +18,7 @@ private:
     proc_map_t proc_map;
 
 public:
-    ProcMap();
+    ProcMap() = default;
 
     ~ProcMap();
 

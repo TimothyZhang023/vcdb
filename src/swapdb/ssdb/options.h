@@ -7,34 +7,8 @@ found in the LICENSE file.
 #define SSDB_OPTION_H_
 
 #include <ostream>
-#include "util/config.h"
 
-#ifdef USE_LEVELDB
-class Options
-{
-public:
-    Options();
-    ~Options(){}
-
-    void load(Config *conf);
-
-    Options() {
-        this->load(c);
-    }
-
-    Config* c = nullptr;
-
-    size_t cache_size;
-    size_t max_open_files;
-    size_t write_buffer_size;
-    size_t block_size;
-    int compaction_speed;
-    std::string compression;
-    bool binlog;
-    size_t binlog_capacity;
-
-};
-#else
+class Config;
 
 #define UNIT_MB (1024 * 1024)
 #define UNIT_KB (1024)
@@ -85,7 +59,6 @@ struct Options {
     friend std::ostream &operator<<(std::ostream &os, const Options &options);
 };
 
-#endif
 
 
 #endif

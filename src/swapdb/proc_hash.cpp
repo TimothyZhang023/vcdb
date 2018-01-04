@@ -6,14 +6,13 @@ found in the LICENSE file.
 /* hash */
 #include "serv.h"
 
-int proc_hexists(Context &ctx, const Request &req, Response *resp) {
+int proc_hexists(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
-    VcServer *serv = ctx.serv;
 
     const Bytes &name = req[1];
     const Bytes &key = req[2];
     std::pair<std::string, bool> val;
-    int ret = serv->db->hget(ctx, name, key, val);
+    int ret = ctx.db->hget(ctx, name, key, val);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -31,9 +30,8 @@ int proc_hexists(Context &ctx, const Request &req, Response *resp) {
 }
 
 
-int proc_hmset(Context &ctx, const Request &req, Response *resp) {
-    VcServer *serv = ctx.serv;
-    if (req.size() < 4 || req.size() % 2 != 0) {
+int proc_hmset(ClientContext &ctx, const Request &req, Response *resp) {
+        if (req.size() < 4 || req.size() % 2 != 0) {
         addReplyErrorInfoReturn("ERR wrong number of arguments for 'hmset' command");
     }
 
@@ -46,7 +44,7 @@ int proc_hmset(Context &ctx, const Request &req, Response *resp) {
         kvs[key] = val;
     }
 
-    int ret = serv->db->hmset(ctx, name, kvs);
+    int ret = ctx.db->hmset(ctx, name, kvs);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -57,9 +55,8 @@ int proc_hmset(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hdel(Context &ctx, const Request &req, Response *resp) {
+int proc_hdel(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
-    VcServer *serv = ctx.serv;
 
     const Bytes &name = req[1];
 
@@ -69,7 +66,7 @@ int proc_hdel(Context &ctx, const Request &req, Response *resp) {
     });
 
     int deleted = 0;
-    int ret = serv->db->hdel(ctx, name, fields, &deleted);
+    int ret = ctx.db->hdel(ctx, name, fields, &deleted);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -79,9 +76,8 @@ int proc_hdel(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hmget(Context &ctx, const Request &req, Response *resp) {
+int proc_hmget(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
-    VcServer *serv = ctx.serv;
 
     const Bytes &name = req[1];
 
@@ -94,7 +90,7 @@ int proc_hmget(Context &ctx, const Request &req, Response *resp) {
     });
 
 
-    int ret = serv->db->hmget(ctx, name, reqKeys, resMap);
+    int ret = ctx.db->hmget(ctx, name, reqKeys, resMap);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -117,12 +113,11 @@ int proc_hmget(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hlen(Context &ctx, const Request &req, Response *resp) {
+int proc_hlen(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
-    VcServer *serv = ctx.serv;
 
     uint64_t size = 0;
-    int ret = serv->db->hsize(ctx, req[1], &size);
+    int ret = ctx.db->hsize(ctx, req[1], &size);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -133,12 +128,11 @@ int proc_hlen(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hset(Context &ctx, const Request &req, Response *resp) {
+int proc_hset(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(4);
-    VcServer *serv = ctx.serv;
 
     int added = 0;
-    int ret = serv->db->hset(ctx, req[1], req[2], req[3], &added);
+    int ret = ctx.db->hset(ctx, req[1], req[2], req[3], &added);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -151,12 +145,11 @@ int proc_hset(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
+int proc_hsetnx(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(4);
-    VcServer *serv = ctx.serv;
 
     int added = 0;
-    int ret = serv->db->hsetnx(ctx, req[1], req[2], req[3], &added);
+    int ret = ctx.db->hsetnx(ctx, req[1], req[2], req[3], &added);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -169,13 +162,12 @@ int proc_hsetnx(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hget(Context &ctx, const Request &req, Response *resp) {
+int proc_hget(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
-    VcServer *serv = ctx.serv;
 
 
     std::pair<std::string, bool> val;
-    int ret = serv->db->hget(ctx, req[1], req[2], val);
+    int ret = ctx.db->hget(ctx, req[1], req[2], val);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -191,13 +183,12 @@ int proc_hget(Context &ctx, const Request &req, Response *resp) {
 }
 
 
-int proc_hgetall(Context &ctx, const Request &req, Response *resp) {
+int proc_hgetall(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
-    VcServer *serv = ctx.serv;
 
 
     std::map<std::string, std::string> resMap;
-    int ret = serv->db->hgetall(ctx, req[1], resp->resp_arr, true, true);
+    int ret = ctx.db->hgetall(ctx, req[1], resp->resp_arr, true, true);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -210,9 +201,8 @@ int proc_hgetall(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hscan(Context &ctx, const Request &req, Response *resp) {
+int proc_hscan(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
-    VcServer *serv = ctx.serv;
 
 
     int cursorIndex = 2;
@@ -231,7 +221,7 @@ int proc_hscan(Context &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    ret = serv->db->hscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
+    ret = ctx.db->hscan(ctx, req[1], cursor, scanParams.pattern, scanParams.limit, resp->resp_arr);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -243,14 +233,13 @@ int proc_hscan(Context &ctx, const Request &req, Response *resp) {
 }
 
 
-int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
+int proc_hkeys(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
-    VcServer *serv = ctx.serv;
 
 //	uint64_t limit = recv_bytes[4].Uint64();
 
     std::map<std::string, std::string> resMap;
-    int ret = serv->db->hgetall(ctx, req[1], resp->resp_arr, true, false);
+    int ret = ctx.db->hgetall(ctx, req[1], resp->resp_arr, true, false);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -265,14 +254,13 @@ int proc_hkeys(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hvals(Context &ctx, const Request &req, Response *resp) {
+int proc_hvals(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(2);
-    VcServer *serv = ctx.serv;
 
 //	uint64_t limit = recv_bytes[4].Uint64();
 
     std::map<std::string, std::string> resMap;
-    int ret = serv->db->hgetall(ctx, req[1], resp->resp_arr, false, true);
+    int ret = ctx.db->hgetall(ctx, req[1], resp->resp_arr, false, true);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -286,9 +274,8 @@ int proc_hvals(Context &ctx, const Request &req, Response *resp) {
     return 0;
 }
 
-int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
-    VcServer *serv = ctx.serv;
-    CHECK_MIN_PARAMS(4);
+int proc_hincrbyfloat(ClientContext &ctx, const Request &req, Response *resp) {
+        CHECK_MIN_PARAMS(4);
 
     long double by = req[3].LDouble();
     if (errno == EINVAL) {
@@ -296,7 +283,7 @@ int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
     }
 
     long double new_val;
-    int ret = serv->db->hincrbyfloat(ctx, req[1], req[2], by, &new_val);
+    int ret = ctx.db->hincrbyfloat(ctx, req[1], req[2], by, &new_val);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {
@@ -306,9 +293,8 @@ int proc_hincrbyfloat(Context &ctx, const Request &req, Response *resp) {
 
 }
 
-int proc_hincrby(Context &ctx, const Request &req, Response *resp) {
-    VcServer *serv = ctx.serv;
-    CHECK_MIN_PARAMS(4);
+int proc_hincrby(ClientContext &ctx, const Request &req, Response *resp) {
+        CHECK_MIN_PARAMS(4);
 
     int64_t by = req[3].Int64();
 
@@ -317,7 +303,7 @@ int proc_hincrby(Context &ctx, const Request &req, Response *resp) {
     }
 
     int64_t new_val = 0;
-    int ret = serv->db->hincr(ctx, req[1], req[2], by, &new_val);
+    int ret = ctx.db->hincr(ctx, req[1], req[2], by, &new_val);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
     } else {

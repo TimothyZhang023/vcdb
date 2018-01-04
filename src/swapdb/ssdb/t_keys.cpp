@@ -6,8 +6,9 @@ found in the LICENSE file.
 
 #include "ssdb_impl.h"
 
-#include "redis/dump_encode.h"
-#include "redis/rdb_decoder.h"
+#include "codec/rdb/DumpEncoder.h"
+#include "codec/rdb/RdbDecoder.h"
+#include "codec/rdb/RdbEncoder.h"
 
 #include "t_hash.h"
 #include "t_set.h"
@@ -35,7 +36,7 @@ int decodeMetaVal(T &mv, const std::string &val) {
 }
 
 
-int SSDBImpl::dump(Context &ctx, const Bytes &key, std::string *res, int64_t *pttl, bool compress) {
+int SSDBImpl::dump(ClientContext &ctx, const Bytes &key, std::string *res, int64_t *pttl, bool compress) {
     *res = "none";
 
     int ret = 0;
@@ -118,8 +119,8 @@ int SSDBImpl::dump(Context &ctx, const Bytes &key, std::string *res, int64_t *pt
 }
 
 
-int SSDBImpl::rdbSaveObject(Context &ctx, const Bytes &key, char dtype, const std::string &meta_val,
-                            RedisEncoder &encoder, const rocksdb::Snapshot *snapshot) {
+int SSDBImpl::rdbSaveObject(ClientContext &ctx, const Bytes &key, char dtype, const std::string &meta_val,
+                            RdbEncoder &encoder, const rocksdb::Snapshot *snapshot) {
 
     int ret = 0;
 
@@ -261,7 +262,7 @@ int SSDBImpl::rdbSaveObject(Context &ctx, const Bytes &key, char dtype, const st
 }
 
 
-int SSDBImpl::restore(Context &ctx, const Bytes &key, int64_t expire, const Bytes &data, bool replace, std::string *res) {
+int SSDBImpl::restore(ClientContext &ctx, const Bytes &key, int64_t expire, const Bytes &data, bool replace, std::string *res) {
     *res = "none";
 
     if (expire < 0) {
@@ -638,7 +639,7 @@ bool getNextString(unsigned char *zl, unsigned char **p, std::string &ret_res) {
 
 }
 
-int SSDBImpl::parse_replic(Context &ctx, const std::vector<Bytes> &kvs) {
+int SSDBImpl::parse_replic(ClientContext &ctx, const std::vector<Bytes> &kvs) {
     if (kvs.size()%2 != 0){
         return -1;
     }
@@ -656,14 +657,14 @@ int SSDBImpl::parse_replic(Context &ctx, const std::vector<Bytes> &kvs) {
 
     rocksdb::Status s = ldb->Write(writeOptions , &(batch));
     if(!s.ok()){
-        log_error("write leveldb error: %s", s.ToString().c_str());
+        log_error("write error: %s", s.ToString().c_str());
         return -1;
     }
 
     return 0;
 }
 
-int SSDBImpl::parse_replic(Context &ctx, const std::vector<std::string> &kvs) {
+int SSDBImpl::parse_replic(ClientContext &ctx, const std::vector<std::string> &kvs) {
     if (kvs.size()%2 != 0){
         return -1;
     }
@@ -681,7 +682,7 @@ int SSDBImpl::parse_replic(Context &ctx, const std::vector<std::string> &kvs) {
 
     rocksdb::Status s = ldb->Write(writeOptions , &(batch));
     if(!s.ok()){
-        log_error("write leveldb error: %s", s.ToString().c_str());
+        log_error("write error: %s", s.ToString().c_str());
         return -1;
     }
 
@@ -746,7 +747,7 @@ int SSDBImpl::redisCursorCleanup() {
     return 1;
 }
 
-int SSDBImpl::type(Context &ctx, const Bytes &key, std::string *type) {
+int SSDBImpl::type(ClientContext &ctx, const Bytes &key, std::string *type) {
     *type = "none";
 
     std::string meta_val;
@@ -792,7 +793,7 @@ int SSDBImpl::type(Context &ctx, const Bytes &key, std::string *type) {
     return 1;
 }
 
-int SSDBImpl::exists(Context &ctx, const Bytes &key) {
+int SSDBImpl::exists(ClientContext &ctx, const Bytes &key) {
     std::string meta_val;
     std::string meta_key = encode_meta_key(key);
     rocksdb::Status s = ldb->Get(rocksdb::ReadOptions(), meta_key, &meta_val);

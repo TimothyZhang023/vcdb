@@ -8,9 +8,10 @@
 
 #include <pink/include/pink_conn.h>
 #include <pink/include/redis_conn.h>
-#include <swapdb/common/context.hpp>
+#include "common/ClientContext.hpp"
 
-class VcServer;
+class ServerContext;
+class ClientContext;
 
 class Buffer;
 
@@ -30,8 +31,8 @@ namespace vcdb {
 
     private:
 
-        VcServer *server = nullptr;
-        Context *ctx = nullptr;
+        ServerContext *server = nullptr;
+        ClientContext *ctx = nullptr;
     };
 
 

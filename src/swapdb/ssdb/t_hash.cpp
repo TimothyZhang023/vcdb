@@ -9,21 +9,21 @@ found in the LICENSE file.
 /**
  * @return -1: error, 0: item updated, 1: new item inserted
  */
-int SSDBImpl::hmset(Context &ctx, const Bytes &name, const std::map<Bytes, Bytes> &kvs) {
+int SSDBImpl::hmset(ClientContext &ctx, const Bytes &name, const std::map<Bytes, Bytes> &kvs) {
     RecordKeyLock l(&mutex_record_, name.String());
     return hmsetNoLock<Bytes>(ctx, name, kvs, true);
 }
 
-int SSDBImpl::hset(Context &ctx, const Bytes &name, const Bytes &key, const Bytes &val, int *added) {
+int SSDBImpl::hset(ClientContext &ctx, const Bytes &name, const Bytes &key, const Bytes &val, int *added) {
     return hsetCommon(ctx, name, key, val, added, false);
 }
 
-int SSDBImpl::hsetnx(Context &ctx, const Bytes &name, const Bytes &key, const Bytes &val, int *added) {
+int SSDBImpl::hsetnx(ClientContext &ctx, const Bytes &name, const Bytes &key, const Bytes &val, int *added) {
     return hsetCommon(ctx, name, key, val, added, true);
 }
 
 
-int SSDBImpl::hdel(Context &ctx, const Bytes &name, const std::set<Bytes> &fields, int *deleted) {
+int SSDBImpl::hdel(ClientContext &ctx, const Bytes &name, const std::set<Bytes> &fields, int *deleted) {
     RecordKeyLock l(&mutex_record_, name.String());
     rocksdb::WriteBatch batch;
     HashMetaVal hv;
@@ -67,7 +67,7 @@ int SSDBImpl::hdel(Context &ctx, const Bytes &name, const std::set<Bytes> &field
 }
 
 
-int SSDBImpl::hincrbyfloat(Context &ctx, const Bytes &name, const Bytes &key, long double by, long double *new_val) {
+int SSDBImpl::hincrbyfloat(ClientContext &ctx, const Bytes &name, const Bytes &key, long double by, long double *new_val) {
 
     auto func = [&](rocksdb::WriteBatch &batch, const HashMetaVal &hv, const std::string &old, int ret) {
 
@@ -101,7 +101,7 @@ int SSDBImpl::hincrbyfloat(Context &ctx, const Bytes &name, const Bytes &key, lo
     return this->hincrCommon<decltype(func)>(ctx, name, key, func);
 }
 
-int SSDBImpl::hincr(Context &ctx, const Bytes &name, const Bytes &key, int64_t by, int64_t *new_val) {
+int SSDBImpl::hincr(ClientContext &ctx, const Bytes &name, const Bytes &key, int64_t by, int64_t *new_val) {
 
     auto func = [&](rocksdb::WriteBatch &batch, const HashMetaVal &hv, const std::string &old, int ret) {
 
@@ -128,7 +128,7 @@ int SSDBImpl::hincr(Context &ctx, const Bytes &name, const Bytes &key, int64_t b
     return this->hincrCommon<decltype(func)>(ctx, name, key, func);
 }
 
-int SSDBImpl::hsize(Context &ctx, const Bytes &name, uint64_t *size) {
+int SSDBImpl::hsize(ClientContext &ctx, const Bytes &name, uint64_t *size) {
     HashMetaVal hv;
     std::string meta_key = encode_meta_key(name);
     int ret = GetHashMetaVal(meta_key, hv);
@@ -140,7 +140,7 @@ int SSDBImpl::hsize(Context &ctx, const Bytes &name, uint64_t *size) {
     }
 }
 
-int SSDBImpl::hmget(Context &ctx, const Bytes &name, const std::vector<std::string> &reqKeys,
+int SSDBImpl::hmget(ClientContext &ctx, const Bytes &name, const std::vector<std::string> &reqKeys,
                     std::map<std::string, std::string> &resMap) {
     HashMetaVal hv;
     const rocksdb::Snapshot *snapshot = nullptr;
@@ -175,7 +175,7 @@ int SSDBImpl::hmget(Context &ctx, const Bytes &name, const std::vector<std::stri
     return 1;
 }
 
-int SSDBImpl::hget(Context &ctx, const Bytes &name, const Bytes &key, std::pair<std::string, bool> &val) {
+int SSDBImpl::hget(ClientContext &ctx, const Bytes &name, const Bytes &key, std::pair<std::string, bool> &val) {
     HashMetaVal hv;
     std::string meta_key = encode_meta_key(name);
     int ret = GetHashMetaVal(meta_key, hv);
@@ -195,7 +195,7 @@ int SSDBImpl::hget(Context &ctx, const Bytes &name, const Bytes &key, std::pair<
 }
 
 
-int SSDBImpl::hgetall(Context &ctx, const Bytes &name, std::vector<std::string> &list, bool save_key , bool save_value) {
+int SSDBImpl::hgetall(ClientContext &ctx, const Bytes &name, std::vector<std::string> &list, bool save_key , bool save_value) {
     HashMetaVal hv;
     const rocksdb::Snapshot *snapshot = nullptr;
 
@@ -227,7 +227,7 @@ int SSDBImpl::hgetall(Context &ctx, const Bytes &name, std::vector<std::string> 
 
 
 HIterator *
-SSDBImpl::hscan_internal(Context &ctx, const Bytes &name, uint16_t version, const rocksdb::Snapshot *snapshot) {
+SSDBImpl::hscan_internal(ClientContext &ctx, const Bytes &name, uint16_t version, const rocksdb::Snapshot *snapshot) {
     rocksdb::ReadOptions iterate_options(false, true);
     if (snapshot) {
         iterate_options.snapshot = snapshot;
@@ -290,7 +290,7 @@ int SSDBImpl::GetHashItemValInternal(const std::string &item_key, std::string *v
 }
 
 
-int SSDBImpl::hsetCommon(Context &ctx, const Bytes &name, const Bytes &key, const Bytes &val, int *added, bool nx) {
+int SSDBImpl::hsetCommon(ClientContext &ctx, const Bytes &name, const Bytes &key, const Bytes &val, int *added, bool nx) {
     RecordKeyLock l(&mutex_record_, name.String());
     rocksdb::WriteBatch batch;
 
@@ -342,7 +342,7 @@ int SSDBImpl::hsetCommon(Context &ctx, const Bytes &name, const Bytes &key, cons
 }
 
 
-int SSDBImpl::incr_hsize(Context &ctx, const Bytes &name, rocksdb::WriteBatch &batch, const std::string &size_key,
+int SSDBImpl::incr_hsize(ClientContext &ctx, const Bytes &name, rocksdb::WriteBatch &batch, const std::string &size_key,
                          HashMetaVal &hv, int64_t incr) {
     int ret = 1;
 
@@ -419,7 +419,7 @@ int SSDBImpl::hset_one(rocksdb::WriteBatch &batch, const HashMetaVal &hv, bool c
 }
 
 
-int SSDBImpl::hscan(Context &ctx, const Bytes &name, const Bytes &cursor, const std::string &pattern, uint64_t limit,
+int SSDBImpl::hscan(ClientContext &ctx, const Bytes &name, const Bytes &cursor, const std::string &pattern, uint64_t limit,
                     std::vector<std::string> &resp) {
 
     HashMetaVal hv;

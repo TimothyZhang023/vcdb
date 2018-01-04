@@ -6,14 +6,15 @@
 
 #include "ClientConn.h"
 #include "RedisJob.h"
+#include "common/ServerContext.hpp"
 
 
 vcdb::VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread, void *worker_specific_data)
         : pink::RedisConn(fd, ip_port, thread) {
 
-    server = static_cast<VcServer *>(worker_specific_data);
-    ctx = new Context();
-    ctx->serv = server;
+    server = static_cast<ServerContext *>(worker_specific_data);
+    ctx = new ClientContext();
+    ctx->db = server->db;
 }
 
 vcdb::VcClientConn::~VcClientConn() {
@@ -46,7 +47,7 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
     }
 
     Command *cmd = server->procMap.getProc(slash::StringToLower(request.cmd));
-    if (!cmd) {
+    if (cmd == nullptr) {
         ReplyError("command not found", response);
         return -2;
     }

@@ -4,11 +4,7 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 #include <cassert>
-#include "proc.h"
-
-
-ProcMap::ProcMap() {
-}
+#include "ProcMap.h"
 
 ProcMap::~ProcMap() {
     for (auto &it : proc_map) {

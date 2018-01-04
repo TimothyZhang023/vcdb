@@ -3,16 +3,16 @@ Copyright (c) 2017, Timothy. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
-#ifndef SSDB_REDISENCODER_H
-#define SSDB_REDISENCODER_H
+#ifndef SSDB_RdbEncoder_H
+#define SSDB_RdbEncoder_H
 
 
 #include "util/bytes.h"
 
-class RedisEncoder {
-
+class RdbEncoder {
 protected:
     bool rdb_compression = false;
+
 public:
 
     virtual int rdbWriteRaw(void *p, size_t n) = 0;
@@ -53,4 +53,4 @@ public:
 };
 
 
-#endif //SSDB_REDISENCODER_H
+#endif //SSDB_RdbEncoder_H

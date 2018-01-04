@@ -6,12 +6,11 @@ found in the LICENSE file.
 /* queue */
 #include "serv.h"
 
-int proc_llen(Context &ctx, const Request &req, Response *resp){
-	VcServer *serv = ctx.serv;
-	CHECK_MIN_PARAMS(2);
+int proc_llen(ClientContext &ctx, const Request &req, Response *resp){
+		CHECK_MIN_PARAMS(2);
 
 	uint64_t len = 0;
-	int ret = serv->db->LLen(ctx, req[1], &len);
+	int ret = ctx.db->LLen(ctx, req[1], &len);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -23,13 +22,12 @@ int proc_llen(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_lpushx(Context &ctx, const Request &req, Response *resp){
+int proc_lpushx(ClientContext &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
-	VcServer *serv = ctx.serv;
 
 	const Bytes &name = req[1];
 	uint64_t len = 0;
-	int ret = serv->db->LPushX(ctx, name, req, 2, &len);
+	int ret = ctx.db->LPushX(ctx, name, req, 2, &len);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -41,13 +39,12 @@ int proc_lpushx(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_lpush(Context &ctx, const Request &req, Response *resp){
+int proc_lpush(ClientContext &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
-	VcServer *serv = ctx.serv;
 
 	const Bytes &name = req[1];
  	uint64_t len = 0;
-	int ret = serv->db->LPush(ctx, name, req, 2, &len);
+	int ret = ctx.db->LPush(ctx, name, req, 2, &len);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
@@ -57,12 +54,11 @@ int proc_lpush(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_rpushx(Context &ctx, const Request &req, Response *resp){
+int proc_rpushx(ClientContext &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(3);
-	VcServer *serv = ctx.serv;
 
 	uint64_t len = 0;
-	int ret = serv->db->RPushX(ctx, req[1], req, 2, &len);
+	int ret = ctx.db->RPushX(ctx, req[1], req, 2, &len);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -74,12 +70,11 @@ int proc_rpushx(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_rpush(Context &ctx, const Request &req, Response *resp){
+int proc_rpush(ClientContext &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(3);
-    VcServer *serv = ctx.serv;
 
     uint64_t len = 0;
-    int ret = serv->db->RPush(ctx, req[1], req, 2, &len);
+    int ret = ctx.db->RPush(ctx, req[1], req, 2, &len);
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
 	} else {
@@ -90,14 +85,13 @@ int proc_rpush(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_lpop(Context &ctx, const Request &req, Response *resp){
+int proc_lpop(ClientContext &ctx, const Request &req, Response *resp){
 	CHECK_MIN_PARAMS(2);
-	VcServer *serv = ctx.serv;
 
 	const Bytes &name = req[1];
 
 	std::pair<std::string, bool> val;
-	int ret = serv->db->LPop(ctx, name, val);
+	int ret = ctx.db->LPop(ctx, name, val);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -113,12 +107,11 @@ int proc_lpop(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_rpop(Context &ctx, const Request &req, Response *resp){
+int proc_rpop(ClientContext &ctx, const Request &req, Response *resp){
     CHECK_MIN_PARAMS(2);
-    VcServer *serv = ctx.serv;
 
 	std::pair<std::string, bool> val;
-    int ret = serv->db->RPop(ctx, req[1], val);
+    int ret = ctx.db->RPop(ctx, req[1], val);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -135,9 +128,8 @@ int proc_rpop(Context &ctx, const Request &req, Response *resp){
 }
 
 
-int proc_ltrim(Context &ctx, const Request &req, Response *resp){
-	VcServer *serv = ctx.serv;
-	CHECK_MIN_PARAMS(4);
+int proc_ltrim(ClientContext &ctx, const Request &req, Response *resp){
+		CHECK_MIN_PARAMS(4);
 
 	int64_t begin = req[2].Int64();
 	if (errno == EINVAL){
@@ -150,7 +142,7 @@ int proc_ltrim(Context &ctx, const Request &req, Response *resp){
 	}
 
 
-	int ret = serv->db->ltrim(ctx, req[1], begin, end);
+	int ret = ctx.db->ltrim(ctx, req[1], begin, end);
 
 	if (ret < 0){
 		resp->resp_arr.clear();
@@ -164,9 +156,8 @@ int proc_ltrim(Context &ctx, const Request &req, Response *resp){
 
 
 
-int proc_lrange(Context &ctx, const Request &req, Response *resp){
-	VcServer *serv = ctx.serv;
-	CHECK_MIN_PARAMS(4);
+int proc_lrange(ClientContext &ctx, const Request &req, Response *resp){
+		CHECK_MIN_PARAMS(4);
 
 	int64_t begin = req[2].Int64();
 	if (errno == EINVAL){
@@ -178,7 +169,7 @@ int proc_lrange(Context &ctx, const Request &req, Response *resp){
         addReplyErrorCodeReturn(INVALID_INT);
 	}
 
-	int ret = serv->db->lrange(ctx, req[1], begin, end, resp->resp_arr);
+	int ret = ctx.db->lrange(ctx, req[1], begin, end, resp->resp_arr);
 
 	if (ret < 0){
         addReplyErrorCodeReturn(ret);
@@ -189,9 +180,8 @@ int proc_lrange(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_lindex(Context &ctx, const Request &req, Response *resp){
-	VcServer *serv = ctx.serv;
-	CHECK_MIN_PARAMS(3);
+int proc_lindex(ClientContext &ctx, const Request &req, Response *resp){
+		CHECK_MIN_PARAMS(3);
 
 	int64_t index = req[2].Int64();
 	if (errno == EINVAL){
@@ -199,7 +189,7 @@ int proc_lindex(Context &ctx, const Request &req, Response *resp){
 	}
 
 	std::pair<std::string, bool> val;
-	int ret = serv->db->LIndex(ctx, req[1], index, val);
+	int ret = ctx.db->LIndex(ctx, req[1], index, val);
 
     if (ret < 0) {
         addReplyErrorCodeReturn(ret);
@@ -214,9 +204,8 @@ int proc_lindex(Context &ctx, const Request &req, Response *resp){
 	return 0;
 }
 
-int proc_lset(Context &ctx, const Request &req, Response *resp){
-	VcServer *serv = ctx.serv;
-	CHECK_MIN_PARAMS(4);
+int proc_lset(ClientContext &ctx, const Request &req, Response *resp){
+		CHECK_MIN_PARAMS(4);
 
 	const Bytes &name = req[1];
 	int64_t index = req[2].Int64();
@@ -225,7 +214,7 @@ int proc_lset(Context &ctx, const Request &req, Response *resp){
 	}
 
 	const Bytes &item = req[3];
-	int ret = serv->db->LSet(ctx, name, index, item);
+	int ret = ctx.db->LSet(ctx, name, index, item);
 
 	if(ret < 0){
         addReplyErrorCodeReturn(ret);

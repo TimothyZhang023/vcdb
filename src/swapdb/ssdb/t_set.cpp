@@ -6,7 +6,7 @@ found in the LICENSE file.
 #include "t_set.h"
 
 
-int SSDBImpl::incr_ssize(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const SetMetaVal &sv,
+int SSDBImpl::incr_ssize(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch, const SetMetaVal &sv,
                          const std::string &meta_key, int64_t incr) {
     int ret = 1;
 
@@ -56,7 +56,7 @@ int SSDBImpl::incr_ssize(Context &ctx, const Bytes &key, rocksdb::WriteBatch &ba
 }
 
 
-int SSDBImpl::sscan(Context &ctx, const Bytes &name, const Bytes &cursor, const std::string &pattern, uint64_t limit,
+int SSDBImpl::sscan(ClientContext &ctx, const Bytes &name, const Bytes &cursor, const std::string &pattern, uint64_t limit,
                     std::vector<std::string> &resp) {
     SetMetaVal sv;
 
@@ -95,7 +95,7 @@ int SSDBImpl::sscan(Context &ctx, const Bytes &name, const Bytes &cursor, const 
 }
 
 
-SIterator *SSDBImpl::sscan_internal(Context &ctx, const Bytes &name, uint16_t version, const rocksdb::Snapshot *snapshot) {
+SIterator *SSDBImpl::sscan_internal(ClientContext &ctx, const Bytes &name, uint16_t version, const rocksdb::Snapshot *snapshot) {
     rocksdb::ReadOptions iterate_options(false, true);
     if (snapshot) {
         iterate_options.snapshot = snapshot;
@@ -107,12 +107,12 @@ SIterator *SSDBImpl::sscan_internal(Context &ctx, const Bytes &name, uint16_t ve
     return new SIterator(this->iterator(key_start, "", -1, iterate_options), name, version);
 }
 
-int SSDBImpl::sadd(Context &ctx, const Bytes &key, const std::set<Bytes> &mem_set, int64_t *num) {
+int SSDBImpl::sadd(ClientContext &ctx, const Bytes &key, const std::set<Bytes> &mem_set, int64_t *num) {
     RecordKeyLock l(&mutex_record_, key.String());
     return saddNoLock<Bytes>(ctx, key, mem_set, num);
 }
 
-int SSDBImpl::srem(Context &ctx, const Bytes &key, const std::vector<Bytes> &members, int64_t *num) {
+int SSDBImpl::srem(ClientContext &ctx, const Bytes &key, const std::vector<Bytes> &members, int64_t *num) {
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
 
@@ -156,7 +156,7 @@ int SSDBImpl::srem(Context &ctx, const Bytes &key, const std::vector<Bytes> &mem
 }
 
 
-int SSDBImpl::scard(Context &ctx, const Bytes &key, uint64_t *llen) {
+int SSDBImpl::scard(ClientContext &ctx, const Bytes &key, uint64_t *llen) {
     *llen = 0;
     SetMetaVal sv;
     std::string meta_key = encode_meta_key(key);
@@ -170,7 +170,7 @@ int SSDBImpl::scard(Context &ctx, const Bytes &key, uint64_t *llen) {
     return ret;
 }
 
-int SSDBImpl::sismember(Context &ctx, const Bytes &key, const Bytes &member, bool *ismember) {
+int SSDBImpl::sismember(ClientContext &ctx, const Bytes &key, const Bytes &member, bool *ismember) {
     SetMetaVal sv;
     std::string meta_key = encode_meta_key(key);
     int ret = GetSetMetaVal(meta_key, sv);
@@ -193,7 +193,7 @@ int SSDBImpl::sismember(Context &ctx, const Bytes &key, const Bytes &member, boo
     return 1;
 }
 
-int SSDBImpl::srandmember(Context &ctx, const Bytes &key, std::vector<std::string> &members, int64_t cnt) {
+int SSDBImpl::srandmember(ClientContext &ctx, const Bytes &key, std::vector<std::string> &members, int64_t cnt) {
     rocksdb::WriteBatch batch;
 
     const rocksdb::Snapshot *snapshot = nullptr;
@@ -263,7 +263,7 @@ int SSDBImpl::srandmember(Context &ctx, const Bytes &key, std::vector<std::strin
     return 1;
 }
 
-int SSDBImpl::spop(Context &ctx, const Bytes &key, std::vector<std::string> &members, int64_t popcnt) {
+int SSDBImpl::spop(ClientContext &ctx, const Bytes &key, std::vector<std::string> &members, int64_t popcnt) {
     rocksdb::WriteBatch batch;
 
     SetMetaVal sv;
@@ -329,7 +329,7 @@ int SSDBImpl::spop(Context &ctx, const Bytes &key, std::vector<std::string> &mem
     return ret;
 }
 
-int SSDBImpl::smembers(Context &ctx, const Bytes &key, std::vector<std::string> &members) {
+int SSDBImpl::smembers(ClientContext &ctx, const Bytes &key, std::vector<std::string> &members) {
     const rocksdb::Snapshot *snapshot = nullptr;
     SetMetaVal sv;
     int ret;

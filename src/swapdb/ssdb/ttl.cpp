@@ -3,8 +3,8 @@ Copyright (c) 2012-2014 The SSDB Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
-#include <serv.h>
 #include "ttl.h"
+#include "ssdb_impl.h"
 
 const int BATCH_SIZE = 1000;
 
@@ -88,7 +88,7 @@ int ExpirationHandler::convert2ms(int64_t *ttl, TimeUnit tu) {
     return 1;
 }
 
-int ExpirationHandler::expire(Context &ctx, const Bytes &key, int64_t ttl, TimeUnit tu) {
+int ExpirationHandler::expire(ClientContext &ctx, const Bytes &key, int64_t ttl, TimeUnit tu) {
     int ret = convert2ms(&ttl,tu);
     if (ret < 0) {
         return ret;
@@ -100,7 +100,7 @@ int ExpirationHandler::expire(Context &ctx, const Bytes &key, int64_t ttl, TimeU
 }
 
 
-int ExpirationHandler::expireAt(Context &ctx, const Bytes &key, int64_t pexpireat_ms, rocksdb::WriteBatch &batch, bool lock) {
+int ExpirationHandler::expireAt(ClientContext &ctx, const Bytes &key, int64_t pexpireat_ms, rocksdb::WriteBatch &batch, bool lock) {
 
     RecordKeyLock l(&ssdb->mutex_record_, key.String(), lock);
 
@@ -162,7 +162,7 @@ void ExpirationHandler::_insertFastKey(const std::string &s_key, int64_t pexpire
 }
 
 
-int ExpirationHandler::persist(Context &ctx, const Bytes &key) {
+int ExpirationHandler::persist(ClientContext &ctx, const Bytes &key) {
 
     {
         Locking<Mutex> exl(&this->mutex);
@@ -188,7 +188,7 @@ int ExpirationHandler::persist(Context &ctx, const Bytes &key) {
     return ret;
 }
 
-int64_t ExpirationHandler::pttl(Context &ctx, const Bytes &key, TimeUnit tu) {
+int64_t ExpirationHandler::pttl(ClientContext &ctx, const Bytes &key, TimeUnit tu) {
 
     {
         Locking<Mutex> exl(&this->mutex);
@@ -295,7 +295,7 @@ void ExpirationHandler::_expire_loop() {
         }
     }
 
-    Context ctx;
+    ClientContext ctx;
 
     int64_t num = 0;
     ssdb->multi_del(ctx, keys, &num);
@@ -319,7 +319,7 @@ void *ExpirationHandler::_thread_func(void *arg) {
     return (void *) nullptr;
 }
 
-int ExpirationHandler::cancelExpiration(Context &ctx, const Bytes &key, rocksdb::WriteBatch &batch) {
+int ExpirationHandler::cancelExpiration(ClientContext &ctx, const Bytes &key, rocksdb::WriteBatch &batch) {
     Locking<Mutex> exl(&this->mutex);
 
     CHECK_DISABLD_EXPIRE

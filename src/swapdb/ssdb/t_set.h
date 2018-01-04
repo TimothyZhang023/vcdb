@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 
 template<typename T>
-int SSDBImpl::quickSet(Context &ctx, const Bytes &key, const std::string &meta_key, const std::string &meta_val,
+int SSDBImpl::quickSet(ClientContext &ctx, const Bytes &key, const std::string &meta_key, const std::string &meta_val,
                        T lambda) {
 
     rocksdb::WriteBatch batch;
@@ -73,7 +73,7 @@ int SSDBImpl::quickSet(Context &ctx, const Bytes &key, const std::string &meta_k
 }
 
 template<typename T>
-int SSDBImpl::saddNoLock(Context &ctx, const Bytes &key, const std::set<T> &mem_set, int64_t *num) {
+int SSDBImpl::saddNoLock(ClientContext &ctx, const Bytes &key, const std::set<T> &mem_set, int64_t *num) {
     rocksdb::WriteBatch batch;
 
     int ret = 0;

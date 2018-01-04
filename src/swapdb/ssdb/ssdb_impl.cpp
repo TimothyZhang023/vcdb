@@ -5,6 +5,8 @@ found in the LICENSE file.
 */
 #include "ssdb_impl.h"
 
+#include "options.h"
+#include "util/time.h"
 
 #include "rocksdb/options.h"
 #include "rocksdb/env.h"
@@ -151,7 +153,7 @@ SSDB *SSDB::open(const Options &opt, const std::string &dir) {
 }
 
 
-int SSDBImpl::flush(Context &ctx, bool wait) {
+int SSDBImpl::flush(ClientContext &ctx, bool wait) {
 
     rocksdb::FlushOptions flushOptions;
 
@@ -162,7 +164,7 @@ int SSDBImpl::flush(Context &ctx, bool wait) {
     return 0;
 }
 
-int SSDBImpl::flushdb(Context &ctx) {
+int SSDBImpl::flushdb(ClientContext &ctx) {
 //lock
     PTST(flushdb, 0.03)
 
@@ -311,7 +313,7 @@ void SSDBImpl::ReleaseSnapshot(const rocksdb::Snapshot *snapshot = nullptr) {
 
 /* raw operates */
 
-int SSDBImpl::raw_set(Context &ctx, const Bytes &key, const Bytes &val) {
+int SSDBImpl::raw_set(ClientContext &ctx, const Bytes &key, const Bytes &val) {
     rocksdb::WriteOptions write_opts;
     rocksdb::Status s = ldb->Put(write_opts, slice(key), slice(val));
     if (!s.ok()) {
@@ -321,7 +323,7 @@ int SSDBImpl::raw_set(Context &ctx, const Bytes &key, const Bytes &val) {
     return 1;
 }
 
-int SSDBImpl::raw_del(Context &ctx, const Bytes &key) {
+int SSDBImpl::raw_del(ClientContext &ctx, const Bytes &key) {
     rocksdb::WriteOptions write_opts;
     rocksdb::Status s = ldb->Delete(write_opts, slice(key));
     if (!s.ok()) {
@@ -331,11 +333,11 @@ int SSDBImpl::raw_del(Context &ctx, const Bytes &key) {
     return 1;
 }
 
-int SSDBImpl::raw_get(Context &ctx, const Bytes &key, std::string *val) {
+int SSDBImpl::raw_get(ClientContext &ctx, const Bytes &key, std::string *val) {
     return raw_get(ctx, key, handles[0], val);
 }
 
-int SSDBImpl::raw_get(Context &ctx, const Bytes &key, rocksdb::ColumnFamilyHandle *column_family, std::string *val) {
+int SSDBImpl::raw_get(ClientContext &ctx, const Bytes &key, rocksdb::ColumnFamilyHandle *column_family, std::string *val) {
     rocksdb::ReadOptions opts;
     opts.fill_cache = false;
     rocksdb::Status s = ldb->Get(opts, column_family, slice(key), val);
@@ -359,12 +361,6 @@ uint64_t SSDBImpl::size() {
 }
 
 std::vector<std::string> SSDBImpl::info() {
-    //  "leveldb.num-files-at-level<N>" - return the number of files at level <N>,
-    //     where <N> is an ASCII representation of a level number (e.g. "0").
-    //  "leveldb.stats" - returns a multi-line string that describes statistics
-    //     about the internal operation of the DB.
-    //  "leveldb.sstables" - returns a multi-line string that describes all
-    //     of the sstables that make up the db contents.
 
     std::vector<std::string> info;
     std::vector<std::string> keys;
@@ -418,14 +414,14 @@ void SSDBImpl::compact() {
 }
 
 
-rocksdb::Status SSDBImpl::CommitBatch(Context &ctx, const rocksdb::WriteOptions &options, rocksdb::WriteBatch *updates) {
+rocksdb::Status SSDBImpl::CommitBatch(ClientContext &ctx, const rocksdb::WriteOptions &options, rocksdb::WriteBatch *updates) {
 
     rocksdb::Status s = ldb->Write(options, updates);
 
     return s;
 }
 
-rocksdb::Status SSDBImpl::CommitBatch(Context &ctx, rocksdb::WriteBatch *updates) {
+rocksdb::Status SSDBImpl::CommitBatch(ClientContext &ctx, rocksdb::WriteBatch *updates) {
 
     return CommitBatch(ctx, rocksdb::WriteOptions(), updates);
 
@@ -616,7 +612,7 @@ extern "C" {
 #include "redis/endianconv.h"
 };
 
-class RocksdbWritableFileEncoder : public RedisEncoder {
+class RocksdbWritableFileEncoder : public RdbEncoder {
 public:
     explicit RocksdbWritableFileEncoder(rocksdb::WritableFile *handle) : handle(handle) {}
 
@@ -645,7 +641,7 @@ public:
     }
 };
 
-int SSDBImpl::save(Context &ctx) {
+int SSDBImpl::save(ClientContext &ctx) {
     Locking<Mutex> l(&this->mutex_backup_);
 
     rocksdb::Status s;

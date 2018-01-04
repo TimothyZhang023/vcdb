@@ -9,7 +9,7 @@ found in the LICENSE file.
 
 #include <string>
 #include "redis/rdb.h"
-#include "redis_encoder.h"
+#include "RdbEncoder.h"
 
 
 extern "C" {
@@ -18,14 +18,13 @@ extern "C" {
 };
 
 
-
-class DumpEncoder : public RedisEncoder {
+class DumpEncoder : public RdbEncoder {
 public:
 
     std::string w;
 
     explicit DumpEncoder(bool rdb_compression) {
-        RedisEncoder::rdb_compression = rdb_compression;
+        RdbEncoder::rdb_compression = rdb_compression;
         w.reserve(1024); //1k
     }
 

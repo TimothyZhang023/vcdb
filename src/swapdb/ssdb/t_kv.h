@@ -9,7 +9,7 @@
 #include "ssdb_impl.h"
 
 template <typename L>
-int SSDBImpl::updateKvCommon(Context &ctx, const Bytes &key, L lambda) {
+int SSDBImpl::updateKvCommon(ClientContext &ctx, const Bytes &key, L lambda) {
 
     RecordKeyLock l(&mutex_record_, key.String());
     rocksdb::WriteBatch batch;
