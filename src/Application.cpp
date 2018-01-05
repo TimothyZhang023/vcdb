@@ -5,11 +5,11 @@
 #include <iostream>
 #include <csignal>
 #include <thread>
-#include <swapdb/ssdb/options.h>
 #include <sstream>
-#include <swapdb/ssdb/ssdb.h>
+#include <storage/options.h>
+#include <storage/ssdb.h>
 #include <util/log.h>
-#include <swapdb/serv.h>
+#include <proc/proc_common.h>
 
 #include "pink/include/redis_conn.h"
 

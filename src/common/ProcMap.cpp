@@ -6,26 +6,28 @@ found in the LICENSE file.
 #include <cassert>
 #include "ProcMap.h"
 
-ProcMap::~ProcMap() {
-    for (auto &it : proc_map) {
-        delete it.second;
+namespace vcdb {
+    ProcMap::~ProcMap() {
+        for (auto &it : proc_map) {
+            delete it.second;
+        }
+        proc_map.clear();
     }
-    proc_map.clear();
-}
 
-void ProcMap::regProc(Command *c) {
-    Command *cmd = this->getProc(c->name);
-    if (cmd == nullptr) {
-        proc_map[c->name] = c;
-    } else {
-        static_assert(true, "dup Command");
+    void ProcMap::regProc(Command *c) {
+        Command *cmd = this->getProc(c->name);
+        if (cmd == nullptr) {
+            proc_map[c->name] = c;
+        } else {
+            static_assert(true, "dup Command");
+        }
     }
-}
 
-Command *ProcMap::getProc(const std::string &str) {
-    auto it = proc_map.find(str);
-    if (it != proc_map.end()) {
-        return it->second;
+    Command *ProcMap::getProc(const std::string &str) {
+        auto it = proc_map.find(str);
+        if (it != proc_map.end()) {
+            return it->second;
+        }
+        return nullptr;
     }
-    return nullptr;
 }

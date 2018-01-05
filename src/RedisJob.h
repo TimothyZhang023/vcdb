@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 #include <util/bytes.h>
-#include <swapdb/serv.h>
+#include <proc/proc_common.h>
 
 class RedisJob {
     std::vector<std::string> recv_string;

@@ -4,19 +4,19 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 /* zset */
-#include "serv.h"
+#include "proc_common.h"
 
 
 int proc_zadd(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(4);
 
-        int flags = ZADD_NONE;
+    int flags = ZADD_NONE;
 
     int elements;
     const Bytes &name = req[1];
 
     int scoreidx = 2;
-    std::vector<Bytes>::const_iterator it = req.begin() + scoreidx;
+    auto it = req.begin() + scoreidx;
     for (; it != req.end(); it += 1) {
         std::string key = (*it).String();
         strtolower(&key);
@@ -106,13 +106,13 @@ int proc_zadd(ClientContext &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->addReplyInt( num);
+    resp->addReplyInt(num);
 
     return 0;
 }
 
 int proc_zrem(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     const Bytes &name = req[1];
     std::set<Bytes> keys;
@@ -128,13 +128,13 @@ int proc_zrem(ClientContext &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->addReplyInt( count);
+    resp->addReplyInt(count);
     return 0;
 }
 
 
 int proc_zcard(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     uint64_t size = 0;
     int ret = ctx.db->zsize(ctx, req[1], &size);
@@ -147,7 +147,7 @@ int proc_zcard(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_zscore(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     double score = 0;
     int ret = ctx.db->zget(ctx, req[1], req[2], &score);
@@ -163,7 +163,7 @@ int proc_zscore(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_zrank(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     int64_t rank = 0;
     int ret = ctx.db->zrank(ctx, req[1], req[2], &rank);
@@ -173,13 +173,13 @@ int proc_zrank(ClientContext &ctx, const Request &req, Response *resp) {
     } else if (ret == 0 || rank == -1) {
         resp->addReplyNil();
     } else {
-        resp->addReplyInt( rank);
+        resp->addReplyInt(rank);
     }
     return 0;
 }
 
 int proc_zrevrank(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     int64_t rank = 0;
     int ret = ctx.db->zrrank(ctx, req[1], req[2], &rank);
@@ -189,17 +189,17 @@ int proc_zrevrank(ClientContext &ctx, const Request &req, Response *resp) {
     } else if (ret == 0 || rank == -1) {
         resp->addReplyNil();
     } else {
-        resp->addReplyInt( rank);
+        resp->addReplyInt(rank);
     }
     return 0;
 }
 
 int proc_zrange(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     bool withscore = false;
     if (req.size() == 5) {
-        auto arg= req[4].String();
+        auto arg = req[4].String();
         strtolower(&arg);
         if (arg == "withscores") {
             withscore = true;
@@ -218,11 +218,11 @@ int proc_zrange(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_zrevrange(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     bool withscore = false;
     if (req.size() == 5) {
-        auto arg= req[4].String();
+        auto arg = req[4].String();
         strtolower(&arg);
         if (arg == "withscores") {
             withscore = true;
@@ -296,11 +296,11 @@ static int _zrangebyscore(ClientContext &ctx, SSDB *ssdb, const Request &req, Re
 }
 
 int proc_zrangebyscore(ClientContext &ctx, const Request &req, Response *resp) {
-        return _zrangebyscore(ctx, ctx.db, req, resp, 0);
+    return _zrangebyscore(ctx, ctx.db, req, resp, 0);
 }
 
 int proc_zrevrangebyscore(ClientContext &ctx, const Request &req, Response *resp) {
-        return _zrangebyscore(ctx, ctx.db, req, resp, 1);
+    return _zrangebyscore(ctx, ctx.db, req, resp, 1);
 }
 
 int proc_zscan(ClientContext &ctx, const Request &req, Response *resp) {
@@ -362,7 +362,7 @@ int proc_zincrby(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_zcount(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t count = 0;
     int ret = ctx.db->zremrangebyscore(ctx, req[1], req[2], req[3], false, &count);
@@ -371,12 +371,12 @@ int proc_zcount(ClientContext &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->addReplyInt( count);
+    resp->addReplyInt(count);
     return 0;
 }
 
 int proc_zremrangebyscore(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t count = 0;
     int ret = ctx.db->zremrangebyscore(ctx, req[1], req[2], req[3], true, &count);
@@ -385,12 +385,12 @@ int proc_zremrangebyscore(ClientContext &ctx, const Request &req, Response *resp
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->addReplyInt( count);
+    resp->addReplyInt(count);
     return 0;
 }
 
 int proc_zremrangebyrank(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     std::vector<std::string> key_score;
     int ret = ctx.db->zrange(ctx, req[1], req[2], req[3], false, key_score);
@@ -459,11 +459,11 @@ static int _zrangebylex(ClientContext &ctx, SSDB *ssdb, const Request &req, Resp
 }
 
 int proc_zrangebylex(ClientContext &ctx, const Request &req, Response *resp) {
-        return _zrangebylex(ctx, ctx.db, req, resp, DIRECTION::FORWARD);
+    return _zrangebylex(ctx, ctx.db, req, resp, DIRECTION::FORWARD);
 }
 
 int proc_zremrangebylex(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t count = 0;
 
@@ -473,13 +473,13 @@ int proc_zremrangebylex(ClientContext &ctx, const Request &req, Response *resp) 
         addReplyErrorCodeReturn(ret);
     }
 
-    resp->addReplyInt( count);
+    resp->addReplyInt(count);
 
     return 0;
 }
 
 int proc_zrevrangebylex(ClientContext &ctx, const Request &req, Response *resp) {
-        return _zrangebylex(ctx, ctx.db, req, resp, DIRECTION::BACKWARD);
+    return _zrangebylex(ctx, ctx.db, req, resp, DIRECTION::BACKWARD);
 }
 
 int proc_zlexcount(ClientContext &ctx, const Request &req, Response *resp) {
@@ -493,7 +493,7 @@ int proc_zlexcount(ClientContext &ctx, const Request &req, Response *resp) {
         addReplyErrorCodeReturn(SYNTAX_ERR);
     }
 
-    resp->addReplyInt( count);
+    resp->addReplyInt(count);
 
     return 0;
 }

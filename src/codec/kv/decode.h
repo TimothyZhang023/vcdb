@@ -9,100 +9,103 @@ found in the LICENSE file.
 #include "codec/util.h"
 #include "util/bytes.h"
 
-class MetaKey{
+class MetaKey {
 public:
-    int DecodeMetaKey(const Bytes& str);
+    int DecodeMetaKey(const Bytes &str);
+
 public:
 //    uint16_t slot;
-    Bytes   key;
+    Bytes key;
 };
 
-class ItemKey{
+class ItemKey {
 public:
-     virtual int DecodeItemKey(const Bytes& str);
+    virtual int DecodeItemKey(const Bytes &str);
 
 public:
-    uint16_t    version;
-    string      key;
-    Bytes       field;
+    uint16_t version;
+    string key;
+    Bytes field;
 };
+
 typedef ItemKey HashItemKey;
 typedef ItemKey SetItemKey;
 typedef ItemKey ZSetItemKey;
 
-class ZScoreItemKey : public ItemKey{
+class ZScoreItemKey : public ItemKey {
 public:
-    virtual int DecodeItemKey(const Bytes& str);
+    int DecodeItemKey(const Bytes &str) override;
 
 public:
-    double      score;
+    double score;
 };
 
-class ListItemKey : public ItemKey{
+class ListItemKey : public ItemKey {
 public:
-    virtual int DecodeItemKey(const Bytes& str);
+    int DecodeItemKey(const Bytes &str) override;
 
 public:
-    uint64_t    seq;
+    uint64_t seq;
 };
 
-class EScoreItemKey : public ItemKey{
+class EScoreItemKey : public ItemKey {
 public:
-    virtual int DecodeItemKey(const Bytes& str);
+    int DecodeItemKey(const Bytes &str) override;
 
 public:
-    int64_t     score;
+    int64_t score;
 };
 
 /*
  * decode meta value class
  */
-class KvMetaVal{
+class KvMetaVal {
 public:
     int DecodeMetaVal(const std::string &str, bool skip_val = false);
 
 public:
-    char        type;
-    char        del;
-    uint16_t    version;
-    string      value;
+    char type;
+    char del;
+    uint16_t version;
+    string value;
 };
 
-class MetaVal{
+class MetaVal {
 public:
-    virtual int DecodeMetaVal(const Bytes& str);
+    virtual int DecodeMetaVal(const Bytes &str);
 
 public:
-    char        type;
-    char        del = KEY_ENABLED_MASK;
-    uint16_t    version = 0;
-    uint64_t    length = 0;
+    char type;
+    char del = KEY_ENABLED_MASK;
+    uint16_t version = 0;
+    uint64_t length = 0;
 };
+
 typedef MetaVal HashMetaVal;
 typedef MetaVal SetMetaVal;
 typedef MetaVal ZSetMetaVal;
 
-class ListMetaVal : public MetaVal{
+class ListMetaVal : public MetaVal {
 public:
-    virtual int DecodeMetaVal(const Bytes& str);
+    int DecodeMetaVal(const Bytes &str) override;
 
 public:
-    uint64_t    left_seq = 0;
-    uint64_t    right_seq = UINT64_MAX;
+    uint64_t left_seq = 0;
+    uint64_t right_seq = UINT64_MAX;
 };
 
 /*
  * decode delete key class
  */
-class DeleteKey{
+class DeleteKey {
 public:
-    int DecodeDeleteKey(const Bytes& str);
+    int DecodeDeleteKey(const Bytes &str);
 
 public:
-    char        type;
+    char type;
 //    uint16_t    slot;
-    uint16_t    version;
-    string      key;
+    uint16_t version;
+    string key;
 };
 
 

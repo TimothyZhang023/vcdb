@@ -22,7 +22,8 @@ public:
     ~ServerContext() = default;
 
     SSDBImpl *db = nullptr;
-    ProcMap procMap;
+
+    vcdb::ProcMap procMap;
 
     std::atomic<bool> status;
 

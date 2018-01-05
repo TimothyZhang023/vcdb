@@ -3,7 +3,7 @@ Copyright (c) 2017, Timothy. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
-#include "serv.h"
+#include "proc_common.h"
 
 int proc_sadd(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
@@ -48,7 +48,7 @@ int proc_srem(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_scard(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     uint64_t len = 0;
 

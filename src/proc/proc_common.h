@@ -6,10 +6,10 @@
 #define VCDB_SERV_H
 
 #include <unordered_map>
+#include <climits>
 
-#include "proc_scan.h"
+#include "storage/ssdb_impl.h"
 
-#include "ssdb/ssdb_impl.h"
 #include "common/ClientContext.hpp"
 #include "common/Response.h"
 #include "common/Request.h"
@@ -17,11 +17,10 @@
 #include "codec/util.h"
 #include "codec/internal_error.h"
 #include "codec/error.h"
+
 #include "util/bytes.h"
 #include "util/strings.h"
 #include "util/time.h"
-
-#include <climits>
 
 
 #define CHECK_MIN_PARAMS(n) do{ \
@@ -41,19 +40,33 @@
 const static int MAX_PACKET_SIZE = 128 * 1024 * 1024;
 
 
-class VcServer {
+class ScanParams {
 public:
-    VcServer(SSDB *ssdb) {
-        this->db = (SSDBImpl *) ssdb;
-        this->status = true;
+    std::string pattern = "*";
+    uint64_t limit = 10;
+};
+
+
+inline int prepareForScanParams(std::vector<Bytes> req, int startIndex, ScanParams &scanParams) {
+
+    std::vector<Bytes>::const_iterator it = req.begin() + startIndex;
+    for (; it != req.end(); it += 2) {
+        std::string key = (*it).String();
+        strtolower(&key);
+
+        if (key == "match") {
+            scanParams.pattern = (*(it + 1)).String();
+        } else if (key == "count") {
+            scanParams.limit = (*(it + 1)).Uint64();
+            if (errno == EINVAL) {
+                return INVALID_INT;
+            }
+        } else {
+            return SYNTAX_ERR;
+        }
     }
 
-    ~VcServer() = default;
-
-    SSDBImpl *db = nullptr;
-
-    atomic<bool> status;
-
-};
+    return 0;
+}
 
 #endif //VCDB_SERV_H

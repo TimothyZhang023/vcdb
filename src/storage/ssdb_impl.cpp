@@ -22,7 +22,7 @@ extern "C" {
 };
 
 
-#include "t_listener.h"
+#include "VcRocksEventListener.h"
 
 
 SSDBImpl::SSDBImpl() {
@@ -117,10 +117,10 @@ SSDB *SSDB::open(const Options &opt, const std::string &dir) {
     ssdb->options.max_bytes_for_level_multiplier = opt.max_bytes_for_level_multiplier; //10  // multiplier between levels
 
     //rate_limiter
-//    ssdb->options.rate_limiter = std::shared_ptr<rocksdb::GenericRateLimiter>(new rocksdb::GenericRateLimiter(1024 * 50, 1000, 10));
+//    storage->options.rate_limiter = std::shared_ptr<rocksdb::GenericRateLimiter>(new rocksdb::GenericRateLimiter(1024 * 50, 1000, 10));
     // refill_bytes  refill_period_us  1024, 1000 = 1MB/s
 
-    ssdb->options.listeners.push_back(std::shared_ptr<t_listener>(new t_listener()));
+    ssdb->options.listeners.push_back(std::shared_ptr<VcRocksEventListener>(new VcRocksEventListener()));
 
     ssdb->options.write_buffer_size = static_cast<size_t >(opt.write_buffer_size) * UNIT_MB;
     if (opt.compression) {
@@ -402,15 +402,14 @@ std::vector<std::string> SSDBImpl::info() {
         }
     }
 
-    info.push_back("");
-
+    info.emplace_back("");
 
     return info;
 }
 
 void SSDBImpl::compact() {
     rocksdb::CompactRangeOptions compactRangeOptions = rocksdb::CompactRangeOptions();
-    ldb->CompactRange(compactRangeOptions, NULL, NULL);
+    ldb->CompactRange(compactRangeOptions, nullptr, nullptr);
 }
 
 

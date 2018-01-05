@@ -11,10 +11,10 @@ found in the LICENSE file.
 
 int MetaKey::DecodeMetaKey(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
-    if (str[POS_TYPE] != DataType::META){
+    if (str[POS_TYPE] != DataType::META) {
         return -1;
     }
 //    if (decoder.read_uint16(&slot) == -1){
@@ -28,18 +28,18 @@ int MetaKey::DecodeMetaKey(const Bytes &str) {
 
 int ItemKey::DecodeItemKey(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
-    if (str[POS_TYPE] != DataType::ITEM){
+    if (str[POS_TYPE] != DataType::ITEM) {
         return -1;
     }
-    if (decoder.read_16_data(&key) == -1){
+    if (decoder.read_16_data(&key) == -1) {
         return -1;
     }
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
     decoder.read_data(field);
@@ -48,24 +48,24 @@ int ItemKey::DecodeItemKey(const Bytes &str) {
 
 int ZScoreItemKey::DecodeItemKey(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
-    if (str[POS_TYPE] != DataType::ZSCORE){
+    if (str[POS_TYPE] != DataType::ZSCORE) {
         return -1;
     }
-    if (decoder.read_16_data(&key) == -1){
+    if (decoder.read_16_data(&key) == -1) {
         return -1;
     }
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
     uint64_t tscore = 0;
-    if (decoder.read_uint64(&tscore) == -1){
+    if (decoder.read_uint64(&tscore) == -1) {
         return -1;
-    } else{
+    } else {
         tscore = be64toh(tscore);
         score = decodeScore(tscore);
     }
@@ -74,26 +74,25 @@ int ZScoreItemKey::DecodeItemKey(const Bytes &str) {
 }
 
 
-
 int ListItemKey::DecodeItemKey(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
-    if (str[POS_TYPE] != DataType::ITEM){
+    if (str[POS_TYPE] != DataType::ITEM) {
         return -1;
     }
-    if (decoder.read_16_data(&key) == -1){
+    if (decoder.read_16_data(&key) == -1) {
         return -1;
     }
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
-    if (decoder.read_uint64(&seq) == -1){
+    if (decoder.read_uint64(&seq) == -1) {
         return -1;
-    } else{
+    } else {
         seq = be64toh(seq);
     }
     return 0;
@@ -102,17 +101,17 @@ int ListItemKey::DecodeItemKey(const Bytes &str) {
 int EScoreItemKey::DecodeItemKey(const Bytes &str) {
 
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
-    if (str[POS_TYPE] != DataType::ESCORE){
+    if (str[POS_TYPE] != DataType::ESCORE) {
         return -1;
     }
 
     uint64_t tscore = 0;
-    if (decoder.read_uint64(&tscore) == -1){
+    if (decoder.read_uint64(&tscore) == -1) {
         return -1;
-    } else{
+    } else {
         tscore = be64toh(tscore);
         score = (int64_t) tscore;
     }
@@ -128,27 +127,27 @@ int EScoreItemKey::DecodeItemKey(const Bytes &str) {
  */
 int KvMetaVal::DecodeMetaVal(const std::string &str, bool skip_val) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
     type = str[POS_TYPE];
 
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
 
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
     del = str[POS_DEL];
-    if((del != KEY_DELETE_MASK) && (del != KEY_ENABLED_MASK)){
+    if ((del != KEY_DELETE_MASK) && (del != KEY_ENABLED_MASK)) {
         return -1;
-    } else if (del == KEY_DELETE_MASK){
+    } else if (del == KEY_DELETE_MASK) {
         return 0;
     }
-    if (type != DataType::KV){
+    if (type != DataType::KV) {
         return WRONG_TYPE_ERR;
     }
 
@@ -162,33 +161,33 @@ int KvMetaVal::DecodeMetaVal(const std::string &str, bool skip_val) {
 
 int MetaVal::DecodeMetaVal(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
     type = str[POS_TYPE];
 
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
 
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
     del = str[POS_DEL];
-    if((del != KEY_DELETE_MASK) && (del != KEY_ENABLED_MASK)){
+    if ((del != KEY_DELETE_MASK) && (del != KEY_ENABLED_MASK)) {
         return -1;
-    } else if (del == KEY_DELETE_MASK){
+    } else if (del == KEY_DELETE_MASK) {
         return 0;
     }
-    if ((type != DataType::HSIZE) && (type != DataType::SSIZE) && (type != DataType::ZSIZE)){
+    if ((type != DataType::HSIZE) && (type != DataType::SSIZE) && (type != DataType::ZSIZE)) {
         return WRONG_TYPE_ERR;
     }
 
-    if (decoder.read_uint64(&length) == -1){
+    if (decoder.read_uint64(&length) == -1) {
         return -1;
-    } else{
+    } else {
         length = be64toh(length);
     }
     return 0;
@@ -196,43 +195,43 @@ int MetaVal::DecodeMetaVal(const Bytes &str) {
 
 int ListMetaVal::DecodeMetaVal(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
     type = str[POS_TYPE];
 
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
 
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
     }
     del = str[POS_DEL];
-    if((del != KEY_DELETE_MASK) && (del != KEY_ENABLED_MASK)){
+    if ((del != KEY_DELETE_MASK) && (del != KEY_ENABLED_MASK)) {
         return -1;
-    } else if (del == KEY_DELETE_MASK){
+    } else if (del == KEY_DELETE_MASK) {
         return 0;
     }
-    if (type != DataType::LSIZE){
+    if (type != DataType::LSIZE) {
         return WRONG_TYPE_ERR;
     }
 
-    if (decoder.read_uint64(&length) == -1){
+    if (decoder.read_uint64(&length) == -1) {
         return -1;
-    } else{
+    } else {
         length = be64toh(length);
     }
-    if (decoder.read_uint64(&left_seq) == -1){
+    if (decoder.read_uint64(&left_seq) == -1) {
         return -1;
-    } else{
+    } else {
         left_seq = be64toh(left_seq);
     }
-    if (decoder.read_uint64(&right_seq) == -1){
+    if (decoder.read_uint64(&right_seq) == -1) {
         return -1;
-    } else{
+    } else {
         right_seq = be64toh(right_seq);
     }
     return 0;
@@ -243,10 +242,10 @@ int ListMetaVal::DecodeMetaVal(const Bytes &str) {
  */
 int DeleteKey::DecodeDeleteKey(const Bytes &str) {
     Decoder decoder(str.data(), str.size());
-    if(decoder.skip(1) == -1){
+    if (decoder.skip(1) == -1) {
         return -1;
-    } else{
-        if ((type = str[POS_TYPE]) != KEY_DELETE_MASK){
+    } else {
+        if ((type = str[POS_TYPE]) != KEY_DELETE_MASK) {
             return -1;
         }
     }
@@ -255,12 +254,12 @@ int DeleteKey::DecodeDeleteKey(const Bytes &str) {
 //    } else{
 //        slot = be16toh(slot);
 //    }
-    if (decoder.read_16_data(&key) == -1){
+    if (decoder.read_16_data(&key) == -1) {
         return -1;
     }
-    if (decoder.read_uint16(&version) == -1){
+    if (decoder.read_uint16(&version) == -1) {
         return -1;
-    } else{
+    } else {
         version = be16toh(version);
     }
 

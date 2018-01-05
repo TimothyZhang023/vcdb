@@ -38,7 +38,7 @@ SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build")
 
 INCLUDE_DIRECTORIES(
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/swapdb
+#        ${CMAKE_CURRENT_SOURCE_DIR}/src/swapdb
 
         ${SLASH_PATH}/
         ${PINK_PATH}/
@@ -86,25 +86,30 @@ set_target_properties(libcrcspeed PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 O
 
 
 set(SWAPDB_SOURCE_FILES
-        src/swapdb/serv.cpp
-        src/swapdb/proc_hash.cpp
-        src/swapdb/proc_kv.cpp
-        src/swapdb/proc_list.cpp
-        src/swapdb/proc_set.cpp
-        src/swapdb/proc_zset.cpp
+        src/proc/proc_server.cpp
+        src/proc/proc_hash.cpp
+        src/proc/proc_kv.cpp
+        src/proc/proc_list.cpp
+        src/proc/proc_set.cpp
+        src/proc/proc_zset.cpp
+        src/proc/procs_def.h
+        src/proc/proc_common.h
 
-        src/swapdb/ssdb/iterator.cpp
-        src/swapdb/ssdb/options.cpp
-        src/swapdb/ssdb/ssdb_impl.cpp
-        src/swapdb/ssdb/t_cursor.cpp
-        src/swapdb/ssdb/t_eset.cpp
-        src/swapdb/ssdb/t_hash.cpp
-        src/swapdb/ssdb/t_keys.cpp
-        src/swapdb/ssdb/t_kv.cpp
-        src/swapdb/ssdb/t_list.cpp
-        src/swapdb/ssdb/t_set.cpp
-        src/swapdb/ssdb/ttl.cpp
-        src/swapdb/ssdb/t_zset.cpp
+        src/storage/iterator.cpp
+        src/storage/options.cpp
+        src/storage/ssdb_impl.cpp
+        src/storage/t_cursor.cpp
+        src/storage/t_eset.cpp
+        src/storage/t_hash.cpp
+        src/storage/t_keys.cpp
+        src/storage/t_kv.cpp
+        src/storage/t_list.cpp
+        src/storage/t_set.cpp
+        src/storage/ttl.cpp
+        src/storage/t_zset.cpp
+        src/storage/VcRocksEventListener.h
+        src/storage/t_scan.h
+
         )
 
 set(CODEC_SOURCE_FILES

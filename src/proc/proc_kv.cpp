@@ -4,11 +4,11 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 /* kv */
-#include "serv.h"
+#include "proc_common.h"
 
 
 int proc_type(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     std::string val;
     int ret = ctx.db->type(ctx, req[1], &val);
@@ -23,7 +23,7 @@ int proc_type(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_get(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     std::string val;
     int ret = ctx.db->get(ctx, req[1], &val);
@@ -40,7 +40,7 @@ int proc_get(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_getset(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     std::pair<std::string, bool> val;
     int ret = ctx.db->getset(ctx, req[1], val, req[2]);
@@ -59,7 +59,7 @@ int proc_getset(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_append(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     uint64_t newlen = 0;
     int ret = ctx.db->append(ctx, req[1], req[2], &newlen);
@@ -72,7 +72,7 @@ int proc_append(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_set(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     int64_t ttl = 0;
 
@@ -153,7 +153,7 @@ int proc_set(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_setnx(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     int added = 0;
     int ret = ctx.db->set(ctx, req[1], req[2], OBJ_SET_NX, 0, &added);
@@ -168,7 +168,7 @@ int proc_setnx(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_setex(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
 
     int64_t ttl = req[2].Int64();
@@ -198,7 +198,7 @@ int proc_setex(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_psetex(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t ttl = req[2].Int64();
     if (errno == EINVAL) {
@@ -229,7 +229,7 @@ int proc_psetex(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_pttl(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     int64_t ttl = ctx.db->expiration->pttl(ctx, req[1], TimeUnit::Millisecond);
     if (ttl == -2) {
@@ -241,7 +241,7 @@ int proc_pttl(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_ttl(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     int64_t ttl = ctx.db->expiration->pttl(ctx, req[1], TimeUnit::Second);
     if (ttl == -2) {
@@ -253,7 +253,7 @@ int proc_ttl(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_pexpire(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     long long when;
     if (string2ll(req[2].data(), (size_t) req[2].size(), &when) == 0) {
@@ -272,7 +272,7 @@ int proc_pexpire(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_expire(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     long long when;
     if (string2ll(req[2].data(), (size_t) req[2].size(), &when) == 0) {
@@ -291,7 +291,7 @@ int proc_expire(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_expireat(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     long long ts_ms;
     if (string2ll(req[2].data(), (size_t) req[2].size(), &ts_ms) == 0) {
@@ -309,7 +309,7 @@ int proc_expireat(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_persist(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     std::string val;
     int ret = ctx.db->expiration->persist(ctx, req[1]);
@@ -323,7 +323,7 @@ int proc_persist(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_pexpireat(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
 
     long long ts_ms;
     if (string2ll(req[2].data(), (size_t) req[2].size(), &ts_ms) == 0) {
@@ -342,7 +342,7 @@ int proc_pexpireat(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_exists(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     uint64_t count = 0;
     for_each(req.begin() + 1, req.end(), [&](Bytes key) {
@@ -362,7 +362,7 @@ int proc_exists(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_mset(ClientContext &ctx, const Request &req, Response *resp) {
-        if (req.size() < 3 || req.size() % 2 != 1) {
+    if (req.size() < 3 || req.size() % 2 != 1) {
         addReplyErrorInfoReturn("ERR wrong number of arguments for MSET");
     } else {
         int ret = ctx.db->multi_set(ctx, req, 1);
@@ -376,7 +376,7 @@ int proc_mset(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_del(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     std::set<std::string> distinct_keys;
 
@@ -396,9 +396,9 @@ int proc_del(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_mget(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
-    resp->addReplyListHead(static_cast<int>(req.size() -1));
+    resp->addReplyListHead(static_cast<int>(req.size() - 1));
 
     for (int i = 1; i < req.size(); i++) {
         std::string val;
@@ -415,7 +415,7 @@ int proc_mget(ClientContext &ctx, const Request &req, Response *resp) {
 
 
 int proc_scan(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     int cursorIndex = 1;
 
@@ -462,7 +462,7 @@ int proc_ssdb_dbsize(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_ssdb_scan(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     uint64_t limit = 1000;
 
@@ -591,15 +591,15 @@ int proc_incrbyfloat(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_incr(ClientContext &ctx, const Request &req, Response *resp) {
-        return _incr(ctx, ctx.db, req, resp, 1);
+    return _incr(ctx, ctx.db, req, resp, 1);
 }
 
 int proc_decr(ClientContext &ctx, const Request &req, Response *resp) {
-        return _incr(ctx, ctx.db, req, resp, -1);
+    return _incr(ctx, ctx.db, req, resp, -1);
 }
 
 int proc_getbit(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(3);
+    CHECK_MIN_PARAMS(3);
     long long offset = 0;
     string2ll(req[2].data(), (size_t) req[2].size(), &offset);
     if (offset < 0 || ((uint64_t) offset >> 3) >= MAX_PACKET_SIZE * 4) {
@@ -620,7 +620,7 @@ int proc_getbit(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_setbit(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     const Bytes &name = req[1];
     long long offset = 0;
@@ -649,7 +649,7 @@ int proc_setbit(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_countbit(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     const Bytes &key = req[1];
     int start = 0;
@@ -681,7 +681,7 @@ int proc_countbit(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_bitcount(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     const Bytes &name = req[1];
     int start = 0;
@@ -713,7 +713,7 @@ int proc_bitcount(ClientContext &ctx, const Request &req, Response *resp) {
 
 
 int proc_getrange(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     const Bytes &name = req[1];
     int64_t start = req[2].Int64();
@@ -745,7 +745,7 @@ int proc_substr(ClientContext &ctx, const Request &req, Response *resp) {
 
 
 int proc_setrange(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t start = req[2].Int64();
     if (errno == EINVAL) {
@@ -768,7 +768,7 @@ int proc_setrange(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_strlen(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(2);
+    CHECK_MIN_PARAMS(2);
 
     const Bytes &name = req[1];
     std::string val;

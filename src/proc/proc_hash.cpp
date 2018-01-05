@@ -4,7 +4,7 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 */
 /* hash */
-#include "serv.h"
+#include "proc_common.h"
 
 int proc_hexists(ClientContext &ctx, const Request &req, Response *resp) {
     CHECK_MIN_PARAMS(3);
@@ -31,7 +31,7 @@ int proc_hexists(ClientContext &ctx, const Request &req, Response *resp) {
 
 
 int proc_hmset(ClientContext &ctx, const Request &req, Response *resp) {
-        if (req.size() < 4 || req.size() % 2 != 0) {
+    if (req.size() < 4 || req.size() % 2 != 0) {
         addReplyErrorInfoReturn("ERR wrong number of arguments for 'hmset' command");
     }
 
@@ -275,7 +275,7 @@ int proc_hvals(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hincrbyfloat(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     long double by = req[3].LDouble();
     if (errno == EINVAL) {
@@ -294,7 +294,7 @@ int proc_hincrbyfloat(ClientContext &ctx, const Request &req, Response *resp) {
 }
 
 int proc_hincrby(ClientContext &ctx, const Request &req, Response *resp) {
-        CHECK_MIN_PARAMS(4);
+    CHECK_MIN_PARAMS(4);
 
     int64_t by = req[3].Int64();
 

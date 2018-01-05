@@ -20,7 +20,7 @@ const char* CompactionReasonString[] = {
         "DB::SuggestCompactRange marked files for compaction"
 };
 
-class t_listener : public rocksdb::EventListener {
+class VcRocksEventListener : public rocksdb::EventListener {
 
 public:
     // A call-back function to RocksDB which will be called whenever a
@@ -60,7 +60,7 @@ public:
     // returned value.
     void OnTableFileDeleted(const rocksdb::TableFileDeletionInfo &info) override {
 
-//        log_info("OnTableFileDeleted %s" , info.file_path.c_str() );
+        log_debug("OnTableFileDeleted %s" , info.file_path.c_str() );
 
     }
 

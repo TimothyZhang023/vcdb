@@ -11,29 +11,31 @@
 
 #include "common/Commands.h"
 
-typedef std::unordered_map<std::string, Command *> proc_map_t;
+namespace vcdb {
+    typedef std::unordered_map<std::string, Command *> proc_map_t;
 
-class ProcMap {
-private:
-    proc_map_t proc_map;
+    class ProcMap {
+    private:
+        proc_map_t proc_map;
 
-public:
-    ProcMap() = default;
+    public:
+        ProcMap() = default;
 
-    ~ProcMap();
+        ~ProcMap();
 
-    void regProc(Command *c);
+        void regProc(Command *c);
 
-    Command *getProc(const std::string &str);
+        Command *getProc(const std::string &str);
 
-    proc_map_t::iterator begin() {
-        return proc_map.begin();
-    }
+        proc_map_t::iterator begin() {
+            return proc_map.begin();
+        }
 
-    proc_map_t::iterator end() {
-        return proc_map.end();
-    }
-};
+        proc_map_t::iterator end() {
+            return proc_map.end();
+        }
+    };
 
+}
 
 #endif //VCDB_PROC_H
