@@ -9,7 +9,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "common/Commands.h"
+#include "Commands.h"
 
 namespace vcdb {
     typedef std::unordered_map<std::string, Command *> proc_map_t;

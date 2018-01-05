@@ -10,9 +10,9 @@
 
 #include "storage/ssdb_impl.h"
 
-#include "common/ClientContext.hpp"
-#include "common/Response.h"
-#include "common/Request.h"
+#include "ClientContext.hpp"
+#include "Response.h"
+#include "Request.h"
 
 #include "codec/util.h"
 #include "codec/internal_error.h"

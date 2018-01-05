@@ -4,9 +4,10 @@
 #ifndef VCDB_VCSERVER_H
 #define VCDB_VCSERVER_H
 
-#include "common/ProcMap.h"
 #include "atomic"
-#include "common/Commands.h"
+
+#include "ProcMap.h"
+#include "Commands.h"
 
 class SSDB;
 class SSDBImpl;

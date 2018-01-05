@@ -16,7 +16,7 @@
 
 #include "Application.h"
 #include "ClientConn.h"
-#include "common/ServerContext.hpp"
+#include "ServerContext.hpp"
 #include "util/daemon.h"
 
 namespace vcdb {

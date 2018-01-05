@@ -6,7 +6,7 @@
 
 #include "ClientConn.h"
 #include "RedisJob.h"
-#include "common/ServerContext.hpp"
+#include "ServerContext.hpp"
 
 
 vcdb::VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread, void *worker_specific_data)

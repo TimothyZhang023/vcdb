@@ -3,3 +3,7 @@
 //
 
 #include "Binlog.h"
+
+namespace vcdb {
+
+}

@@ -8,7 +8,7 @@
 
 #include <pink/include/pink_conn.h>
 #include <pink/include/redis_conn.h>
-#include "common/ClientContext.hpp"
+#include "ClientContext.hpp"
 
 class ServerContext;
 class ClientContext;

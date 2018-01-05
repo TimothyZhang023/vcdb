@@ -5,9 +5,9 @@
 #ifndef VCDB_PROCS_H
 #define VCDB_PROCS_H
 
-#include "common/ClientContext.hpp"
-#include "common/Response.h"
-#include "common/Request.h"
+#include "ClientContext.hpp"
+#include "Response.h"
+#include "Request.h"
 
 
 #define DEF_PROC(f) int proc_##f(ClientContext &ctx, const Request &req, Response *resp)

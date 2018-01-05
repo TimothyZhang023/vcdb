@@ -37,8 +37,8 @@ SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build")
 
 
 INCLUDE_DIRECTORIES(
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/swapdb
 
         ${SLASH_PATH}/
         ${PINK_PATH}/
@@ -92,7 +92,6 @@ set(SWAPDB_SOURCE_FILES
         src/proc/proc_list.cpp
         src/proc/proc_set.cpp
         src/proc/proc_zset.cpp
-        src/proc/procs_def.h
         src/proc/proc_common.h
 
         src/storage/iterator.cpp
@@ -132,23 +131,29 @@ set(UTIL_SOURCE_FILES
         src/util/log.cpp
         )
 
+set(HEADERS_FILES
+        include/Constant.h
+        include/Binlog.h
+        include/ClientContext.hpp
+        include/ServerContext.hpp
+        include/Commands.h
+        include/Request.h
+        include/Response.h
+        include/procs_def.h
 
-set(SOURCE_FILES ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} ${UTIL_SOURCE_FILES}
+        )
+
+
+set(SOURCE_FILES ${HEADERS_FILES} ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} ${UTIL_SOURCE_FILES}
         src/main.cpp
         src/RedisJob.cpp
         src/Application.cpp
         src/ClientConn.cpp
         src/AppArgs.cpp
 
-        src/Constant.h
-
         src/common/ProcMap.cpp
-        src/common/ClientContext.hpp
-        src/common/ServerContext.hpp
-        src/common/Commands.h
-        src/common/Request.h
 
-        src/Binlog.cpp src/Binlog.h)
+        src/Binlog.cpp)
 
 
 add_executable(vcdb ${SOURCE_FILES})

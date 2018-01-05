@@ -5,7 +5,7 @@
 #define VCDB_COMMANDS_H
 
 #include "Constant.h"
-#include "proc/procs_def.h"
+#include "procs_def.h"
 
 
 typedef int redisCommandProc(ClientContext &ctx, const Request &req, Response *resp);

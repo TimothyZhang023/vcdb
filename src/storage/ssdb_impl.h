@@ -8,7 +8,7 @@ found in the LICENSE file.
 
 #include <queue>
 #include <atomic>
-#include "common/ClientContext.hpp"
+#include "ClientContext.hpp"
 
 #include <rocksdb/db.h>
 #include <rocksdb/slice.h>

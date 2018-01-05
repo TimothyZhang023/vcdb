@@ -5,4 +5,15 @@
 #ifndef VCDB_BINLOG_H
 #define VCDB_BINLOG_H
 
+
+namespace vcdb {
+
+    class Binlog {
+
+
+    };
+
+}
+
+
 #endif //VCDB_BINLOG_H
