@@ -33,6 +33,7 @@ namespace vcdb {
         std::string pid_file;
         std::string conf_file;
         std::string work_dir;
+        std::string binlog_dir;
         std::string action;
 
     };

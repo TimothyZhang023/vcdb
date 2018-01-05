@@ -148,7 +148,7 @@ set(SOURCE_FILES ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} ${UTIL_SOURCE_FILE
         src/common/Commands.h
         src/common/Request.h
 
-        )
+        src/Binlog.cpp src/Binlog.h)
 
 
 add_executable(vcdb ${SOURCE_FILES})

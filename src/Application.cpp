@@ -148,14 +148,18 @@ int vcdb::Application::Init() {
     appArgs.port = conf->get_num("server.port", appArgs.port);
     appArgs.ip = conf->get_str("server.ip", appArgs.ip.c_str());
 
-    appArgs.work_dir = conf->get_str("work_dir");
-    if (appArgs.work_dir.empty()) {
-        appArgs.work_dir = ".";
-    }
-    if (!is_dir(appArgs.work_dir)) {
-        fprintf(stderr, "'%s' is not a directory or not exists!\n", appArgs.work_dir.c_str());
-        exit(1);
-    }
+
+    auto check_dir = [=](std::string *dir, const std::string &op_key) {
+        dir->assign(conf->get_str(op_key.data(), "."));
+        if (!is_dir(*dir)) {
+            fprintf(stderr, "'%s' is not a directory or not exists!\n", dir->c_str());
+            exit(1);
+        }
+    };
+
+    check_dir(&appArgs.work_dir, "work_dir");
+    check_dir(&appArgs.binlog_dir, "binlog_dir");
+
 
     // WARN!!!
     // deamonize() MUST be called before any thread is created!
@@ -190,6 +194,8 @@ int vcdb::Application::go() {
                      PRId64, Logger::shared()->rotate_size());
 
     log_info("main_db          : %s", data_db_dir.c_str());
+    log_info("work_dir         : %s", appArgs.work_dir.c_str());
+    log_info("binlog_dir       : %s", appArgs.binlog_dir.c_str());
     log_info("cache_size       : %d MB", option.cache_size);
     log_info("block_size       : %d KB", option.block_size);
     log_info("write_buffer     : %d MB", option.write_buffer_size);
