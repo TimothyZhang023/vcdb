@@ -8,12 +8,9 @@
 
 #include <pink/include/pink_conn.h>
 #include <pink/include/redis_conn.h>
-#include "ClientContext.hpp"
 
 class ServerContext;
 class ClientContext;
-
-class Buffer;
 
 namespace vcdb {
 

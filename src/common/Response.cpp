@@ -13,16 +13,19 @@ void Response::addReplyError(const std::string &err_msg) {
     output->append("-");
     output->append(err_msg);
     output->append("\r\n");
+    status = status | RESP_ERR;
 }
 
 void Response::addReplyError(const char *err_msg) {
     output->append("-");
     output->append(err_msg);
     output->append("\r\n");
+    status = status | RESP_ERR;
 }
 
 void Response::addReplyNil() {
     output->append("$-1\r\n");
+    status = status | RESP_NIL;
 }
 
 
@@ -30,10 +33,12 @@ void Response::addReplyStatus(const std::string &msg) {
     output->append("+");
     output->append(msg);
     output->append("\r\n");
+    status = status | RESP_STATUS;
 }
 
 void Response::addReplyStatusOK() {
     output->append("+OK\r\n");
+    status = status | RESP_STATUS;
 }
 
 
@@ -43,6 +48,7 @@ void Response::addReplyString(const std::string &msg) {
     output->append(buf);
     output->append(msg.data(), msg.size());
     output->append("\r\n");
+    status = status | RESP_STRING;
 }
 
 void Response::addReplyBulkCBuffer(const void *p, size_t len) {
@@ -51,13 +57,16 @@ void Response::addReplyBulkCBuffer(const void *p, size_t len) {
     output->append(buf);
     output->append(static_cast<const char *>(p), len);
     output->append("\r\n");
+    status = status | RESP_STRING;
 }
 
 void Response::addReplyBulkCString(const char *s) {
     if (s == nullptr) {
         addReplyNil();
+        status = status | RESP_NIL;
     } else {
         addReplyBulkCBuffer(s, strlen(s));
+        status = status | RESP_STRING;
     }
 }
 
@@ -78,13 +87,15 @@ void Response::addReplyInt(uint64_t i) {
     char buf[24] = {0};
     snprintf(buf, sizeof(buf), ":%" PRIu64 "\r\n", i);
     output->append(buf);
+    status = status | RESP_INT;
+
 }
 
 void Response::addReplyInt(int64_t i) {
     char buf[24] = {0};
     snprintf(buf, sizeof(buf), ":%" PRId64 "\r\n", i);
     output->append(buf);
-
+    status = status | RESP_INT;
 }
 
 void Response::addReplyInt(int i) {
@@ -93,6 +104,7 @@ void Response::addReplyInt(int i) {
 
 void Response::addReplyListEmpty() {
     output->append("*0\r\n");
+    status = status | RESP_ARRAY;
 }
 
 void Response::addReplyListHead(int size) {
@@ -101,6 +113,7 @@ void Response::addReplyListHead(int size) {
         snprintf(buf, sizeof(buf), "*%d\r\n", size);
         output->append(buf);
     }
+    status = status | RESP_ARRAY;
 }
 
 
@@ -119,6 +132,8 @@ void Response::convertReplyToList() {
         output->append(val.data(), val.size());
         output->append("\r\n");
     }
+
+    status = status | RESP_ARRAY;
 }
 
 
@@ -143,6 +158,8 @@ void Response::convertReplyToScanResult() {
             output->append("\r\n");
         }
     }
+
+    status = status | RESP_ARRAY;
 }
 
 Response::Response(std::string *output) : output(output) {}

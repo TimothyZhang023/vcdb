@@ -198,8 +198,6 @@ DEF_PROC(flushdb);
 
 DEF_PROC(flushall);
 
-DEF_PROC(dreply);
-
 DEF_PROC(cursor_cleanup);
 
 DEF_PROC(debug);

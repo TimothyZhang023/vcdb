@@ -12,5 +12,3 @@ RedisJob::RedisJob(const std::vector<std::string> &recv_string, std::string *res
     cmd = recv_string.at(0);
 }
 
-RedisJob::~RedisJob() {
-}

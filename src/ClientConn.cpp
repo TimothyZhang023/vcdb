@@ -7,9 +7,12 @@
 #include "ClientConn.h"
 #include "RedisJob.h"
 #include "ServerContext.hpp"
+#include "ClientContext.hpp"
+#include "util/log.h"
 
 
-vcdb::VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread, void *worker_specific_data)
+vcdb::VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::ServerThread *thread,
+                                 void *worker_specific_data)
         : pink::RedisConn(fd, ip_port, thread) {
 
     server = static_cast<ServerContext *>(worker_specific_data);
@@ -43,7 +46,7 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
     RedisJob request(argv, response);
 
     if (log_level() >= Logger::LEVEL_DEBUG) {
-        log_debug("[receive] req: %s", serialize_req(request.req).c_str());
+        log_debug("[receive] req: %s", SerializeRequest(request.req).c_str());
     }
 
     Command *cmd = server->procMap.getProc(slash::StringToLower(request.cmd));
@@ -57,16 +60,22 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
     //-------response---------debug--------
     if (response->empty()) {
         log_error("bug detected?");
-        ReplyError("empty response got for " + serialize_req(request.req), response);
+        ReplyError("empty response got for " + SerializeRequest(request.req), response);
     }
     //-------response---------debug--------
 
     int64_t time_proc = slash::NowMicros() - start_us;
 
     if (log_level() >= Logger::LEVEL_DEBUG) {
-        log_debug("[result] p:%d, req: %s, resp: %s", time_proc, serialize_req(request.req).c_str(),
-                  hexcstr(*response));
+        log_debug("[result] process:%d, req: %s, resp: %s",
+                  time_proc, SerializeRequest(request.req).c_str(), hexcstr(*response));
     }
+
+    if ((cmd->flags & CMD_WRITE) && !(request.response.getStatus() & RESP_ERR)) {
+        log_debug("write success %s", hexcstr(RestoreRequest(request.req)));
+        //TODO cmd write ok send to slave
+    }
+
 
     return 0;
 }

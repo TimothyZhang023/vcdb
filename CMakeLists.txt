@@ -139,7 +139,8 @@ set(HEADERS_FILES
         include/Commands.h
         include/Request.h
         include/Response.h
-        include/procs_def.h
+        include/ProcMap.h
+        include/ProcDefine.h
 
         )
 
