@@ -10,14 +10,19 @@
 #include "Commands.h"
 
 class SSDB;
+
 class SSDBImpl;
+
+const int SERVER_RUNNING = (1 << 0);
+const int SERVER_LOADING = (1 << 1);
+const int SERVER_CLOSE = (1 << 2);
 
 class ServerContext {
 public:
     ServerContext(SSDB *ssdb) {
         this->db = (SSDBImpl *) ssdb;
         this->regProcs();
-        this->status = true;
+        this->status = SERVER_RUNNING;
     }
 
     ~ServerContext() = default;
@@ -26,7 +31,7 @@ public:
 
     vcdb::ProcMap procMap;
 
-    std::atomic<bool> status;
+    std::atomic<int> status;
 
     void regProcs() {
         int j;

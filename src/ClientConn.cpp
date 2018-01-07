@@ -32,12 +32,7 @@ int vcdb::VcClientConn::ReplyError(const std::string &msg, std::string *response
 
 int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *response) {
     if (argv.empty()) {
-        ReplyError("empty request", response);
-        return -2;
-    }
-
-    if (!server->status) {
-        ReplyError("server not serving ~", response);
+        ReplyError("EMPTY REQUEST", response);
         return -2;
     }
 
@@ -51,16 +46,29 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
 
     Command *cmd = server->procMap.getProc(slash::StringToLower(request.cmd));
     if (cmd == nullptr) {
-        ReplyError("command not found", response);
+        ReplyError("COMMAND NOT FOUND", response);
+        return 0;
+    }
+
+    if (server->status != SERVER_RUNNING) {
+        if (server->status == SERVER_LOADING) {
+            if (!(cmd->flags & CMD_LOADING)) {
+                ReplyError("LOADING", response);
+                return 0;
+            }
+        }
+
+        ReplyError("SERVER NOT RUNNING", response);
         return -2;
     }
+
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
 
     //-------response---------debug--------
     if (response->empty()) {
         log_error("bug detected?");
-        ReplyError("empty response got for " + SerializeRequest(request.req), response);
+        ReplyError("EMPTY RESPONSE FOR " + SerializeRequest(request.req), response);
     }
     //-------response---------debug--------
 
