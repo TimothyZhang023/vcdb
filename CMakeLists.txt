@@ -154,9 +154,11 @@ set(SOURCE_FILES ${HEADERS_FILES} ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} $
 
         src/common/ProcMap.cpp
 
-        src/Binlog.cpp)
+        src/Binlog.cpp
+        src/replication/SyncRedisMaster.cpp src/replication/SyncRedisMaster.h
+        src/RedisClient.cpp src/RedisClient.h)
 
 
-add_executable(vcdb ${SOURCE_FILES})
+add_executable(vcdb ${SOURCE_FILES} )
 
 TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb librdb snappy z bz2 libcrcspeed)
