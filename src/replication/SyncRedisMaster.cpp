@@ -34,16 +34,8 @@ void *SyncRedisMaster::ThreadMain() {
             cmd = RestoreRequest(std::vector<std::string>{"SYNC"});
             master_client->Send(&cmd);
 
-            pink::RedisCmdArgsType res;
-            s = master_client->Recv(&res);
-            log_info ("s:%s, res:%s\r\n", s.ToString().c_str(), RestoreRequest(res).c_str());
-
-
             auto size = master_client->BufferRead();
-            log_info ("read :%d", size);
-
-//            auto remain = master_client->RemainBufferd();
-//            log_info ("remain :%d", size);
+            log_info ("got :%d bytes", size);
 
             while (size > 0) {
                 auto buf = master_client->ReadBytes(static_cast<unsigned int>(size));
@@ -53,6 +45,7 @@ void *SyncRedisMaster::ThreadMain() {
                     log_info ("sbuf :%s", hexcstr(sbuf));
 
                     size = master_client->BufferRead();
+                    log_info ("got :%d bytes", size);
                 }
             }
 
