@@ -159,7 +159,7 @@ set(SOURCE_FILES ${HEADERS_FILES} ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} $
 
         src/Binlog.cpp
         src/replication/SyncRedisMaster.cpp src/replication/SyncRedisMaster.h
-        src/RedisClient.cpp src/RedisClient.h)
+        src/RedisClient.cpp src/RedisClient.h src/replication/proc_replic.cpp src/replication/ReplicationManager.cpp src/replication/ReplicationManager.h)
 
 
 add_executable(vcdb ${SOURCE_FILES} )

@@ -7,11 +7,13 @@
 
 
 class SSDBImpl;
+class ReplicationManager;
 
 
 class ClientContext {
 public:
     SSDBImpl *db = nullptr;
+    ReplicationManager *replicationManager = nullptr;
 };
 
 

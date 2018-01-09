@@ -11,6 +11,7 @@
 #include <util/log.h>
 #include <proc/proc_common.h>
 #include <replication/SyncRedisMaster.h>
+#include <replication/ReplicationManager.h>
 
 #include "pink/include/redis_conn.h"
 
@@ -224,6 +225,8 @@ int vcdb::Application::go() {
 
     log_info("vcdb server starting on 0.0.0.0:%d", appArgs.port);
 
+    server->replicationManager = new ReplicationManager(server.get());
+
     std::unique_ptr<pink::ConnFactory> connFactory(new VcServerConnFactory(server.get()));
     std::unique_ptr<pink::ServerHandle> serverHandle(new VcServerHandle());
     std::unique_ptr<pink::ServerThread> serverThread(
@@ -240,16 +243,13 @@ int vcdb::Application::go() {
     log_info("pidfile: %s, pid: %d", appArgs.pid_file.c_str(), (int) getpid());
     log_info("vcdb server started.");
 
-    SyncRedisMaster syncRedisMaster(server.get(), "127.0.0.1", 6380);
-    syncRedisMaster.StartThread();
-
     while (running.load()) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    syncRedisMaster.StopThread();
-    serverThread->StopThread();
+    delete server->replicationManager;
 
+    serverThread->StopThread();
     log_info("server stopped");
 }
 

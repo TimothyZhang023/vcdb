@@ -32,7 +32,6 @@
 #define CMD_MODULE_NO_CLUSTER (1<<15) /* Deny on Redis Cluster. */
 
 
-
 typedef int redisCommandProc(ClientContext &ctx, const Request &req, Response *resp);
 
 typedef int *redisGetKeysProc(struct redisCommand *cmd, const Request &req, int *numkeys);
@@ -236,6 +235,7 @@ static struct redisCommand redisCommandTable[] = {
 //        {"latency",          proc_latency,          -2, "aslt", 0, NULL, 0, 0,  0, 0, 0},
 
 //        {"filesize",         proc_filesize,         1,  "rF",  0, NULL, 0, 0,  0, 0, 0}
+        {"slaveof",          proc_slaveof,          3,  "a",   0, NULL, 0, 0,  0, 0, 0}
 
 };
 

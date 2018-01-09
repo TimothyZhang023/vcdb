@@ -13,6 +13,8 @@ class SSDB;
 
 class SSDBImpl;
 
+class ReplicationManager;
+
 const int SERVER_RUNNING = (1 << 0);
 const int SERVER_LOADING = (1 << 1);
 const int SERVER_CLOSE = (1 << 2);
@@ -28,6 +30,8 @@ public:
     ~ServerContext() = default;
 
     SSDBImpl *db = nullptr;
+
+    ReplicationManager *replicationManager = nullptr;
 
     vcdb::ProcMap procMap;
 

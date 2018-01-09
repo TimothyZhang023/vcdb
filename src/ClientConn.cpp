@@ -18,6 +18,7 @@ vcdb::VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::Serve
     server = static_cast<ServerContext *>(worker_specific_data);
     ctx = new ClientContext();
     ctx->db = server->db;
+    ctx->replicationManager = server->replicationManager;
 }
 
 vcdb::VcClientConn::~VcClientConn() {

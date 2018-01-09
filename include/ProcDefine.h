@@ -218,5 +218,7 @@ DEF_PROC(ssdb_scan);
 
 DEF_PROC(ssdb_dbsize);
 
+DEF_PROC(slaveof);
+
 
 #endif //VCDB_PROCS_H

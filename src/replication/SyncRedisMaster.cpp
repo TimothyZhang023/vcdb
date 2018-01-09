@@ -132,25 +132,6 @@ void *SyncRedisMaster::ThreadMain() {
 
             }
 
-//            size = master_client->BufferRead();
-//            while (true) {
-//                if (size > 0) {
-//                    auto buf = master_client->ReadBytes(static_cast<unsigned int>(size));
-//                    if (buf != nullptr) {
-//                        std::string sbuf(buf, static_cast<unsigned long>(size));
-//                        log_info ("sbuf<%d> :%s", size, hexcstr(sbuf));
-//
-//                        size = master_client->BufferRead();
-//                        log_info ("got :%d bytes", size);
-//                        rdb_size = rdb_size - size;
-//                    }
-//                } else {
-//                    log_error("read %d", size);
-//                    break;
-//                }
-//            }
-
-
             sleep(2000);
 
         }
