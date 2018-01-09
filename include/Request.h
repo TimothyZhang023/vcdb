@@ -23,6 +23,16 @@ std::string RestoreRequest(const std::vector<T> &req) {
 }
 
 template<typename T>
+std::string InlineRequest(const std::vector<T> &req) {
+    std::string ori_request;
+    for_each(req.begin(), req.end(), [&](T s) {
+        ori_request.append(s.data(), s.size()).append(" ");
+    });
+
+    return ori_request;
+}
+
+template<typename T>
 std::string SerializeRequest(T &req) {
     std::string ret;
     char buf[50];

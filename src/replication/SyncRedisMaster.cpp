@@ -31,23 +31,124 @@ void *SyncRedisMaster::ThreadMain() {
         if (result.ok()) {
             std::string cmd;
 
-            cmd = RestoreRequest(std::vector<std::string>{"SYNC"});
+            std::string my_id = "0";
+            std::string offset = "0";
+
+            cmd = RestoreRequest(std::vector<std::string>{"PSYNC", my_id, offset});
             master_client->Send(&cmd);
 
-            auto size = master_client->BufferRead();
-            log_info ("got :%d bytes", size);
+            pink::RedisCmdArgsType res;
+            s = master_client->Recv(&res);
+            if (res.empty()) {
+                //error
+                break;
+            }
 
-            while (size > 0) {
-                auto buf = master_client->ReadBytes(static_cast<unsigned int>(size));
+            std::string next = res[0];
+            std::vector<std::string> v_res = strsplit(next, " ");
+            if (v_res.size() < 3) {
+                //error
+                break;
+            }
 
-                if (buf != nullptr) {
-                    std::string sbuf(buf, static_cast<unsigned long>(size));
-                    log_info ("sbuf :%s", hexcstr(sbuf));
+            std::string next_action = v_res[0];
+            my_id = v_res[1];
+            offset = v_res[2];
+            log_info ("%s", hexcstr(InlineRequest(v_res)));
 
+
+            int64_t rdb_size = 0;
+            {
+                auto size = master_client->BufferRead();
+                if (size <= 0) {
+                    break;
+                }
+
+                auto buf = master_client->ReadBytes(1);
+                char *p;
+                int len;
+
+                if ((p = master_client->ReadLine(&len)) == nullptr) {
+                    break;
+                }
+                std::string arg(p, len);
+                rdb_size = str_to_int64(arg);
+                log_info ("rdb: %d", rdb_size);
+            }
+
+
+            auto size = rdb_size;
+            while (true) {
+                if (rdb_size == 0) {
+                    break;
+                }
+                if (size > 0) {
+                    auto buf = master_client->ReadBytes(static_cast<unsigned int>(size));
+                    if (buf != nullptr) {
+                        std::string sbuf(buf, static_cast<unsigned long>(size));
+                        log_info ("sbuf<%d> :%s", size, hexcstr(sbuf));
+                        log_info ("got :%d bytes", size);
+                        rdb_size = rdb_size - size;
+                    }
                     size = master_client->BufferRead();
-                    log_info ("got :%d bytes", size);
+
+                } else {
+                    log_error("read %d", size);
+                    break;
                 }
             }
+
+            if (rdb_size != 0) {
+                break;
+            }
+
+
+            while (true) {
+                s = master_client->Recv(&res);
+                if (!s.ok()) {
+                    log_error("%s ", s.ToString().c_str());
+                    break;
+                }
+                if (res.empty()) {
+                    //error
+                    break;
+                }
+
+                log_info ("%s", hexcstr(InlineRequest(res)));
+
+                for (const auto &r : res) {
+                    if (r == "PING") {
+                        cmd = RestoreRequest(std::vector<std::string>{"PING"});
+                        master_client->Send(&cmd);
+                    }
+
+                    if (r == "PONG") {
+//                        cmd = RestoreRequest(std::vector<std::string>{"PING"});
+//                        master_client->Send(&cmd);
+                    }
+
+                }
+
+
+            }
+
+//            size = master_client->BufferRead();
+//            while (true) {
+//                if (size > 0) {
+//                    auto buf = master_client->ReadBytes(static_cast<unsigned int>(size));
+//                    if (buf != nullptr) {
+//                        std::string sbuf(buf, static_cast<unsigned long>(size));
+//                        log_info ("sbuf<%d> :%s", size, hexcstr(sbuf));
+//
+//                        size = master_client->BufferRead();
+//                        log_info ("got :%d bytes", size);
+//                        rdb_size = rdb_size - size;
+//                    }
+//                } else {
+//                    log_error("read %d", size);
+//                    break;
+//                }
+//            }
 
 
             sleep(2000);

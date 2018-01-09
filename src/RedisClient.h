@@ -45,6 +45,8 @@ namespace vcdb {
 
         char *ReadBytes(unsigned int bytes);
 
+        char *ReadLine(int *_len);
+
     private:
 
         pink::RedisCmdArgsType argv_;   // The parsed result
@@ -67,7 +69,6 @@ namespace vcdb {
         int ProcessMultiBulkItem();
 
 
-        char *ReadLine(int *_len);
 
         // No copyable
         RedisClient(const RedisClient &);

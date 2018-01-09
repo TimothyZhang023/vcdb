@@ -142,6 +142,9 @@ set(HEADERS_FILES
         include/ProcMap.h
         include/ProcDefine.h
 
+        include/RedisResponse.h
+        include/RedisJob.h
+
         )
 
 
