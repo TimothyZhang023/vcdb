@@ -12,13 +12,13 @@
 #include <proc/proc_common.h>
 
 #include "pink/include/redis_conn.h"
+#include "pika/pika_binlog.h"
 
 
 #include "Application.h"
 #include "ClientConn.h"
 #include "ServerContext.hpp"
 #include "util/daemon.h"
-#include "Binlog.h"
 
 namespace vcdb {
 
@@ -133,7 +133,7 @@ int vcdb::Application::Init() {
         std::string log_level_;
         int64_t log_rotate_size;
 
-        log_level_ = conf->get_str("logger.level", "debug");
+        log_level_ = conf->get_str("logger.level", "info");
         strtolower(&log_level_);
         int level = Logger::get_level(log_level_.c_str());
 
@@ -220,7 +220,7 @@ int vcdb::Application::go() {
         exit(1);
     }
 
-    std::unique_ptr<vcdb::Binlog> binlog(new vcdb::Binlog());
+    std::unique_ptr<Binlog> binlog(new Binlog(data_db_dir + "/log"));
 
     std::unique_ptr<ServerContext> server(new ServerContext(data_db.get(), binlog.get()));
 

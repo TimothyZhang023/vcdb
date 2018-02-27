@@ -1,9 +1,9 @@
 //
 // Created by zts on 12/18/17.
 //
-#include <Binlog.h>
 #include "slash/include/slash_string.h"
 #include "slash/include/env.h"
+#include "pika/pika_binlog.h"
 
 #include "ClientConn.h"
 #include "RedisJob.h"
@@ -70,7 +70,7 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
     }
 
     if (cmd->flags & CMD_WRITE) {
-        binlog->mutex_record_.Lock(key);
+        binlog->LockKey(key);
     }
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
@@ -90,12 +90,13 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
     }
 
     if (cmd->flags & CMD_WRITE) {
+        binlog->Lock();
         if (!(request.response.getStatus() & RESP_ERR)) {
             log_debug("write success %s", hexcstr(RestoreRequest(request.req)));
             binlog->Put(RestoreRequest(request.req));
         }
-
-        binlog->mutex_record_.Unlock(key);
+        binlog->UnlockKey(key);
+        binlog->Unlock();
     }
 
 

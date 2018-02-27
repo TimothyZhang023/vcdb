@@ -39,6 +39,7 @@ SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/build")
 INCLUDE_DIRECTORIES(
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/3rdpart
 
         ${SLASH_PATH}/
         ${PINK_PATH}/
@@ -63,14 +64,22 @@ LINK_DIRECTORIES(
 )
 
 
+SET(PIKA_OBJS
+        src/3rdpart/pika/pika_binlog.h
+        src/3rdpart/pika/pika_binlog.cc
+        src/3rdpart/pika/pika_define.h)
+ADD_LIBRARY(libpika STATIC ${PIKA_OBJS})
+set_target_properties(libpika PROPERTIES LINKER_LANGUAGE CXX OUTPUT_NAME "pika")
+
+
 SET(RDB_OBJS
-        src/redis/ziplist.c
-        src/redis/intset.c
-        src/redis/lzf_c.c
-        src/redis/lzf_d.c
-        src/redis/endianconv.c
-        src/redis/zmalloc.c
-        src/redis/sha1.c
+        src/3rdpart/redis/ziplist.c
+        src/3rdpart/redis/intset.c
+        src/3rdpart/redis/lzf_c.c
+        src/3rdpart/redis/lzf_d.c
+        src/3rdpart/redis/endianconv.c
+        src/3rdpart/redis/zmalloc.c
+        src/3rdpart/redis/sha1.c
         )
 ADD_LIBRARY(librdb STATIC ${RDB_OBJS})
 set_target_properties(librdb PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11 OUTPUT_NAME "rdb")
@@ -133,7 +142,6 @@ set(UTIL_SOURCE_FILES
 
 set(HEADERS_FILES
         include/Constant.h
-        include/Binlog.h
         include/ClientContext.hpp
         include/ServerContext.hpp
         include/Commands.h
@@ -154,9 +162,9 @@ set(SOURCE_FILES ${HEADERS_FILES} ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} $
 
         src/common/ProcMap.cpp
 
-        src/Binlog.cpp)
+)
 
 
 add_executable(vcdb ${SOURCE_FILES})
 
-TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb librdb snappy z bz2 libcrcspeed)
+TARGET_LINK_LIBRARIES(vcdb pink slash jemalloc pthread rocksdb libpika librdb snappy z bz2 libcrcspeed)
