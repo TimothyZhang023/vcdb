@@ -162,7 +162,7 @@ set(SOURCE_FILES ${HEADERS_FILES} ${CODEC_SOURCE_FILES} ${SWAPDB_SOURCE_FILES} $
 
         src/common/ProcMap.cpp
 
-)
+        src/BinlogManager.cpp src/BinlogManager.h)
 
 
 add_executable(vcdb ${SOURCE_FILES})

@@ -11,6 +11,7 @@
 #include <util/file.h>
 #include "AppArgs.h"
 
+class BinlogManager;
 class Config;
 
 namespace vcdb {
@@ -32,6 +33,8 @@ namespace vcdb {
         int Run();
 
         int Init();
+
+        int CronTask(BinlogManager *bm);
 
         void SignalSetup();
 

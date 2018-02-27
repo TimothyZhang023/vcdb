@@ -138,7 +138,7 @@ Binlog::Binlog(const std::string& binlog_path, const int file_size) :
 
     uint64_t filesize = queue_->Filesize();
     log_info("Binlog: filesize is  %d", filesize);
-    }
+  }
 
   InitLogFile();
 }

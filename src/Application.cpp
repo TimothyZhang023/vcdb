@@ -19,6 +19,7 @@
 #include "ClientConn.h"
 #include "ServerContext.hpp"
 #include "util/daemon.h"
+#include "BinlogManager.h"
 
 namespace vcdb {
 
@@ -220,7 +221,9 @@ int vcdb::Application::go() {
         exit(1);
     }
 
-    std::unique_ptr<Binlog> binlog(new Binlog(data_db_dir + "/log"));
+    std::string b_dir = data_db_dir + "/log/";
+    std::unique_ptr<Binlog> binlog(new Binlog(b_dir, 32 * 1024 * 1024));
+    std::unique_ptr<BinlogManager> bm(new BinlogManager(binlog.get(), b_dir, 2, 1));
 
     std::unique_ptr<ServerContext> server(new ServerContext(data_db.get(), binlog.get()));
 
@@ -243,7 +246,16 @@ int vcdb::Application::go() {
     log_info("vcdb server started.");
 
     while (running.load()) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        int i = 0;
+        while (running.load() && i++ < 10) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+        if (running.load()) {
+            CronTask(bm.get());
+        }
+
     }
 
     serverThread->StopThread();
@@ -263,6 +275,14 @@ vcdb::Application::~Application() {
         delete conf;
         conf = nullptr;
     }
+}
+
+int vcdb::Application::CronTask(BinlogManager *bm) {
+    //purge log
+
+    bm->PurgeFiles(0, false, false);
+
+    return 0;
 }
 
 
