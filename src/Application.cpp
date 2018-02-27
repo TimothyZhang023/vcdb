@@ -18,6 +18,7 @@
 #include "ClientConn.h"
 #include "ServerContext.hpp"
 #include "util/daemon.h"
+#include "Binlog.h"
 
 namespace vcdb {
 
@@ -219,7 +220,9 @@ int vcdb::Application::go() {
         exit(1);
     }
 
-    std::unique_ptr<ServerContext> server(new ServerContext(data_db.get()));
+    std::unique_ptr<vcdb::Binlog> binlog(new vcdb::Binlog());
+
+    std::unique_ptr<ServerContext> server(new ServerContext(data_db.get(), binlog.get()));
 
     log_info("vcdb server starting on 0.0.0.0:%d", appArgs.port);
 

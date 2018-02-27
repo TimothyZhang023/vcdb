@@ -1,6 +1,7 @@
 //
 // Created by zts on 12/18/17.
 //
+#include <Binlog.h>
 #include "slash/include/slash_string.h"
 #include "slash/include/env.h"
 
@@ -16,6 +17,7 @@ vcdb::VcClientConn::VcClientConn(int fd, const std::string &ip_port, pink::Serve
         : pink::RedisConn(fd, ip_port, thread) {
 
     server = static_cast<ServerContext *>(worker_specific_data);
+    binlog = server->binlog;
     ctx = new ClientContext();
     ctx->db = server->db;
 }
@@ -62,6 +64,14 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
         return -2;
     }
 
+    std::string key;
+    if (argv.size() > 1) {
+        key = argv[1];
+    }
+
+    if (cmd->flags & CMD_WRITE) {
+        binlog->mutex_record_.Lock(key);
+    }
 
     int result = (*cmd->proc)(*ctx, request.req, &(request.response));
 
@@ -79,9 +89,13 @@ int vcdb::VcClientConn::DealMessage(pink::RedisCmdArgsType &argv, std::string *r
                   time_proc, SerializeRequest(request.req).c_str(), hexcstr(*response));
     }
 
-    if ((cmd->flags & CMD_WRITE) && !(request.response.getStatus() & RESP_ERR)) {
-        log_debug("write success %s", hexcstr(RestoreRequest(request.req)));
-        //TODO cmd write ok send to slave
+    if (cmd->flags & CMD_WRITE) {
+        if (!(request.response.getStatus() & RESP_ERR)) {
+            log_debug("write success %s", hexcstr(RestoreRequest(request.req)));
+            binlog->Put(RestoreRequest(request.req));
+        }
+
+        binlog->mutex_record_.Unlock(key);
     }
 
 

@@ -6,4 +6,7 @@
 
 namespace vcdb {
 
+    int Binlog::Put(const std::string &content) {
+        return 0;
+    }
 }

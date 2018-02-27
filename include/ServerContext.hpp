@@ -13,14 +13,19 @@ class SSDB;
 
 class SSDBImpl;
 
+namespace vcdb {
+    class Binlog;
+}
+
 const int SERVER_RUNNING = (1 << 0);
 const int SERVER_LOADING = (1 << 1);
 const int SERVER_CLOSE = (1 << 2);
 
 class ServerContext {
 public:
-    ServerContext(SSDB *ssdb) {
+    ServerContext(SSDB *ssdb, vcdb::Binlog* binlog) {
         this->db = (SSDBImpl *) ssdb;
+        this->binlog = binlog;
         this->regProcs();
         this->status = SERVER_RUNNING;
     }
@@ -28,6 +33,8 @@ public:
     ~ServerContext() = default;
 
     SSDBImpl *db = nullptr;
+
+    vcdb::Binlog *binlog = nullptr;
 
     vcdb::ProcMap procMap;
 

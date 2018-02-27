@@ -11,6 +11,7 @@
 
 class ServerContext;
 class ClientContext;
+class Binlog;
 
 namespace vcdb {
 
@@ -28,6 +29,7 @@ namespace vcdb {
 
     private:
 
+        Binlog *binlog = nullptr;
         ServerContext *server = nullptr;
         ClientContext *ctx = nullptr;
     };
