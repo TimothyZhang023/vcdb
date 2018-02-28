@@ -12,9 +12,25 @@
 #include "AppArgs.h"
 
 class BinlogManager;
+
 class Config;
 
+class SSDB;
+
+class Binlog;
+
 namespace vcdb {
+
+    class ApplicationContextContainer {
+    public:
+        ApplicationContextContainer() = default;
+
+        SSDB *ssdb;
+        Binlog *binlog;
+        BinlogManager *bm;
+
+
+    };
 
     static std::atomic<bool> running(false);
 
@@ -34,9 +50,11 @@ namespace vcdb {
 
         int Init();
 
-        int CronTask(BinlogManager *bm);
+        int CronTask();
 
         void SignalSetup();
+
+        ApplicationContextContainer container;
 
     private:
         int usage(int argc, char **argv);

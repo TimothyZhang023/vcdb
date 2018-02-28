@@ -185,6 +185,7 @@ int vcdb::Application::go() {
     option.load(conf);
 
     std::string data_db_dir = appArgs.work_dir;
+    std::string binlog_dir = data_db_dir + "/log/";
 
 //    log_info("vcdb-server %s", APP_VERSION);
 //    log_info("build_version %s", APP_GIT_BUILD);
@@ -221,11 +222,19 @@ int vcdb::Application::go() {
         exit(1);
     }
 
-    std::string b_dir = data_db_dir + "/log/";
-    std::unique_ptr<Binlog> binlog(new Binlog(b_dir, 32 * 1024 * 1024));
-    std::unique_ptr<BinlogManager> bm(new BinlogManager(binlog.get(), b_dir, 2, 1));
-
+    std::unique_ptr<Binlog> binlog(new Binlog(binlog_dir, 32 * 1024 * 1024));
+    std::unique_ptr<BinlogManager> bm(new BinlogManager(binlog.get(), binlog_dir, 2, 1));
     std::unique_ptr<ServerContext> server(new ServerContext(data_db.get(), binlog.get()));
+
+
+
+    {
+        //fill container
+        container.ssdb = data_db.get();
+        container.binlog = binlog.get();
+        container.bm = bm.get();
+    }
+
 
     log_info("vcdb server starting on 0.0.0.0:%d", appArgs.port);
 
@@ -253,7 +262,7 @@ int vcdb::Application::go() {
         }
 
         if (running.load()) {
-            CronTask(bm.get());
+            CronTask();
         }
 
     }
@@ -277,10 +286,10 @@ vcdb::Application::~Application() {
     }
 }
 
-int vcdb::Application::CronTask(BinlogManager *bm) {
+int vcdb::Application::CronTask() {
     //purge log
 
-    bm->PurgeFiles(0, false, false);
+    container.bm->PurgeFiles(0, false, false);
 
     return 0;
 }
